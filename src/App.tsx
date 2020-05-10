@@ -1,9 +1,18 @@
 import React from 'react';
+import { Switch, Route } from 'react-router-dom';
+
 import Map from './components/map/map';
-import './App.css';
+import AddPlace from './components/add-place/add-place';
 
 const App = () => {
-	return <Map />;
+	return (
+		<>
+			<Route path='/map' component={Map} />
+			<Switch>
+				<Route path='/map/add-place' exact component={AddPlace} />
+			</Switch>
+		</>
+	);
 };
 
 export default App;

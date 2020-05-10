@@ -11,7 +11,7 @@ const Wrapper = styled.div`
 const Map = () => {
 	return (
 		<Wrapper>
-			<SideBar />
+			{/* <SideBar /> */}
 			<LeafletMap />;
 		</Wrapper>
 	);

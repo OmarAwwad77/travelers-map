@@ -12,16 +12,16 @@ import {
 	PolylineCoordinates,
 	Feature,
 	PolygonCoordinates,
+	CreatedEvent,
 } from 'react-leaflet-draw';
+import { Layer } from 'leaflet';
 import DropDown from '../drop-down/drop-down';
-import { v4 as uuidv4 } from 'uuid';
 import { ReactComponent as SaveIcon } from '../../assets/icons/save.svg';
 import { db } from '../../firebase/firebase.utils';
 import Popup from '../map-popup/map-popup';
 import {
 	transformFeaturesForMap,
 	transformFeaturesForUpload,
-	getReversedCoords,
 	getMapData,
 } from './leaflet-map.util';
 import { MapStyle, getMapStyle } from './leaflet-map.themes';
@@ -35,6 +35,32 @@ let editableFG: null | FeatureGroup = null;
 const LeafletMap = () => {
 	const [mapStyle, setMapStyle] = useState<MapStyle>('Light');
 	const [geoJson, setGeoJson] = useState<StateType>(initialGeoState);
+
+	useEffect(() => {
+		const newMarkerAdded: boolean =
+			geoJson.features[geoJson.features.length - 1]?.geometry.type === 'Point';
+
+		if (newMarkerAdded) {
+			const markersArr = geoJson.features.filter(
+				(feature) => feature.geometry.type === 'Point'
+			);
+			const lastMarker = markersArr[markersArr.length - 1];
+			const lastMarkerCoords = lastMarker?.geometry.coordinates;
+
+			if (editableFG) {
+				const FG = editableFG.leafletElement;
+				FG.eachLayer((layer: any) => {
+					if (layer._latlngs) return; // only continue if it's a marker
+					if (
+						layer._latlng.lat === lastMarkerCoords[0] &&
+						layer._latlng.lng === lastMarkerCoords[1]
+					) {
+						layer.openPopup();
+					}
+				});
+			}
+		}
+	}, [geoJson]);
 
 	useEffect(() => {
 		const fetchMapData = async () => {
@@ -52,7 +78,7 @@ const LeafletMap = () => {
 			}
 		};
 
-		fetchMapData();
+		// fetchMapData();
 	}, []);
 
 	const onFeatureGroupReady = (reactFGref: FeatureGroup) => {
@@ -81,19 +107,21 @@ const LeafletMap = () => {
 		alert('check firebase');
 	};
 
-	const onMarkerCreated = () => {
+	const onMarkerCreated = (e: CreatedEvent) => {
 		if (!editableFG) {
 			return;
 		}
-		const FG = editableFG.leafletElement;
-		setGeoJson(getMapData(FG, geoJson));
+		if (e.layerType === 'marker') {
+			const FG = editableFG.leafletElement;
+			setGeoJson(getMapData(FG, geoJson));
+		}
 	};
 
 	return (
 		<Wrapper>
 			<Map center={[51.51, -0.06]} zoom={5}>
 				{getMapStyle(mapStyle)}
-				<FeatureGroup key={uuidv4()} ref={onFeatureGroupReady}>
+				<FeatureGroup key={Date.now()} ref={onFeatureGroupReady}>
 					<EditControl
 						onCreated={onMarkerCreated}
 						position='topright'
@@ -141,10 +169,7 @@ const mapGeoJsonToLayers = ({
 					key={properties!.id}
 					position={coordinates as MarkerCoordinates}
 				>
-					<Popup
-						url={'https://i.picsum.photos/id/866/400/300.jpg'}
-						layerId={properties!.id}
-					></Popup>
+					<Popup url={undefined} layerId={undefined}></Popup>
 				</Marker>
 			);
 

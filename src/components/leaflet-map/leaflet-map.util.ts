@@ -58,7 +58,6 @@ export const transformFeaturesForMap = (features: Feature[]): Feature[] =>
 export const getMapData = (FG: FeatureGroup, state: StateType): StateType => {
 	const ids: number[] = [];
 	FG.eachLayer((layer: any) => {
-		console.log(layer);
 		ids.push(layer._leaflet_id);
 	});
 
