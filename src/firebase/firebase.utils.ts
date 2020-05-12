@@ -1,5 +1,6 @@
 import firebase from 'firebase/app';
 import 'firebase/auth';
+import 'firebase/storage';
 import 'firebase/firestore';
 
 const config = {
@@ -16,18 +17,61 @@ firebase.initializeApp(config);
 
 export const db = firebase.firestore();
 export const auth = firebase.auth();
+export const storageRef = firebase.storage().ref();
 
-// features {
-//   userId
-//   features: [
-//     { // Feature
-//       geometry:{ // Geometry
-//         type, // Geometry from geojson as GeometryType
-//         coordinates:[ // []
+export const uploadImage = (file: File) => {
+	return new Promise<string>(async (resolve) => {
+		const snapshot = await storageRef.child(`images/${Date.now()}`).put(file);
 
-//         ]
-//       },
+		const url = await snapshot.task.snapshot.ref.getDownloadURL();
+		resolve(url);
+	});
+};
 
-//     }
-//   ]
-// }
+interface PlaceToAdd {
+	tripId?: string;
+	tripName: string;
+	userId: string;
+	placeId: string;
+	coords: number[];
+	placeDesc: string;
+	placeImages: string[];
+}
+export const addPlace = async (place: PlaceToAdd) => {
+	try {
+		const trip = {
+			tripName: place.tripName,
+			userId: place.userId,
+			places: [
+				{
+					placeId: place.placeId,
+					placeDesc: place.placeDesc,
+					coords: place.coords,
+					placeImages: place.placeImages,
+				},
+			],
+		};
+		await db.collection('trips').add(trip);
+
+		console.log('place added', place);
+	} catch (error) {
+		console.log('error adding a place', place);
+	}
+};
+
+// trips:{
+// 	trip:
+// 		{
+// 			tripName:// got it
+// 			userId //got it
+// 			places:[
+// 				{
+// 					id:// got it
+// 					coords:// got it
+// 					placeDesc: //got it
+// 					images: []// got it
+// 				}
+// 			]
+// 		}
+
+// 		}

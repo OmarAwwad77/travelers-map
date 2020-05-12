@@ -6,10 +6,9 @@ export const Model = styled.div`
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
-	max-width: 80rem;
 	background-color: #fff;
 	border-radius: 1rem;
-	overflow: hidden;
+	/* overflow: hidden; */
 `;
 
 export const ModelClose = styled.span`

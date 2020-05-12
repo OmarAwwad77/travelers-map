@@ -1,6 +1,7 @@
-import { Feature, StateType } from 'react-leaflet-draw';
+import { Feature, GeoJSON } from 'react-leaflet-draw';
 import { FeatureGroup } from 'leaflet';
 import { Dispatch, SetStateAction } from 'react';
+import { Place } from '../../redux/map/map.types';
 
 type NestedCoords = number[][];
 type FlatCoords = number[];
@@ -55,23 +56,48 @@ export const transformFeaturesForMap = (features: Feature[]): Feature[] =>
 		},
 	}));
 
-export const getMapData = (FG: FeatureGroup, state: StateType): StateType => {
+export const getMapData = (FG: FeatureGroup, state: GeoJSON): GeoJSON => {
 	const ids: number[] = [];
 	FG.eachLayer((layer: any) => {
 		ids.push(layer._leaflet_id);
 	});
 
-	const geoJsonData = FG.toGeoJSON() as StateType;
+	const geoJsonData = FG.toGeoJSON() as GeoJSON;
 
 	return {
 		...geoJsonData,
 		features: geoJsonData.features.map((feature, i) => ({
 			...feature,
-			properties: { id: state.features[i]?.properties?.id ?? ids[i] },
+			properties: {
+				...state.features[i]?.properties,
+				id: state.features[i]?.properties?.id ?? ids[i],
+			},
 			geometry: {
 				...feature.geometry,
 				coordinates: getReversedCoords(feature.geometry.coordinates),
 			},
 		})),
 	};
+};
+
+export const getProperties = (feature: Feature, places: Place[]) => {
+	// if (feature.geometry.coordinates.join(',') === coords.join(',')) {
+	// 	return {
+	// 		...feature.properties,
+	// 		...place,
+	// 	};
+	// } else {
+	// 	return feature.properties;
+	// }
+	const place = places.find(
+		(place) => place.placeId === feature.properties?.id
+	);
+	if (place) {
+		return {
+			...feature.properties,
+			...place,
+		};
+	} else {
+		return feature.properties;
+	}
 };

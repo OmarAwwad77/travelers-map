@@ -61,7 +61,7 @@ declare module 'react-leaflet-draw' {
 		target: LayerExtended;
 	}
 
-	export interface StateType {
+	export interface GeoJSON {
 		type: 'FeatureCollection';
 		features: Feature[];
 	}

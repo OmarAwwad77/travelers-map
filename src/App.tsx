@@ -9,7 +9,7 @@ const App = () => {
 		<>
 			<Route path='/map' component={Map} />
 			<Switch>
-				<Route path='/map/add-place' exact component={AddPlace} />
+				<Route path='/map/add-place/:id/:coords' exact component={AddPlace} />
 			</Switch>
 		</>
 	);

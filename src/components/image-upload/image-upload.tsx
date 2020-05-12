@@ -1,4 +1,4 @@
-import React, { ChangeEvent, MouseEvent } from 'react';
+import React, { ChangeEvent } from 'react';
 
 import {
 	Wrapper,
@@ -6,18 +6,19 @@ import {
 	ImagePreviewOverlay,
 	ImageUploadIcon,
 	ErrorMessage,
+	ImageUploadWrapper,
+	Spinner,
 } from './image-upload.styles';
 import { ReactComponent as Plus } from '../../assets/icons/plus.svg';
-// import Spinner from '../../../UI/Spinner/Spinner';
 
 interface OwnProps {
 	inputId: string;
-	url?: string;
+	url: string;
 	loading: boolean;
-	errorMessage?: string;
+	errorMessage: string | null;
 	onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 	onCancel: () => void;
-	onSwitch: () => void;
+	onSwitch?: () => void;
 }
 type Props = OwnProps;
 const ImageUpload: React.FC<Props> = ({
@@ -37,33 +38,35 @@ const ImageUpload: React.FC<Props> = ({
 	}
 	return (
 		<Wrapper>
-			{loading ? (
-				<div>loading...</div>
-			) : (
-				<>
-					<input id={inputId} type='file' onChange={(e) => onChange(e)} />
-					{url ? (
-						<ImagePreview url={url}>
-							<ImagePreviewOverlay>
-								<a onClick={onCancel}>Cancel</a>
+			<ImageUploadWrapper withUrl={!!url}>
+				{loading ? (
+					<Spinner />
+				) : (
+					<>
+						<input id={inputId} type='file' onChange={onChange} />
+						{url ? (
+							<ImagePreview url={url}>
+								<ImagePreviewOverlay>
+									<a onClick={onCancel}>Cancel</a>
 
-								<label onClick={onSwitch} htmlFor={inputId}>
-									Change
-								</label>
-							</ImagePreviewOverlay>
-						</ImagePreview>
-					) : (
-						<>
-							<ImageUploadIcon htmlFor={inputId}>
-								<Plus width='100%' height='100%' />
-							</ImageUploadIcon>
-							<span>{text}</span>
-							<span style={{ whiteSpace: 'pre-line' }}>{requiredText}</span>
-						</>
-					)}
-					<ErrorMessage>{errorMessage}</ErrorMessage>
-				</>
-			)}
+									<label onClick={onSwitch} htmlFor={inputId}>
+										Change
+									</label>
+								</ImagePreviewOverlay>
+							</ImagePreview>
+						) : (
+							<>
+								<ImageUploadIcon htmlFor={inputId}>
+									<Plus width='100%' height='100%' />
+								</ImageUploadIcon>
+								<span>{text}</span>
+								<span style={{ whiteSpace: 'pre-line' }}>{requiredText}</span>
+							</>
+						)}
+					</>
+				)}
+			</ImageUploadWrapper>
+			<ErrorMessage>{errorMessage}</ErrorMessage>
 		</Wrapper>
 	);
 };
