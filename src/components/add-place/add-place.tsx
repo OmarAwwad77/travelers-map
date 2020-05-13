@@ -1,6 +1,7 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
+import { createStructuredSelector } from 'reselect';
 import { useHistory, useParams } from 'react-router-dom';
 
 import {
@@ -24,7 +25,9 @@ import {
 } from './add-place.util';
 import { storageRef, uploadImage } from '../../firebase/firebase.utils';
 import { StoreActions, addPlace, addTrip } from '../../redux/root.actions';
-import { Place, Trip } from '../../redux/map/map.types';
+import { Place, Trip, Coords } from '../../redux/map/map.types';
+import { AppState } from '../../redux/root.reducer';
+import { selectTrips } from '../../redux/map/map.selectors';
 
 export type Ids = 'main' | 'extra1';
 export type ImageUpload = {
@@ -34,19 +37,23 @@ export type ImageUpload = {
 	loading: boolean;
 	errorMessage: string | null;
 };
-const options = ['paris', 'amsterdam', 'london'];
+
 const defaultOption = 'choose a trip';
 
 interface OwnProps {}
 
-interface LinkDispatchProps {
+interface LinkDispatchToProps {
 	addPlace: typeof addPlace;
 	addTrip: typeof addTrip;
 }
+interface LinkStateToProps {
+	trips: Trip[];
+}
 
-type Props = OwnProps & LinkDispatchProps;
-const AddPlace: React.FC<Props> = ({ addPlace, addTrip }) => {
+type Props = OwnProps & LinkDispatchToProps & LinkStateToProps;
+const AddPlace: React.FC<Props> = ({ addPlace, addTrip, trips }) => {
 	const [tripDropdown, setTripDropdown] = useState(defaultOption);
+	const [tripOptions, setTripOptions] = useState<string[]>([]);
 	const [tripInput, setTripInput] = useState('');
 	const [placeName, setPlaceName] = useState('');
 	const [description, setDescription] = useState('');
@@ -83,6 +90,10 @@ const AddPlace: React.FC<Props> = ({ addPlace, addTrip }) => {
 			setIsFormValid(true);
 		}
 	}, [imageUploads, description, tripInput, tripDropdown, placeName]);
+
+	useEffect(() => {
+		setTripOptions(trips.map((trip) => trip.tripName));
+	}, [trips]);
 
 	const { goBack } = useHistory();
 	const { id, coords } = useParams<{
@@ -192,18 +203,24 @@ const AddPlace: React.FC<Props> = ({ addPlace, addTrip }) => {
 			promises.push(uploadImage(file));
 		});
 		Promise.all([...promises]).then((urls) => {
-			const tripId = Date.now();
+			let tripId: number = Date.now();
 
-			addTrip({
-				id: tripId,
-				tripName: tripInput,
-			});
+			if (tripInput) {
+				addTrip({
+					tripId: tripId,
+					tripName: tripInput,
+				});
+			} else {
+				tripId = trips.find(
+					(trip) => trip.tripName.trim() === tripDropdown.trim()
+				)?.tripId!;
+			}
 
 			addPlace({
 				placeId,
-				placeCoords,
 				placeName,
 				tripId,
+				placeCoords: placeCoords as Coords,
 				placeDesc: description,
 				placeImages: urls,
 			});
@@ -214,10 +231,10 @@ const AddPlace: React.FC<Props> = ({ addPlace, addTrip }) => {
 		<WithModel backDropOnClick={goBack}>
 			<Wrapper onSubmit={onFormSubmit}>
 				<TripNameWrapper>
-					<DropDownWrapper disabled={!!tripInput}>
+					<DropDownWrapper disabled={!!tripInput || tripOptions.length === 0}>
 						<DropDown
-							disabled={!!tripInput}
-							list={options}
+							disabled={!!tripInput || tripOptions.length === 0}
+							list={tripOptions}
 							value={tripDropdown}
 							onChangeHandler={setTripDropdown}
 						/>
@@ -263,9 +280,17 @@ const AddPlace: React.FC<Props> = ({ addPlace, addTrip }) => {
 
 const mapDispatchToProps = (
 	dispatch: Dispatch<StoreActions>
-): LinkDispatchProps => ({
+): LinkDispatchToProps => ({
 	addPlace: (place: Place) => dispatch(addPlace(place)),
 	addTrip: (trip: Trip) => dispatch(addTrip(trip)),
 });
 
-export default connect(null, mapDispatchToProps)(AddPlace);
+const mapStateToProps = createStructuredSelector<
+	AppState,
+	OwnProps,
+	LinkStateToProps
+>({
+	trips: selectTrips,
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(AddPlace);

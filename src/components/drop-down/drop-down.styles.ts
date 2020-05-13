@@ -52,6 +52,7 @@ export const List = styled.div<{ show: boolean }>`
 	top: 100%;
 	z-index: 5;
 	transition: all 0.3s ease;
+	text-transform: capitalize;
 	opacity: ${(p) => (p.show ? '1' : '0')};
 	visibility: ${(p) => (p.show ? 'visible' : 'hidden')};
 `;

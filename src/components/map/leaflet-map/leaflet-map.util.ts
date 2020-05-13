@@ -1,7 +1,7 @@
 import { Feature, GeoJSON } from 'react-leaflet-draw';
 import { FeatureGroup } from 'leaflet';
 import { Dispatch, SetStateAction } from 'react';
-import { Place } from '../../redux/map/map.types';
+import { Place } from '../../../redux/map/map.types';
 
 type NestedCoords = number[][];
 type FlatCoords = number[];
@@ -71,6 +71,7 @@ export const getMapData = (FG: FeatureGroup, state: GeoJSON): GeoJSON => {
 			properties: {
 				...state.features[i]?.properties,
 				id: state.features[i]?.properties?.id ?? ids[i],
+				placeCoords: getReversedCoords(feature.geometry.coordinates),
 			},
 			geometry: {
 				...feature.geometry,
@@ -89,6 +90,7 @@ export const getProperties = (feature: Feature, places: Place[]) => {
 	// } else {
 	// 	return feature.properties;
 	// }
+	if (feature.geometry.type !== 'Point') return feature.properties;
 	const place = places.find(
 		(place) => place.placeId === feature.properties?.id
 	);

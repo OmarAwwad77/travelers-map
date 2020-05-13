@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
-import { createStructuredSelector } from 'reselect';
-import { AppState } from '../../redux/root.reducer';
-import { MapState } from '../../redux/map/map.types';
-import { selectPlaces, selectTrips } from '../../redux/map/map.selectors';
+import { MapState, MapConfig } from '../../../redux/map/map.types';
 import { Map, FeatureGroup, Marker, Polyline, Polygon } from 'react-leaflet';
+import L from 'leaflet';
 import {
 	DropDownWrapper,
 	Wrapper,
@@ -19,35 +16,45 @@ import {
 	PolygonCoordinates,
 	CreatedEvent,
 } from 'react-leaflet-draw';
-import DropDown from '../drop-down/drop-down';
-import { ReactComponent as SaveIcon } from '../../assets/icons/save.svg';
-import { db } from '../../firebase/firebase.utils';
+import DropDown from '../../drop-down/drop-down';
+import { ReactComponent as SaveIcon } from '../../../assets/icons/save.svg';
 import Popup from '../map-popup/map-popup';
 import {
-	transformFeaturesForMap,
 	transformFeaturesForUpload,
 	getMapData,
 	getProperties,
 } from './leaflet-map.util';
 import { MapStyle, getMapStyle } from './leaflet-map.themes';
 
+import { getPlacesFromFeatures } from '../map.util';
+import { setPlaces } from '../../../redux/root.actions';
+
 export interface Trip {
 	id: number;
 	tripName: string;
 }
 
-interface LinkStateProps extends MapState {}
-interface OwnProps {}
-type Props = LinkStateProps & OwnProps;
+interface OwnProps extends Pick<MapState, 'places'>, MapConfig {
+	onSave: (features: Feature[]) => void;
+	dbFeatures: Feature[];
+	setPlaces: typeof setPlaces;
+}
+type Props = OwnProps;
 
 const initialGeoState: GeoJSON = {
 	type: 'FeatureCollection',
 	features: [],
 };
 let editableFG: null | FeatureGroup = null;
-const userId = '1';
 
-const LeafletMap: React.FC<Props> = ({ places, trips }) => {
+const LeafletMap: React.FC<Props> = ({
+	places,
+	onSave,
+	dbFeatures,
+	zoom,
+	center,
+	setPlaces,
+}) => {
 	const [mapStyle, setMapStyle] = useState<MapStyle>('Light');
 	const [geoJson, setGeoJson] = useState<GeoJSON>(initialGeoState);
 
@@ -59,7 +66,8 @@ const LeafletMap: React.FC<Props> = ({ places, trips }) => {
 				properties: getProperties(feature, places),
 			})),
 		});
-	}, [places, trips]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [places]);
 
 	useEffect(() => {
 		const newMarkerAdded: boolean =
@@ -72,7 +80,7 @@ const LeafletMap: React.FC<Props> = ({ places, trips }) => {
 			const lastMarker = markersArr[markersArr.length - 1];
 			const lastMarkerCoords = lastMarker?.geometry.coordinates;
 
-			if (editableFG) {
+			if (editableFG && !lastMarker.properties?.placeId) {
 				const FG = editableFG.leafletElement;
 				FG.eachLayer((layer: any) => {
 					if (layer._latlngs) return; // only continue if it's a marker
@@ -88,24 +96,24 @@ const LeafletMap: React.FC<Props> = ({ places, trips }) => {
 	}, [geoJson]);
 
 	useEffect(() => {
-		const fetchMapData = async () => {
-			const doc = await db.collection('features').doc('1').get();
+		setGeoJson({
+			...geoJson,
+			features: dbFeatures,
+		});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [dbFeatures]);
 
-			if (doc.exists) {
-				const features = doc.data()?.userFeatures ?? [];
-
-				const transformedFeatures = transformFeaturesForMap(features);
-
-				setGeoJson({
-					...geoJson,
-					features: transformedFeatures,
-				});
-			}
-		};
-
-		fetchMapData();
-	}, []);
-
+	useEffect(() => {
+		if (editableFG) {
+			const FG = editableFG.leafletElement;
+			FG.eachLayer((layer: any) => {
+				if (layer._latlngs) return; // only continue if it's a marker
+				if (Object.values(layer._latlng).toString() === center.toString()) {
+					layer.openPopup();
+				}
+			});
+		}
+	}, [center]);
 	const onFeatureGroupReady = (reactFGref: FeatureGroup) => {
 		if (reactFGref) {
 			editableFG = reactFGref;
@@ -123,12 +131,7 @@ const LeafletMap: React.FC<Props> = ({ places, trips }) => {
 		const transformedFeatures = transformFeaturesForUpload(mapData.features);
 
 		try {
-			await db.collection('features').doc(userId).set({
-				userFeatures: transformedFeatures,
-			});
-			await db.collection('trips').doc(userId).set({
-				userTrips: trips,
-			});
+			onSave(transformedFeatures);
 		} catch (error) {
 			console.log('error saving');
 		}
@@ -146,13 +149,24 @@ const LeafletMap: React.FC<Props> = ({ places, trips }) => {
 		}
 	};
 
+	const onMarkerEdited = (e: any) => {
+		if (!editableFG) {
+			return;
+		}
+		const FG = editableFG.leafletElement;
+		const updatedState = getMapData(FG, geoJson);
+		setGeoJson(updatedState);
+		setPlaces(getPlacesFromFeatures(updatedState.features));
+	};
+
 	return (
 		<Wrapper>
-			<Map center={[51.51, -0.06]} zoom={5}>
+			<Map center={center} zoom={zoom}>
 				{getMapStyle(mapStyle)}
 				<FeatureGroup key={Date.now()} ref={onFeatureGroupReady}>
 					<EditControl
 						onCreated={onMarkerCreated}
+						onEditStop={onMarkerEdited}
 						position='topright'
 						draw={{
 							circle: false,
@@ -185,16 +199,7 @@ const LeafletMap: React.FC<Props> = ({ places, trips }) => {
 	);
 };
 
-const mapStateToProps = createStructuredSelector<
-	AppState,
-	OwnProps,
-	LinkStateProps
->({
-	places: selectPlaces,
-	trips: selectTrips,
-});
-
-export default connect(mapStateToProps)(LeafletMap);
+export default LeafletMap;
 
 const mapGeoJsonToLayers = ({
 	geometry: { type, coordinates },

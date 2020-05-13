@@ -9,3 +9,8 @@ export const selectPlaces = createSelector(
 );
 
 export const selectTrips = createSelector([selectMapState], (map) => map.trips);
+
+export const selectMapConfig = createSelector(
+	[selectMapState],
+	(map) => map.config
+);
