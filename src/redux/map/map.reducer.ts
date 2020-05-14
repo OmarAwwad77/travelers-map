@@ -4,6 +4,7 @@ import { addItem } from './map.util';
 const initialState: MapState = {
 	trips: [],
 	places: [],
+	markerToAdd: null,
 	config: {
 		center: [51.51, -0.06],
 		zoom: 5,
@@ -41,6 +42,13 @@ const mapReducer = (state = initialState, action: MapActions): MapState => {
 				...state,
 				config: action.config,
 			};
+
+		case 'SET_MARKER_TO_ADD':
+			return {
+				...state,
+				markerToAdd: action.markerToAdd,
+			};
+
 		default:
 			return state;
 	}

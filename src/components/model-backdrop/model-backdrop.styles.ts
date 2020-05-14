@@ -8,7 +8,7 @@ export const Model = styled.div`
 	transform: translate(-50%, -50%);
 	background-color: #fff;
 	border-radius: 1rem;
-	/* overflow: hidden; */
+	overflow-y: auto;
 `;
 
 export const ModelClose = styled.span`
@@ -30,6 +30,11 @@ export const ModelClose = styled.span`
 	&::after {
 		transform: rotate(-45deg);
 	}
+`;
+
+export const ModelContent = styled.div`
+	margin: 3rem 1rem 2rem 1rem;
+	max-height: 85vh;
 `;
 
 export const Backdrop = styled.div`

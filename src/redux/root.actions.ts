@@ -6,6 +6,7 @@ export {
 	setTrips,
 	setPlaces,
 	setMapConfig,
+	setMarkerToAdd,
 } from './map/map.actions';
 
 export type StoreActions = MapActions;

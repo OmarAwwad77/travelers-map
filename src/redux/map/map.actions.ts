@@ -1,4 +1,4 @@
-import { Place, Trip, MapActions, MapConfig } from './map.types';
+import { Place, Trip, MapActions, MapConfig, MarkerToAdd } from './map.types';
 
 export const addPlace = (place: Place): MapActions => ({
 	place,
@@ -23,4 +23,9 @@ export const setPlaces = (places: Place[]): MapActions => ({
 export const setMapConfig = (config: MapConfig): MapActions => ({
 	config,
 	type: 'SET_MAP_CONFIG',
+});
+
+export const setMarkerToAdd = (markerToAdd: MarkerToAdd): MapActions => ({
+	markerToAdd,
+	type: 'SET_MARKER_TO_ADD',
 });

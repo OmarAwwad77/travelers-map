@@ -1,59 +1,62 @@
-import React, { Dispatch, SetStateAction } from 'react';
-import styled from 'styled-components';
-import { useHistory, useRouteMatch } from 'react-router-dom';
+import React from 'react';
+import { useHistory, useRouteMatch, Link } from 'react-router-dom';
+import { Place, MarkerToAdd } from '../../../redux/map/map.types';
+import { Popup } from 'react-leaflet';
 
-import { Popup as LeafletPopup } from 'react-leaflet';
+import { connect } from 'react-redux';
+import { StoreActions, setMarkerToAdd } from '../../../redux/root.actions';
+import { Dispatch } from 'redux';
+import {
+	Wrapper,
+	ImgWrapper,
+	AddPlaceLink,
+	PlaceName,
+} from './map-popup.styles';
 
-export const ImgWrapper = styled.div<{ url: string }>`
-	width: 35rem;
-	height: 25rem;
-	background: url(${(p) => p.url}) center/cover no-repeat;
-`;
-
-export const AddPlaceLink = styled.a`
-	cursor: pointer;
-	&:hover {
-		text-decoration: underline;
-	}
-`;
-
-interface Props {
-	url?: string;
-	layerId: number;
-	coords: any[];
+interface LinkDispatchToProps {
+	setMarkerToAdd: typeof setMarkerToAdd;
 }
+interface OwnProps {
+	place?: Place;
+	markerToAdd?: MarkerToAdd;
+}
+type Props = OwnProps & LinkDispatchToProps;
 
-const Popup: React.FC<Props> = ({ url, layerId, coords }) => {
+const MapPopup: React.FC<Props> = ({ place, markerToAdd, setMarkerToAdd }) => {
 	const { path } = useRouteMatch();
 	const { push } = useHistory();
 
 	return (
-		<LeafletPopup minWidth={350}>
-			{url ? (
-				<>
-					<div style={{ display: 'inline-block', margin: '0 auto' }}>
-						{layerId}
-					</div>
-					<ImgWrapper url={url} />
-					<a target='_black' href='https://www.google.com'>
-						click here
-					</a>
-				</>
-			) : (
-				<AddPlaceLink
-					onClick={() => push(`${path}/add-place/${layerId}/${coords}`)}
-				>
-					Add a Place
-				</AddPlaceLink>
-				// <AddPlace
-				// 	coordsArr={coords}
-				// 	placeId={layerId!}
-				// 	setTrips={setTrips}
-				// 	setGeoJson={setGeoJson}
-				// />
-			)}
-		</LeafletPopup>
+		<Popup minWidth={place ? 350 : 105}>
+			<Wrapper withImages={!!place}>
+				{place ? (
+					<>
+						<PlaceName>{place.placeName}</PlaceName>
+						<ImgWrapper url={place.placeImages[0]} />
+						<Link to={`${path}/place-details/${place.placeId}`}>
+							see more...
+						</Link>
+					</>
+				) : (
+					<AddPlaceLink
+						onClick={() => {
+							setMarkerToAdd(markerToAdd!);
+							push(`${path}/add-place`);
+						}}
+					>
+						Add a Place
+					</AddPlaceLink>
+				)}
+			</Wrapper>
+		</Popup>
 	);
 };
 
-export default Popup;
+const mapDispatchToProps = (
+	dispatch: Dispatch<StoreActions>
+): LinkDispatchToProps => ({
+	setMarkerToAdd: (markerToAdd: MarkerToAdd) =>
+		dispatch(setMarkerToAdd(markerToAdd)),
+});
+
+export default connect(null, mapDispatchToProps)(MapPopup);

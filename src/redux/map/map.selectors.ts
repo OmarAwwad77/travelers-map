@@ -14,3 +14,8 @@ export const selectMapConfig = createSelector(
 	[selectMapState],
 	(map) => map.config
 );
+
+export const selectMarkerToAdd = createSelector(
+	[selectMapState],
+	(map) => map.markerToAdd
+);

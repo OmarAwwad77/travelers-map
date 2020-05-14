@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { MapState, MapConfig } from '../../../redux/map/map.types';
+import {
+	MapState,
+	MapConfig,
+	MarkerToAdd,
+	Coords,
+	Place,
+} from '../../../redux/map/map.types';
 import { Map, FeatureGroup, Marker, Polyline, Polygon } from 'react-leaflet';
-import L from 'leaflet';
 import {
 	DropDownWrapper,
 	Wrapper,
@@ -129,7 +134,7 @@ const LeafletMap: React.FC<Props> = ({
 		const mapData = getMapData(FG, geoJson);
 
 		const transformedFeatures = transformFeaturesForUpload(mapData.features);
-
+		console.log(transformedFeatures);
 		try {
 			onSave(transformedFeatures);
 		} catch (error) {
@@ -172,6 +177,7 @@ const LeafletMap: React.FC<Props> = ({
 							circle: false,
 							rectangle: false,
 							circlemarker: false,
+							polygon: false,
 							polyline: {
 								shapeOptions: {
 									opacity: 0.2,
@@ -201,10 +207,21 @@ const LeafletMap: React.FC<Props> = ({
 
 export default LeafletMap;
 
-const mapGeoJsonToLayers = ({
-	geometry: { type, coordinates },
-	properties,
-}: Feature) => {
+const mapGeoJsonToLayers = (feature: Feature) => {
+	const {
+		geometry: { type, coordinates },
+		properties,
+	} = feature;
+	const hasPlace = !!properties?.placeName;
+	const place: Place | false = hasPlace && getPlacesFromFeatures([feature])[0];
+	const markerToAdd: MarkerToAdd | false = !hasPlace && {
+		markerId: properties?.id as number,
+		markerCoords: coordinates as Coords,
+	};
+	const popupProps = {
+		...(place && { place }),
+		...(markerToAdd && { markerToAdd }),
+	};
 	switch (type) {
 		case 'Point':
 			return (
@@ -212,11 +229,7 @@ const mapGeoJsonToLayers = ({
 					key={properties!.id}
 					position={coordinates as MarkerCoordinates}
 				>
-					<Popup
-						coords={coordinates}
-						url={properties?.placeImages?.[0]}
-						layerId={properties!.id}
-					></Popup>
+					<Popup {...popupProps}></Popup>
 				</Marker>
 			);
 

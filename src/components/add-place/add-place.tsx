@@ -2,7 +2,6 @@ import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import { createStructuredSelector } from 'reselect';
-import { useHistory, useParams } from 'react-router-dom';
 
 import {
 	Wrapper,
@@ -23,11 +22,11 @@ import {
 	updateImageUploads,
 	getFileDataUrl,
 } from './add-place.util';
-import { storageRef, uploadImage } from '../../firebase/firebase.utils';
+import { uploadImage } from '../../firebase/firebase.utils';
 import { StoreActions, addPlace, addTrip } from '../../redux/root.actions';
-import { Place, Trip, Coords } from '../../redux/map/map.types';
+import { Place, Trip, Coords, MapState } from '../../redux/map/map.types';
 import { AppState } from '../../redux/root.reducer';
-import { selectTrips } from '../../redux/map/map.selectors';
+import { selectTrips, selectMarkerToAdd } from '../../redux/map/map.selectors';
 
 export type Ids = 'main' | 'extra1';
 export type ImageUpload = {
@@ -46,12 +45,15 @@ interface LinkDispatchToProps {
 	addPlace: typeof addPlace;
 	addTrip: typeof addTrip;
 }
-interface LinkStateToProps {
-	trips: Trip[];
-}
+interface LinkStateToProps extends Pick<MapState, 'trips' | 'markerToAdd'> {}
 
 type Props = OwnProps & LinkDispatchToProps & LinkStateToProps;
-const AddPlace: React.FC<Props> = ({ addPlace, addTrip, trips }) => {
+const AddPlace: React.FC<Props> = ({
+	addPlace,
+	addTrip,
+	trips,
+	markerToAdd,
+}) => {
 	const [tripDropdown, setTripDropdown] = useState(defaultOption);
 	const [tripOptions, setTripOptions] = useState<string[]>([]);
 	const [tripInput, setTripInput] = useState('');
@@ -95,14 +97,8 @@ const AddPlace: React.FC<Props> = ({ addPlace, addTrip, trips }) => {
 		setTripOptions(trips.map((trip) => trip.tripName));
 	}, [trips]);
 
-	const { goBack } = useHistory();
-	const { id, coords } = useParams<{
-		id: string;
-		coords: string;
-	}>();
-
-	const placeId = +id;
-	const placeCoords = coords.split(',').map((val) => +val);
+	const placeId = markerToAdd?.markerId!;
+	const placeCoords = markerToAdd?.markerCoords!;
 
 	const onImageUploadChange = async (
 		e: ChangeEvent<HTMLInputElement>,
@@ -228,7 +224,7 @@ const AddPlace: React.FC<Props> = ({ addPlace, addTrip, trips }) => {
 	};
 
 	return (
-		<WithModel backDropOnClick={goBack}>
+		<WithModel>
 			<Wrapper onSubmit={onFormSubmit}>
 				<TripNameWrapper>
 					<DropDownWrapper disabled={!!tripInput || tripOptions.length === 0}>
@@ -291,6 +287,7 @@ const mapStateToProps = createStructuredSelector<
 	LinkStateToProps
 >({
 	trips: selectTrips,
+	markerToAdd: selectMarkerToAdd,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AddPlace);

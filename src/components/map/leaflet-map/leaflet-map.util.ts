@@ -22,22 +22,27 @@ export const getReversedCoords = (coords: any[]) => {
 	return coords.map((coords) => reverseCords(coords));
 };
 
+const turnNestedArrIntoObj = (arr: any[]) => {
+	let obj: { [key: string]: [] } = {};
+
+	arr.forEach((value, i) => {
+		obj[i] = value;
+	});
+
+	return obj;
+};
+
 export const transformFeaturesForUpload = (features: Feature[]): Feature[] =>
-	features.map((feature: any) => ({
+	features.map((feature) => ({
 		...feature,
 		geometry: {
 			...feature.geometry,
-			coordinates: feature.geometry.coordinates.map((val: any) => {
+			coordinates: feature.geometry.coordinates.map((val) => {
 				if (!Array.isArray(val)) {
 					return val;
 				}
-				let obj: { [key: string]: [] } = {};
 
-				val.forEach((value, i) => {
-					obj[i] = value;
-				});
-
-				return obj;
+				return turnNestedArrIntoObj(val);
 			}),
 		},
 	}));
@@ -71,7 +76,9 @@ export const getMapData = (FG: FeatureGroup, state: GeoJSON): GeoJSON => {
 			properties: {
 				...state.features[i]?.properties,
 				id: state.features[i]?.properties?.id ?? ids[i],
-				placeCoords: getReversedCoords(feature.geometry.coordinates),
+				...(state.features[i]?.properties?.placeCoords && {
+					placeCoords: getReversedCoords(feature.geometry.coordinates),
+				}),
 			},
 			geometry: {
 				...feature.geometry,

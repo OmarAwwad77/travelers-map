@@ -17,7 +17,6 @@ import { Dispatch } from 'redux';
 import { StoreActions, setTrips, setPlaces } from '../../redux/root.actions';
 import SideBar, { SideBarTrip } from '../side-bar/side-bar';
 import { getSideBarTrips, getPlacesFromFeatures } from './map.util';
-import { FeatureGroup } from 'react-leaflet';
 
 const Wrapper = styled.div`
 	position: relative;
@@ -25,7 +24,7 @@ const Wrapper = styled.div`
 	overflow: hidden;
 `;
 
-interface LinkStateToProps extends MapState {}
+interface LinkStateToProps extends Omit<MapState, 'markerToAdd'> {}
 interface LinkDispatchToProps {
 	setTrips: typeof setTrips;
 	setPlaces: typeof setPlaces;
@@ -64,7 +63,8 @@ const Map: React.FC<Props> = ({
 				setTrips(trips);
 			}
 		};
-		fetchMapData();
+
+		// fetchMapData();
 	}, []);
 
 	useEffect(() => {

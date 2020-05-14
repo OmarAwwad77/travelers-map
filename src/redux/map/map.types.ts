@@ -17,6 +17,11 @@ export interface Trip {
 	tripName: string;
 }
 
+export interface MarkerToAdd {
+	markerCoords: Coords;
+	markerId: number;
+}
+
 export interface MapConfig {
 	zoom: number;
 	center: Coords;
@@ -25,6 +30,7 @@ export interface MapState {
 	trips: Trip[];
 	places: Place[];
 	config: MapConfig;
+	markerToAdd: MarkerToAdd | null;
 }
 
 export const ADD_PLACE = 'ADD_PLACE';
@@ -32,6 +38,7 @@ export const ADD_TRIP = 'ADD_TRIP';
 export const SET_TRIPS = 'SET_TRIPS';
 export const SET_PLACES = 'SET_PLACES';
 export const SET_MAP_CONFIG = 'SET_MAP_CONFIG';
+export const SET_MARKER_TO_ADD = 'SET_MARKER_TO_ADD';
 
 export interface AddPlace {
 	type: typeof ADD_PLACE;
@@ -58,9 +65,15 @@ export interface SetMapConfig {
 	config: MapConfig;
 }
 
+export interface SetMarkerToAdd {
+	type: typeof SET_MARKER_TO_ADD;
+	markerToAdd: MarkerToAdd;
+}
+
 export type MapActions =
 	| AddPlace
 	| AddTrip
 	| SetTrips
 	| SetPlaces
-	| SetMapConfig;
+	| SetMapConfig
+	| SetMarkerToAdd;
