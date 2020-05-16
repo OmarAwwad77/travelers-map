@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, SetStateAction } from 'react';
 import {
 	MapState,
 	MapConfig,
@@ -39,10 +39,12 @@ export interface Trip {
 	tripName: string;
 }
 
-interface OwnProps extends Pick<MapState, 'places'>, MapConfig {
+interface OwnProps extends Pick<MapState, 'places'> {
 	onSave: (features: Feature[]) => void;
 	dbFeatures: Feature[];
 	setPlaces: typeof setPlaces;
+	onChange: React.Dispatch<SetStateAction<boolean>>;
+	config: MapConfig;
 }
 type Props = OwnProps;
 
@@ -56,13 +58,14 @@ const LeafletMap: React.FC<Props> = ({
 	places,
 	onSave,
 	dbFeatures,
-	zoom,
-	center,
+	config,
 	setPlaces,
+	onChange,
 }) => {
 	const [mapStyle, setMapStyle] = useState<MapStyle>('Light');
 	const [geoJson, setGeoJson] = useState<GeoJSON>(initialGeoState);
 
+	console.log('leaflet map');
 	useEffect(() => {
 		setGeoJson({
 			...geoJson,
@@ -113,12 +116,14 @@ const LeafletMap: React.FC<Props> = ({
 			const FG = editableFG.leafletElement;
 			FG.eachLayer((layer: any) => {
 				if (layer._latlngs) return; // only continue if it's a marker
-				if (Object.values(layer._latlng).toString() === center.toString()) {
+				if (
+					Object.values(layer._latlng).toString() === config.center.toString()
+				) {
 					layer.openPopup();
 				}
 			});
 		}
-	}, [center]);
+	}, [config.center]);
 	const onFeatureGroupReady = (reactFGref: FeatureGroup) => {
 		if (reactFGref) {
 			editableFG = reactFGref;
@@ -148,30 +153,34 @@ const LeafletMap: React.FC<Props> = ({
 		if (!editableFG) {
 			return;
 		}
+		onChange(false);
 		if (e.layerType === 'marker') {
 			const FG = editableFG.leafletElement;
 			setGeoJson(getMapData(FG, geoJson));
 		}
 	};
 
-	const onMarkerEdited = (e: any) => {
+	const onEditStop = () => {
 		if (!editableFG) {
 			return;
 		}
+		onChange(false);
 		const FG = editableFG.leafletElement;
 		const updatedState = getMapData(FG, geoJson);
 		setGeoJson(updatedState);
+
 		setPlaces(getPlacesFromFeatures(updatedState.features));
 	};
 
 	return (
 		<Wrapper>
-			<Map center={center} zoom={zoom}>
+			<Map center={config.center} zoom={config.zoom}>
 				{getMapStyle(mapStyle)}
 				<FeatureGroup key={Date.now()} ref={onFeatureGroupReady}>
 					<EditControl
 						onCreated={onMarkerCreated}
-						onEditStop={onMarkerEdited}
+						onEditStop={onEditStop}
+						onDeleteStop={onEditStop}
 						position='topright'
 						draw={{
 							circle: false,
@@ -205,7 +214,7 @@ const LeafletMap: React.FC<Props> = ({
 	);
 };
 
-export default LeafletMap;
+export default React.memo(LeafletMap);
 
 const mapGeoJsonToLayers = (feature: Feature) => {
 	const {

@@ -22,10 +22,11 @@ export default createGlobalStyle`
       box-sizing: border-box;
     }
     body {
-      font-family: 'Roboto', sans-serif;
+      font-family: 'Open Sans', sans-serif;
       font-weight: 400;
       font-size: 1.6rem;
       line-height: 1.6;
+      color: ${(p) => p.theme.colors.text};
     }
     form,
     input,

@@ -67,7 +67,7 @@ export interface SetMapConfig {
 
 export interface SetMarkerToAdd {
 	type: typeof SET_MARKER_TO_ADD;
-	markerToAdd: MarkerToAdd;
+	markerToAdd: MarkerToAdd | null;
 }
 
 export type MapActions =

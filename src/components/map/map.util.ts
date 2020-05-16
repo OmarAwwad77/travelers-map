@@ -9,7 +9,11 @@ export const getSideBarTrips = (places: Place[], trips: Trip[]) =>
 
 export const getPlacesFromFeatures = (features: Feature[]): Place[] =>
 	features
-		.filter((feature) => (feature.properties?.placeId ? true : false))
+		.filter((feature) =>
+			feature.properties?.placeId && feature.geometry.type === 'Point'
+				? true
+				: false
+		)
 		.map((feature) => ({
 			placeId: feature.properties?.placeId,
 			placeName: feature.properties?.placeName,

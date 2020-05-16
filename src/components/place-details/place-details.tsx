@@ -6,9 +6,9 @@ import WithModel from '../../hoc/with-model/with-model';
 import { MapState } from '../../redux/map/map.types';
 import { AppState } from '../../redux/root.reducer';
 import { selectPlaces } from '../../redux/map/map.selectors';
+import Slider from '../slider/slider';
 import {
 	Wrapper,
-	Slider,
 	PlaceName,
 	PlaceDesc,
 	DescTitle,
@@ -44,18 +44,15 @@ const PlaceDetails: React.FC<Props> = ({ places }) => {
 		<WithModel>
 			<Wrapper>
 				<PlaceName>{placeName}</PlaceName>
-				<Slider url={placeImages[0]} />
+				<Slider
+					urls={placeImages}
+					width='100%'
+					height='0'
+					paddingTop='60.25%'
+				/>
 				<div>
 					<DescTitle>Place Description</DescTitle>
-					<PlaceDesc>
-						Lorem Ipsum Is Simply Dummy Text Of The Printing And Typesetting
-						Industry. Lorem Ipsum Has Been The Industry's Standard Dummy Text
-						Ever Since The 1500s, When An Unknown Printer Took A Galley Of Type
-						And Scrambled It To Make A Type Specimen Book. It Has Survived Not
-						Only Five Centuries, But Also The Leap Into Electronic Typesetting,
-						Remaining Essentially Unchanged. It Was Popularised In The 1960s
-						With The Release Of Letraset Sheets Containing Lorem
-					</PlaceDesc>
+					<PlaceDesc>{placeDesc}</PlaceDesc>
 				</div>
 				<div>
 					<AddressTitle>Address</AddressTitle>

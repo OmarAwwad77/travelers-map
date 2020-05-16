@@ -9,17 +9,18 @@ export interface SideBarTrip extends Trip {
 
 interface OwnProps {
 	trips: SideBarTrip[];
+	show: boolean;
 }
 type Props = OwnProps;
 
-const SideBar: React.FC<Props> = ({ trips }) => {
-	return (
+const SideBar: React.FC<Props> = ({ trips, show }) => {
+	return show ? (
 		<Wrapper>
 			{trips.map(({ places, tripName, tripId }) => (
 				<UserTrip name={tripName} key={tripId} places={places} />
 			))}
 		</Wrapper>
-	);
+	) : null;
 };
 
 export default SideBar;

@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
+import { Prompt, useLocation, useHistory } from 'react-router-dom';
 import { AppState } from '../../redux/root.reducer';
 import styled from 'styled-components';
 import LeafletMap from './leaflet-map/leaflet-map';
-import { MapState, Trip, Place } from '../../redux/map/map.types';
+import { MapState, Trip } from '../../redux/map/map.types';
 import {
 	selectPlaces,
 	selectTrips,
@@ -17,11 +18,26 @@ import { Dispatch } from 'redux';
 import { StoreActions, setTrips, setPlaces } from '../../redux/root.actions';
 import SideBar, { SideBarTrip } from '../side-bar/side-bar';
 import { getSideBarTrips, getPlacesFromFeatures } from './map.util';
+import MenuIcon from '../menu-icon/menu-icon';
 
 const Wrapper = styled.div`
 	position: relative;
 	height: 100vh;
 	overflow: hidden;
+	z-index: 1;
+`;
+
+const MenuIconWrapper = styled.div`
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 3;
+	position: absolute;
+	top: 2rem;
+	left: 1rem;
+	width: 3rem;
+	height: 3rem;
+	background: #fff;
 `;
 
 interface LinkStateToProps extends Omit<MapState, 'markerToAdd'> {}
@@ -43,6 +59,11 @@ const Map: React.FC<Props> = ({
 }) => {
 	const [dbFeatures, setDbFeatures] = useState<Feature[]>([]);
 	const [sideBarTrips, setSideBarTrips] = useState<SideBarTrip[]>([]);
+	const [showSideBar, setShowSideBar] = useState(true);
+	const [changesSaved, setChangesSaved] = useState(true);
+
+	const { pathname } = useLocation();
+	const { push } = useHistory();
 
 	useEffect(() => {
 		const fetchMapData = async () => {
@@ -64,32 +85,61 @@ const Map: React.FC<Props> = ({
 			}
 		};
 
-		// fetchMapData();
+		fetchMapData();
 	}, []);
+
+	useEffect(() => {
+		if (changesSaved) {
+			onbeforeunload = null;
+		} else {
+			onbeforeunload = () => true;
+		}
+	}, [changesSaved]);
 
 	useEffect(() => {
 		setSideBarTrips(getSideBarTrips(places, trips));
 	}, [trips, places]);
 
-	const onSave = async (features: Feature[]) => {
-		await db.collection('features').doc(userId).set({
-			userFeatures: features,
-		});
-		await db.collection('trips').doc(userId).set({
-			userTrips: trips,
-		});
-	};
+	const onSave = useCallback(
+		async (features: Feature[]) => {
+			await db.collection('features').doc(userId).set({
+				userFeatures: features,
+			});
+			await db.collection('trips').doc(userId).set({
+				userTrips: trips,
+			});
+			setChangesSaved(true);
+		},
+		[trips]
+	);
 
 	return (
 		<>
-			<SideBar trips={sideBarTrips} />
+			<Prompt
+				message={(loc) =>
+					loc.pathname.startsWith('/map')
+						? true
+						: !changesSaved
+						? `Unsaved Changes. Are you sure you want to leave to ${loc.pathname} without saving?`
+						: true
+				}
+			/>
+			<MenuIconWrapper>
+				<MenuIcon
+					dir='left'
+					// toggleSideBar={() => setShowSideBar(!showSideBar)}
+					toggleSideBar={() => push('/')}
+				/>
+			</MenuIconWrapper>
+			<SideBar show={showSideBar} trips={sideBarTrips} />
 			<Wrapper>
 				<LeafletMap
 					places={places}
 					dbFeatures={dbFeatures}
 					onSave={onSave}
+					onChange={setChangesSaved}
 					setPlaces={setPlaces}
-					{...config}
+					config={config}
 				/>
 			</Wrapper>
 		</>
@@ -109,8 +159,8 @@ const mapStateToProps = createStructuredSelector<
 const mapDispatchToProps = (
 	dispatch: Dispatch<StoreActions>
 ): LinkDispatchToProps => ({
-	setTrips: (trips: Trip[]) => dispatch(setTrips(trips)),
-	setPlaces: (places: Place[]) => dispatch(setPlaces(places)),
+	setTrips: (trips) => dispatch(setTrips(trips)),
+	setPlaces: (places) => dispatch(setPlaces(places)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Map);

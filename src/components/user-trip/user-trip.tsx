@@ -44,7 +44,7 @@ const UserTrip: React.FC<Props> = ({ name, places, setMapConfig }) => {
 const mapDispatchToProps = (
 	dispatch: Dispatch<StoreActions>
 ): LinkDispatchToProps => ({
-	setMapConfig: (config: MapConfig) => dispatch(setMapConfig(config)),
+	setMapConfig: (config) => dispatch(setMapConfig(config)),
 });
 
 export default connect(null, mapDispatchToProps)(UserTrip);

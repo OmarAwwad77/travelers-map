@@ -1,4 +1,4 @@
-import styled, { keyframes } from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
 
 export type AnimType = 'in' | 'out';
 export type AnimDir = 'right' | 'left';
@@ -61,13 +61,6 @@ const outAnimRight = keyframes`
   }
 `;
 
-export const Wrapper = styled.div`
-	width: 50rem;
-	height: 35rem;
-	position: relative;
-	overflow: hidden;
-`;
-
 const getAnim = (type: AnimType, dir: AnimDir) => {
 	let animName;
 	if (type === 'in') {
@@ -100,29 +93,73 @@ const getAnim = (type: AnimType, dir: AnimDir) => {
 	return animName;
 };
 
+interface WrapperProps {
+	width: string;
+	height: string;
+	paddingTop?: string;
+}
+export const Wrapper = styled.div<WrapperProps>`
+	width: ${(p) => p.width ?? '50rem'};
+	height: ${(p) => p.height ?? '35rem'};
+	position: relative;
+	overflow: hidden;
+	padding-top: ${(p) => p.paddingTop};
+`;
+
 export const SliderImg = styled.div<Image>`
 	width: 100%;
 	height: 100%;
 	position: absolute;
 	top: 0;
 	left: 0;
+	backface-visibility: hidden;
 	background: url(${(p) => p.url}) center/cover no-repeat;
 	animation: ${(p) => p.type && getAnim(p.type, p.dir!)} 1s ease-in forwards;
 	z-index: ${(p) => p.default && 1};
 `;
 
-export const Arrow = styled.span<{ dir: 'left' | 'right' }>`
-	width: 1.7rem;
-	height: 1.7rem;
+const arrowStyles = css`
+	background: #fff;
 	position: absolute;
+	width: 2.5rem;
+	height: 2.5rem;
+	border-radius: 50%;
 	top: 50%;
-	border: 3px solid #333;
-	border-bottom: none;
-	border-left: none;
 	cursor: pointer;
 	z-index: 2;
-	right: ${(p) => p.dir === 'right' && '1%'};
-	left: ${(p) => p.dir === 'left' && '1%'};
-	transform: translateY(-50%)
-		rotate(${(p) => (p.dir === 'right' ? '45deg' : '-135deg')});
+`;
+
+const beforeAndAfter = css`
+	content: '';
+	width: 1.2rem;
+	height: 1.2rem;
+	position: absolute;
+	top: 50%;
+	border: 2px solid #333;
+	border-bottom: none;
+	border-left: none;
+`;
+
+export const LeftArrow = styled.span<{ disabled: boolean }>`
+	${arrowStyles}
+	left: 1%;
+	&::before {
+		${beforeAndAfter};
+		left: 40%;
+		transform: translateY(-50%) rotate(-135deg);
+	}
+	opacity: ${(p) => p.disabled && 0.4};
+	cursor: ${(p) => p.disabled && 'not-allowed'};
+`;
+
+export const RightArrow = styled.span<{ disabled: boolean }>`
+	${arrowStyles}
+	right: 1%;
+	&::before {
+		${beforeAndAfter};
+		right: 40%;
+		transform: translateY(-50%) rotate(45deg);
+	}
+	opacity: ${(p) => p.disabled && 0.4};
+	cursor: ${(p) => p.disabled && 'not-allowed'};
 `;

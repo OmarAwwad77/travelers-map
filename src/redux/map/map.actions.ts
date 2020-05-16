@@ -25,7 +25,9 @@ export const setMapConfig = (config: MapConfig): MapActions => ({
 	type: 'SET_MAP_CONFIG',
 });
 
-export const setMarkerToAdd = (markerToAdd: MarkerToAdd): MapActions => ({
+export const setMarkerToAdd = (
+	markerToAdd: MarkerToAdd | null
+): MapActions => ({
 	markerToAdd,
 	type: 'SET_MARKER_TO_ADD',
 });

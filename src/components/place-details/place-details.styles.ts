@@ -25,19 +25,13 @@ export const PlaceName = styled.h2`
 	${titleStyles}
 `;
 
-export const Slider = styled.div<{ url: string }>`
-	width: 100%;
-	padding-top: 60.25%;
-	background: url(${(p) => p.url}) center/cover no-repeat;
-`;
-
 export const DescTitle = styled.h2`
 	${titleStyles}
 	margin: 2rem 0 .5rem 0;
 `;
 export const PlaceDesc = styled.p`
 	text-transform: capitalize;
-	text-align: justify;
+	text-align: center;
 `;
 
 export const AddressTitle = styled.h2`

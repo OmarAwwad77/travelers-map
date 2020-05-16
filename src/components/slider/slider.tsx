@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 
-import WithModel from '../../hoc/with-model/with-model';
-
-import { Wrapper, SliderImg, Arrow, AnimDir, AnimType } from './slider.styles';
-
-const images = [
-	'https://i.picsum.photos/id/866/400/300.jpg',
-	'https://i.picsum.photos/id/865/400/300.jpg',
-];
+import {
+	Wrapper,
+	SliderImg,
+	LeftArrow,
+	RightArrow,
+	AnimDir,
+	AnimType,
+} from './slider.styles';
 
 interface AnimState {
 	in: number;
@@ -16,7 +16,14 @@ interface AnimState {
 	lastChange: number;
 }
 const throttle = 1000;
-const Slider = () => {
+
+interface Props {
+	urls: string[];
+	width: string;
+	height: string;
+	paddingTop?: string;
+}
+const Slider: React.FC<Props> = ({ urls, width, height, paddingTop }) => {
 	const [animState, setAnimState] = useState<AnimState>({
 		in: 0,
 		out: -1,
@@ -29,10 +36,10 @@ const Slider = () => {
 		if (now - animState.lastChange < throttle) return;
 
 		if (dir === 'right') {
-			const newIn = (animState.in + 1) % images.length;
+			const newIn = (animState.in + 1) % urls.length;
 			setAnimState({ in: newIn, out: newOut, dir: 'left', lastChange: now });
 		} else {
-			const newIn = animState.in === 0 ? images.length - 1 : animState.in - 1;
+			const newIn = animState.in === 0 ? urls.length - 1 : animState.in - 1;
 			setAnimState({ in: newIn, out: newOut, dir: 'right', lastChange: now });
 		}
 	};
@@ -43,22 +50,28 @@ const Slider = () => {
 		if (index === animState.out) return 'out';
 	};
 
+	const arrowDisabled: boolean = urls.length === 1;
+
 	return (
-		<WithModel>
-			<Wrapper>
-				{images.map((url, i) => (
-					<SliderImg
-						key={i}
-						url={url}
-						type={getAnimType(i)}
-						dir={animState.dir}
-						default={animState.out === -1 && i === 0}
-					/>
-				))}
-				<Arrow dir='right' onClick={() => slide('right')} />
-				<Arrow dir='left' onClick={() => slide('left')} />
-			</Wrapper>
-		</WithModel>
+		<Wrapper width={width} height={height} paddingTop={paddingTop}>
+			{urls.map((url, i) => (
+				<SliderImg
+					key={i}
+					url={url}
+					type={getAnimType(i)}
+					dir={animState.dir}
+					default={animState.out === -1 && i === 0}
+				/>
+			))}
+			<RightArrow
+				disabled={arrowDisabled}
+				{...(!arrowDisabled && { onClick: () => slide('right') })}
+			/>
+			<LeftArrow
+				disabled={arrowDisabled}
+				{...(!arrowDisabled && { onClick: () => slide('right') })}
+			/>
+		</Wrapper>
 	);
 };
 

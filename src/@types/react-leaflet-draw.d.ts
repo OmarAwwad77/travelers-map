@@ -77,7 +77,8 @@ declare module 'react-leaflet-draw' {
 		draw: Draw;
 		onEdited?: (e: { layers: LayerGroup }) => void;
 		onCreated?: (e: CreatedEvent) => void;
-		onDeleted?: () => void;
+		onDeleted?: (e: LayerGroup) => void;
+		onDeleteStop?: () => void;
 		onEditMove?: (e: any) => void;
 		onEditStop?: (e: any) => void;
 		onEditStart?: function;

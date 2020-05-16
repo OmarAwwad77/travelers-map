@@ -2,7 +2,7 @@ import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import { createStructuredSelector } from 'reselect';
-
+import { Redirect } from 'react-router-dom';
 import {
 	Wrapper,
 	TripNameWrapper,
@@ -23,7 +23,12 @@ import {
 	getFileDataUrl,
 } from './add-place.util';
 import { uploadImage } from '../../firebase/firebase.utils';
-import { StoreActions, addPlace, addTrip } from '../../redux/root.actions';
+import {
+	StoreActions,
+	addPlace,
+	addTrip,
+	setMarkerToAdd,
+} from '../../redux/root.actions';
 import { Place, Trip, Coords, MapState } from '../../redux/map/map.types';
 import { AppState } from '../../redux/root.reducer';
 import { selectTrips, selectMarkerToAdd } from '../../redux/map/map.selectors';
@@ -44,6 +49,7 @@ interface OwnProps {}
 interface LinkDispatchToProps {
 	addPlace: typeof addPlace;
 	addTrip: typeof addTrip;
+	setMarkerToAdd: typeof setMarkerToAdd;
 }
 interface LinkStateToProps extends Pick<MapState, 'trips' | 'markerToAdd'> {}
 
@@ -53,6 +59,7 @@ const AddPlace: React.FC<Props> = ({
 	addTrip,
 	trips,
 	markerToAdd,
+	setMarkerToAdd,
 }) => {
 	const [tripDropdown, setTripDropdown] = useState(defaultOption);
 	const [tripOptions, setTripOptions] = useState<string[]>([]);
@@ -220,10 +227,12 @@ const AddPlace: React.FC<Props> = ({
 				placeDesc: description,
 				placeImages: urls,
 			});
+
+			setMarkerToAdd(null);
 		});
 	};
 
-	return (
+	return markerToAdd ? (
 		<WithModel>
 			<Wrapper onSubmit={onFormSubmit}>
 				<TripNameWrapper>
@@ -271,14 +280,17 @@ const AddPlace: React.FC<Props> = ({
 				<SaveButton disabled={!isFormValid}>Save</SaveButton>
 			</Wrapper>
 		</WithModel>
+	) : (
+		<Redirect to='/map' />
 	);
 };
 
 const mapDispatchToProps = (
 	dispatch: Dispatch<StoreActions>
 ): LinkDispatchToProps => ({
-	addPlace: (place: Place) => dispatch(addPlace(place)),
-	addTrip: (trip: Trip) => dispatch(addTrip(trip)),
+	addPlace: (place) => dispatch(addPlace(place)),
+	addTrip: (trip) => dispatch(addTrip(trip)),
+	setMarkerToAdd: (val) => dispatch(setMarkerToAdd(val)),
 });
 
 const mapStateToProps = createStructuredSelector<
