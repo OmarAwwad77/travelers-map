@@ -55,7 +55,7 @@ export const TextArea = styled.div`
 	justify-content: space-evenly;
 `;
 export const Title = styled.h2`
-	font-size: 3rem;
+	font-size: 4rem;
 	text-align: center;
 	text-transform: capitalize;
 `;

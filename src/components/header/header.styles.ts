@@ -17,10 +17,10 @@ export const LogoWrapper = styled.div`
 export const Wrapper = styled.header`
 	display: flex;
 	justify-content: space-between;
-	padding: 4rem 5rem 5rem 5rem;
+	padding: 3rem 5rem 5rem 5rem;
 	width: 100%;
 	background: transparent;
 	${LogoWrapper} {
-		width: 20%;
+		width: 30%;
 	}
 `;

@@ -16,7 +16,7 @@ import { db } from '../../firebase/firebase.utils';
 import { transformFeaturesForMap } from './leaflet-map/leaflet-map.util';
 import { Dispatch } from 'redux';
 import { StoreActions, setTrips, setPlaces } from '../../redux/root.actions';
-import SideBar, { SideBarTrip } from '../side-bar/side-bar';
+import SideBar, { SideBarTrip } from './sidebar/sidebar';
 import { getSideBarTrips, getPlacesFromFeatures } from './map.util';
 import MenuIcon from '../menu-icon/menu-icon';
 

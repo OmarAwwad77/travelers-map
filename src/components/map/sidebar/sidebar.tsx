@@ -1,7 +1,7 @@
 import React from 'react';
-import { Place, Trip } from '../../redux/map/map.types';
-import { Wrapper } from './side-bar.styles';
-import UserTrip from '../user-trip/user-trip';
+import { Place, Trip } from '../../../redux/map/map.types';
+import { Wrapper } from './sidebar.styles';
+import UserTrip from '../../user-trip/user-trip';
 
 export interface SideBarTrip extends Trip {
 	places: Place[];
