@@ -1,7 +1,9 @@
-import firebase from 'firebase/app';
+import firebase, { firestore } from 'firebase/app';
+import { User } from 'firebase';
 import 'firebase/auth';
 import 'firebase/storage';
 import 'firebase/firestore';
+import { User as AppUser } from '../redux/user/user.types';
 
 const config = {
 	apiKey: 'AIzaSyCqTuRU04Iv39jAhk5jxrLDBYUDVkXRcd4',
@@ -15,9 +17,21 @@ const config = {
 // Initialize Firebase
 firebase.initializeApp(config);
 
+export type FirebaseUser = User;
+export type DocumentSnapshot = firestore.DocumentSnapshot;
+export const googleProvider = new firebase.auth.GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: 'select_account' });
 export const db = firebase.firestore();
 export const auth = firebase.auth();
 export const storageRef = firebase.storage().ref();
+
+export const createUserDocInDb = (user: AppUser) => {
+	return db.collection('users').doc(user.uid!).set(user);
+};
+
+export const getUserDocFromDb = (uid: string) => {
+	return db.collection('users').doc(uid).get();
+};
 
 export const uploadImage = (file: File) => {
 	return new Promise<string>(async (resolve) => {

@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { CSSProperties } from 'react';
 import styled, { css } from 'styled-components';
 
-const Wrapper = styled.div`
-	width: 100%;
-	height: 100%;
+const Wrapper = styled.div<CSSProperties>`
+	width: ${(p) => p.width ?? '100%'};
+	height: ${(p) => p.height ?? '100%'};
 	position: relative;
 
 	@-webkit-keyframes sk-bounce {
@@ -53,9 +53,9 @@ const Bounce2 = styled.div<{ color?: string }>`
 type Props = {
 	color?: string;
 	className?: string;
-};
-const Spinner: React.FC<Props> = ({ color, className }) => (
-	<Wrapper className={className}>
+} & CSSProperties;
+const Spinner: React.FC<Props> = ({ color, className, width, height }) => (
+	<Wrapper width={width} height={height} className={className}>
 		<Bounce1 color={color} />
 		<Bounce2 color={color} />
 	</Wrapper>

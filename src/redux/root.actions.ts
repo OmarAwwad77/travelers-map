@@ -1,4 +1,5 @@
 import { MapActions } from './map/map.types';
+import { UserActions } from './user/user.types';
 
 export {
 	addPlace,
@@ -9,4 +10,14 @@ export {
 	setMarkerToAdd,
 } from './map/map.actions';
 
-export type StoreActions = MapActions;
+export {
+	emailSignInStart,
+	googleSignInStart,
+	signInSuccess,
+	signInFailure,
+	signUpStart,
+	signUpFailure,
+	clearError,
+} from './user/user.actions';
+
+export type StoreActions = MapActions | UserActions;

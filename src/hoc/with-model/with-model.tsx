@@ -22,7 +22,7 @@ const WithModel: React.FC<Props> = ({ backDropOnClick, children }) => {
 		<Wrapper>
 			<Backdrop onClick={backDropOnClick ?? goBack} />
 			<Model>
-				<ModelClose onClick={backDropOnClick} />
+				<ModelClose onClick={backDropOnClick ?? goBack} />
 				<ModelContent>{children}</ModelContent>
 			</Model>
 		</Wrapper>

@@ -8,6 +8,7 @@ import { ReactComponent as MapIcon } from '../../../assets/icons/place.svg';
 import paris from '../../../assets/images/paris.png';
 import Slider from '../../slider/slider';
 import Comment from '../comment/comment';
+import AddComment from '../add-comment/add-comment';
 import {
 	Wrapper,
 	PostHeader,
@@ -18,7 +19,6 @@ import {
 	IconWithText,
 	PlaceName,
 	Divider,
-	AddComment,
 } from './post.styles';
 
 const Post = () => {
@@ -50,13 +50,8 @@ const Post = () => {
 				</IconWithText>
 			</PostFooter>
 			<Divider />
-			<AddComment>
-				<PostAvatar />
-				<input type='text' placeholder='Add a Comment...' />
-			</AddComment>
+			<AddComment url='https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50' />
 			<Divider />
-			<Comment />
-			<Comment />
 			<Comment />
 		</Wrapper>
 	);

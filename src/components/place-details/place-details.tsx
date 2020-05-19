@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { createStructuredSelector } from 'reselect';
-import WithModel from '../../hoc/with-model/with-model';
+import WithModel from '../../hoc/With-model/With-model';
 import { MapState } from '../../redux/map/map.types';
 import { AppState } from '../../redux/root.reducer';
 import { selectPlaces } from '../../redux/map/map.selectors';

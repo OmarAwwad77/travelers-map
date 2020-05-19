@@ -14,7 +14,7 @@ import {
 	SaveButton,
 	PlaceName,
 } from './add-place.styles';
-import WithModel from '../../hoc/with-model/with-model';
+import WithModel from '../../hoc/With-model/With-model';
 import DropDown from '../drop-down/drop-down';
 import ImageUpload from '../image-upload/image-upload';
 import {

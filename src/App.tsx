@@ -4,12 +4,14 @@ import { Switch, Route } from 'react-router-dom';
 import Map from './components/map/map';
 import AddPlace from './components/add-place/add-place';
 import PlaceDetails from './components/place-details/place-details';
-import Main from './pages/main/main';
+import Main from './pages/main/main.page';
 import Layout from './components/layout/layout';
+import Sign from './pages/sign/sign.page';
 
 const App = () => {
 	return (
 		<Layout>
+			<Route path='/sign' component={Sign} />
 			<Route path='/' exact component={Main} />
 			<Route path='/map' component={Map} />
 			<Route path='/map/add-place' exact component={AddPlace} />

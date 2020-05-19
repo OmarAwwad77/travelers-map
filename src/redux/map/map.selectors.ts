@@ -1,21 +1,24 @@
 import { createSelector } from 'reselect';
 import { AppState } from '../root.reducer';
 
-export const selectMapState = (state: AppState) => state.map;
+export const selectMapState = (state: AppState) => state.mapState;
 
 export const selectPlaces = createSelector(
 	[selectMapState],
-	(map) => map.places
+	(mapState) => mapState.places
 );
 
-export const selectTrips = createSelector([selectMapState], (map) => map.trips);
+export const selectTrips = createSelector(
+	[selectMapState],
+	(mapState) => mapState.trips
+);
 
 export const selectMapConfig = createSelector(
 	[selectMapState],
-	(map) => map.config
+	(mapState) => mapState.config
 );
 
 export const selectMarkerToAdd = createSelector(
 	[selectMapState],
-	(map) => map.markerToAdd
+	(mapState) => mapState.markerToAdd
 );
