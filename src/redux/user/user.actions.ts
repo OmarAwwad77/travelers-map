@@ -37,6 +37,28 @@ export const signUpFailure = (error: ErrorMessage): UserActions => ({
 	type: 'SIGN_UP_FAILURE',
 });
 
+export const changePasswordStart = (
+	oldPassword: string,
+	newPassword: string
+): UserActions => ({
+	oldPassword,
+	newPassword,
+	type: 'CHANGE_PASSWORD_START',
+});
+
+export const changePasswordSuccess = (): UserActions => ({
+	type: 'CHANGE_PASSWORD_SUCCESS',
+});
+
+export const changePasswordFailure = (error: ErrorMessage): UserActions => ({
+	error,
+	type: 'CHANGE_PASSWORD_FAILURE',
+});
+
+export const deleteAccount = (): UserActions => ({
+	type: 'DELETE_ACCOUNT',
+});
+
 export const clearError = (): UserActions => ({
 	type: 'CLEAR_ERROR',
 });

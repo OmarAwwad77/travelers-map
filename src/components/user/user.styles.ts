@@ -1,20 +1,7 @@
 import styled from 'styled-components';
-import { HeroButton } from '../../hero/hero.styles';
+import { HeroButton } from '../hero/hero.styles';
 
 export const Wrapper = styled.div`
-	width: 30%;
-	max-width: 32rem;
-	border-left: 2px solid ${(p) => p.theme.colors.mainDarker};
-`;
-
-export const SidBarTitle = styled.h3`
-	font-size: 2.5rem;
-	text-transform: capitalize;
-	margin-bottom: 4rem;
-	text-align: center;
-`;
-
-export const User = styled.div`
 	width: 24rem;
 	height: 10rem;
 	display: flex;
@@ -49,11 +36,4 @@ export const FollowButton = styled(HeroButton)`
 	padding: 1rem 3rem;
 	border-radius: 1rem;
 	text-transform: capitalize;
-`;
-
-export const Divider = styled.div`
-	height: 1.5px;
-	width: 80%;
-	background: ${(p) => p.theme.colors.mainDarker};
-	margin: 2.5rem auto 2.5rem auto;
 `;

@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { NavLink as Link } from 'react-router-dom';
 
 export const Wrapper = styled.ul`
 	width: 100%;
@@ -25,5 +26,16 @@ export const NavItem = styled.li`
 	svg {
 		width: 2.8rem;
 		height: 2.8rem;
+	}
+`;
+
+export const NavLink = styled(Link)`
+	color: ${(p) => p.theme.colors.secondary2};
+	text-decoration: none;
+	display: flex;
+	align-items: center;
+
+	&.active {
+		color: ${(p) => p.theme.colors.secondary1};
 	}
 `;

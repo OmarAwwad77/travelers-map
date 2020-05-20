@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+export { SideBarWrapper } from '../../pages/profile/profile.page.styles';
 
 export const Wrapper = styled.div`
 	padding: 1rem;

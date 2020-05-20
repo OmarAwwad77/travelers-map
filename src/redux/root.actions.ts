@@ -17,6 +17,10 @@ export {
 	signInFailure,
 	signUpStart,
 	signUpFailure,
+	changePasswordStart,
+	changePasswordFailure,
+	changePasswordSuccess,
+	deleteAccount,
 	clearError,
 } from './user/user.actions';
 

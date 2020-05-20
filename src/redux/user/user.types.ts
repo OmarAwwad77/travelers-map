@@ -6,8 +6,8 @@ export interface User {
 
 export interface ErrorMessage {
 	message: string;
-	label: 'email' | 'password' | 'unknown';
-	type: 'sign-in' | 'sign-up';
+	label: 'email' | 'password' | 'oldPassword' | 'unknown';
+	type: 'sign-in' | 'sign-up' | 'changePassword';
 }
 
 export interface UserState {
@@ -31,6 +31,10 @@ export const SIGN_IN_SUCCESS = 'SIGN_IN_SUCCESS';
 export const SIGN_IN_FAILURE = 'SIGN_IN_FAILURE';
 export const SIGN_UP_START = 'SIGN_UP_START';
 export const SIGN_UP_FAILURE = 'SIGN_UP_FAILURE';
+export const CHANGE_PASSWORD_START = 'CHANGE_PASSWORD_START';
+export const CHANGE_PASSWORD_SUCCESS = 'CHANGE_PASSWORD_SUCCESS';
+export const CHANGE_PASSWORD_FAILURE = 'CHANGE_PASSWORD_FAILURE';
+export const DELETE_ACCOUNT = 'DELETE_ACCOUNT';
 export const CLEAR_ERROR = 'CLEAR_ERROR';
 
 export interface GoogleSignInStart {
@@ -62,6 +66,25 @@ export interface SignUpFailure {
 	error: ErrorMessage;
 }
 
+export interface ChangePasswordStart {
+	type: typeof CHANGE_PASSWORD_START;
+	oldPassword: string;
+	newPassword: string;
+}
+
+export interface ChangePasswordSuccess {
+	type: typeof CHANGE_PASSWORD_SUCCESS;
+}
+
+export interface ChangePasswordFailure {
+	type: typeof CHANGE_PASSWORD_FAILURE;
+	error: ErrorMessage;
+}
+
+export interface DeleteAccount {
+	type: typeof DELETE_ACCOUNT;
+}
+
 export interface ClearError {
 	type: typeof CLEAR_ERROR;
 }
@@ -73,4 +96,8 @@ export type UserActions =
 	| SignInFailure
 	| SignUpStart
 	| SignUpFailure
+	| ChangePasswordStart
+	| ChangePasswordSuccess
+	| ChangePasswordFailure
+	| DeleteAccount
 	| ClearError;

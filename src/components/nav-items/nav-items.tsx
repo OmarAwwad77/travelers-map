@@ -5,7 +5,7 @@ import { ReactComponent as SignInIcon } from '../../assets/icons/sign-in.svg';
 import { ReactComponent as ProfileIcon } from '../../assets/icons/user.svg';
 import { ReactComponent as MapIcon } from '../../assets/icons/place.svg';
 import { ReactComponent as HomeIcon } from '../../assets/icons/home.svg';
-import { Wrapper, NavItem } from './nav-items.styles';
+import { Wrapper, NavItem, NavLink } from './nav-items.styles';
 
 const NavItems = () => {
 	const user = true;
@@ -22,8 +22,10 @@ const NavItems = () => {
 			{user ? (
 				<>
 					<NavItem>
-						<ProfileIcon />
-						<span>profile</span>
+						<NavLink to='/profile'>
+							<ProfileIcon />
+							<span>profile</span>
+						</NavLink>
 					</NavItem>
 					<NavItem>
 						<SignOutIcon />

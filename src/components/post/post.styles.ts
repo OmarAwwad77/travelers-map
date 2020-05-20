@@ -1,10 +1,7 @@
 import styled from 'styled-components';
 
-import {
-	UserAvatar,
-	UserName,
-	Divider as SlideBarDivider,
-} from '../sidebar/sidebar.styles';
+import { UserAvatar, UserName } from '../user/user.styles';
+import { Divider as SlideBarDivider } from '../sidebar/sidebar.styles';
 
 export const Wrapper = styled.div`
 	width: 40rem;

@@ -24,6 +24,22 @@ googleProvider.setCustomParameters({ prompt: 'select_account' });
 export const db = firebase.firestore();
 export const auth = firebase.auth();
 export const storageRef = firebase.storage().ref();
+export const EmailAuthProvider = firebase.auth.EmailAuthProvider;
+
+export const getCurrentUser = () => {
+	return new Promise<User | null>((res, rej) => {
+		const unsubscribe = auth.onAuthStateChanged(
+			(user) => {
+				unsubscribe();
+				res(user);
+			},
+			(error) => {
+				unsubscribe();
+				rej(error);
+			}
+		);
+	});
+};
 
 export const createUserDocInDb = (user: AppUser) => {
 	return db.collection('users').doc(user.uid!).set(user);

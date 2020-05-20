@@ -1,5 +1,5 @@
 import { call, apply, takeLatest, all, put } from 'redux-saga/effects';
-import { SagaIterator } from 'redux-saga';
+import { SagaIterator, Saga } from 'redux-saga';
 import {
 	auth,
 	googleProvider,
@@ -7,6 +7,8 @@ import {
 	createUserDocInDb,
 	getUserDocFromDb,
 	DocumentSnapshot,
+	getCurrentUser,
+	EmailAuthProvider,
 } from '../../firebase/firebase.utils';
 import {
 	EMAIL_SIGN_IN_START,
@@ -15,8 +17,11 @@ import {
 	User,
 	GOOGLE_SIGN_IN_START,
 	SIGN_UP_START,
+	CHANGE_PASSWORD_START,
+	ChangePasswordStart,
 } from './user.types';
 import { signInSuccess, signInFailure, signUpFailure } from '../root.actions';
+import { changePasswordFailure, changePasswordSuccess } from './user.actions';
 
 function* putUserOnSuccess(appUser: User): SagaIterator {
 	yield put(signInSuccess(appUser));
@@ -188,6 +193,53 @@ function* signUpSaga({
 	}
 }
 
+function* changePasswordSaga({
+	oldPassword,
+	newPassword,
+}: ChangePasswordStart): SagaIterator {
+	try {
+		// get user
+		const firebaseUser: FirebaseUser = yield call(getCurrentUser);
+
+		// re-authenticate user
+		const credentials = yield apply(
+			EmailAuthProvider,
+			EmailAuthProvider.credential,
+			[firebaseUser.email!, oldPassword]
+		);
+
+		yield apply(firebaseUser, firebaseUser.reauthenticateWithCredential, [
+			credentials,
+		]);
+
+		// change password
+		yield apply(firebaseUser, firebaseUser.updatePassword, [newPassword]);
+
+		yield put(changePasswordSuccess());
+	} catch (error) {
+		switch (error.code) {
+			case 'auth/wrong-password':
+				yield put(
+					changePasswordFailure({
+						label: 'oldPassword',
+						type: 'changePassword',
+						message: 'The password is invalid.',
+					})
+				);
+				break;
+
+			default:
+				yield put(
+					changePasswordFailure({
+						label: 'unknown',
+						message: 'something went wrong. try again later',
+						type: 'changePassword',
+					})
+				);
+		}
+	}
+}
+
 function* onEmailSignInSaga(): SagaIterator {
 	yield takeLatest(EMAIL_SIGN_IN_START, emailSignInSaga);
 }
@@ -200,11 +252,16 @@ function* onSignUpSaga(): SagaIterator {
 	yield takeLatest(SIGN_UP_START, signUpSaga);
 }
 
+function* onChangePasswordSaga(): SagaIterator {
+	yield takeLatest(CHANGE_PASSWORD_START, changePasswordSaga);
+}
+
 export function* userSagas(): SagaIterator {
 	yield all([
 		call(onEmailSignInSaga),
 		call(onGoogleSignInSaga),
 		call(onSignUpSaga),
+		call(onChangePasswordSaga),
 	]);
 }
 

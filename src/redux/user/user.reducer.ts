@@ -16,6 +16,8 @@ const userReducer = (state = initialState, action: UserActions): UserState => {
 			};
 
 		case 'SIGN_IN_FAILURE':
+		case 'SIGN_UP_FAILURE':
+		case 'CHANGE_PASSWORD_FAILURE':
 			return {
 				...state,
 				error: action.error,
@@ -25,6 +27,7 @@ const userReducer = (state = initialState, action: UserActions): UserState => {
 		case 'GOOGLE_SIGN_IN_START':
 		case 'EMAIL_SIGN_IN_START':
 		case 'SIGN_UP_START':
+		case 'CHANGE_PASSWORD_START':
 			return {
 				...state,
 				error: null,
