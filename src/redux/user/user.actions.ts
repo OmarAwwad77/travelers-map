@@ -55,8 +55,37 @@ export const changePasswordFailure = (error: ErrorMessage): UserActions => ({
 	type: 'CHANGE_PASSWORD_FAILURE',
 });
 
-export const deleteAccount = (): UserActions => ({
-	type: 'DELETE_ACCOUNT',
+export const changeEmailStart = (
+	newEmail: string,
+	password: string
+): UserActions => ({
+	password,
+	newEmail,
+	type: 'CHANGE_EMAIL_START',
+});
+
+export const changeEmailSuccess = (newEmail: string): UserActions => ({
+	newEmail,
+	type: 'CHANGE_EMAIL_SUCCESS',
+});
+
+export const changeEmailFailure = (error: ErrorMessage): UserActions => ({
+	error,
+	type: 'CHANGE_EMAIL_FAILURE',
+});
+
+export const deleteAccountStart = (password?: string): UserActions => ({
+	password,
+	type: 'DELETE_ACCOUNT_START',
+});
+
+export const deleteAccountSuccess = (): UserActions => ({
+	type: 'DELETE_ACCOUNT_SUCCESS',
+});
+
+export const deleteAccountFailure = (error: ErrorMessage): UserActions => ({
+	error,
+	type: 'DELETE_ACCOUNT_FAILURE',
 });
 
 export const clearError = (): UserActions => ({

@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import WithModel from '../With-model/With-model';
 import { UserState } from '../../redux/user/user.types';
 
-const ErrorMessage = styled.div`
+export const ErrorMessage = styled.div`
 	text-transform: capitalize;
 	font-size: 1.8rem;
 	font-weight: 600;

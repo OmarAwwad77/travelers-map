@@ -20,7 +20,12 @@ export {
 	changePasswordStart,
 	changePasswordFailure,
 	changePasswordSuccess,
-	deleteAccount,
+	changeEmailStart,
+	changeEmailSuccess,
+	changeEmailFailure,
+	deleteAccountStart,
+	deleteAccountSuccess,
+	deleteAccountFailure,
 	clearError,
 } from './user/user.actions';
 

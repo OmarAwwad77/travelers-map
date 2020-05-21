@@ -2,12 +2,24 @@ export interface User {
 	displayName: string;
 	email: string;
 	uid: string;
+	providerId: string;
+	url: string;
 }
 
 export interface ErrorMessage {
 	message: string;
 	label: 'email' | 'password' | 'oldPassword' | 'unknown';
-	type: 'sign-in' | 'sign-up' | 'changePassword';
+	type:
+		| 'sign-in'
+		| 'sign-up'
+		| 'changePassword'
+		| 'changeEmail'
+		| 'deleteAccount';
+}
+
+export interface DbUser {
+	displayName: string;
+	profileImg: string;
 }
 
 export interface UserState {
@@ -34,7 +46,12 @@ export const SIGN_UP_FAILURE = 'SIGN_UP_FAILURE';
 export const CHANGE_PASSWORD_START = 'CHANGE_PASSWORD_START';
 export const CHANGE_PASSWORD_SUCCESS = 'CHANGE_PASSWORD_SUCCESS';
 export const CHANGE_PASSWORD_FAILURE = 'CHANGE_PASSWORD_FAILURE';
-export const DELETE_ACCOUNT = 'DELETE_ACCOUNT';
+export const CHANGE_EMAIL_START = 'CHANGE_EMAIL_START';
+export const CHANGE_EMAIL_SUCCESS = 'CHANGE_EMAIL_SUCCESS';
+export const CHANGE_EMAIL_FAILURE = 'CHANGE_EMAIL_FAILURE';
+export const DELETE_ACCOUNT_START = 'DELETE_ACCOUNT_START';
+export const DELETE_ACCOUNT_SUCCESS = 'DELETE_ACCOUNT_SUCCESS';
+export const DELETE_ACCOUNT_FAILURE = 'DELETE_ACCOUNT_FAILURE';
 export const CLEAR_ERROR = 'CLEAR_ERROR';
 
 export interface GoogleSignInStart {
@@ -81,8 +98,34 @@ export interface ChangePasswordFailure {
 	error: ErrorMessage;
 }
 
-export interface DeleteAccount {
-	type: typeof DELETE_ACCOUNT;
+export interface ChangeEmailStart {
+	type: typeof CHANGE_EMAIL_START;
+	newEmail: string;
+	password: string;
+}
+
+export interface ChangeEmailSuccess {
+	type: typeof CHANGE_EMAIL_SUCCESS;
+	newEmail: string;
+}
+
+export interface ChangeEmailFailure {
+	type: typeof CHANGE_EMAIL_FAILURE;
+	error: ErrorMessage;
+}
+
+export interface DeleteAccountStart {
+	type: typeof DELETE_ACCOUNT_START;
+	password?: string;
+}
+
+export interface DeleteAccountSuccess {
+	type: typeof DELETE_ACCOUNT_SUCCESS;
+}
+
+export interface DeleteAccountFailure {
+	type: typeof DELETE_ACCOUNT_FAILURE;
+	error: ErrorMessage;
 }
 
 export interface ClearError {
@@ -99,5 +142,10 @@ export type UserActions =
 	| ChangePasswordStart
 	| ChangePasswordSuccess
 	| ChangePasswordFailure
-	| DeleteAccount
+	| ChangeEmailStart
+	| ChangeEmailSuccess
+	| ChangeEmailFailure
+	| DeleteAccountStart
+	| DeleteAccountSuccess
+	| DeleteAccountFailure
 	| ClearError;

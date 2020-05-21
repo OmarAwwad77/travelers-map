@@ -1,19 +1,29 @@
 import { createSelector } from 'reselect';
 import { AppState } from '../root.reducer';
 
-const selectUser = (state: AppState) => state.userState;
+const selectUserState = (state: AppState) => state.userState;
 
 export const selectError = createSelector(
-	[selectUser],
+	[selectUserState],
 	(userState) => userState.error
 );
 
 export const selectLoading = createSelector(
-	[selectUser],
+	[selectUserState],
 	(userState) => userState.loading
 );
 
-export const selectIsAuth = createSelector(
+export const selectUser = createSelector(
+	[selectUserState],
+	(userState) => userState.user
+);
+
+export const selectUserProviderId = createSelector(
 	[selectUser],
+	(user) => user?.providerId!
+);
+
+export const selectIsAuth = createSelector(
+	[selectUserState],
 	(userState) => !!userState.user
 );

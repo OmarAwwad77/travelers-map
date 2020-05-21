@@ -126,7 +126,7 @@ const AddPlace: React.FC<Props> = ({
 
 		// validate file
 		const validExts = ['jpg', 'png', 'jpeg'];
-		const maxFileSize = 1;
+		const maxFileSize = 5;
 
 		const fileExt = file.name.substring(file.name.lastIndexOf('.') + 1);
 		const fileSize = file.size / 1000000; // size in mb

@@ -23,6 +23,9 @@ export const EditLink = styled.span`
 	&:hover {
 		text-decoration: underline;
 	}
+	&:last-child {
+		color: red;
+	}
 `;
 
 export const EditLinksWrapper = styled.div`

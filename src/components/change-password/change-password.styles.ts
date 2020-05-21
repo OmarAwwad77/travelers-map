@@ -1,5 +1,6 @@
 import styled, { css } from 'styled-components';
 import { HeroButton } from '../../components/hero/hero.styles';
+export { ErrorMessage } from '../../hoc/with-error/with-error';
 
 export const ChangePasswordWrapper = styled.div`
 	padding: 2rem;

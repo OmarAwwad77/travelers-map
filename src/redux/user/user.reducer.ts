@@ -17,7 +17,9 @@ const userReducer = (state = initialState, action: UserActions): UserState => {
 
 		case 'SIGN_IN_FAILURE':
 		case 'SIGN_UP_FAILURE':
+		case 'CHANGE_EMAIL_FAILURE':
 		case 'CHANGE_PASSWORD_FAILURE':
+		case 'DELETE_ACCOUNT_FAILURE':
 			return {
 				...state,
 				error: action.error,
@@ -32,6 +34,21 @@ const userReducer = (state = initialState, action: UserActions): UserState => {
 				...state,
 				error: null,
 				loading: true,
+			};
+
+		case 'CHANGE_EMAIL_SUCCESS':
+			return {
+				...state,
+				user: {
+					...state.user!,
+					email: action.newEmail,
+				},
+			};
+
+		case 'DELETE_ACCOUNT_SUCCESS':
+			return {
+				...state,
+				user: null,
 			};
 
 		case 'CLEAR_ERROR':

@@ -2,32 +2,41 @@ import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
+import { css } from 'styled-components';
 
 import Form from '../../components/form/form';
 import WithModel from '../../hoc/With-model/With-model';
 
-import { changePasswordStart, clearError } from '../../redux/root.actions';
+import { changeEmailStart, clearError } from '../../redux/root.actions';
 import { FormStateType } from '../form/form.types';
 import { AppState } from '../../redux/root.reducer';
 import { createStructuredSelector } from 'reselect';
 import { UserState } from '../../redux/user/user.types';
 import { selectError } from '../../redux/user/user.selectors';
 import {
-	ChangePasswordWrapper,
+	ChangePasswordWrapper as ChangeEmailWrapper,
 	UpdateButton,
-	gridCss,
 	ErrorMessage,
-} from './change-password.styles';
+} from '../change-password/change-password.styles';
 
-const changePasswordForm: FormStateType = {
+export const gridCss = css`
+	gap: 1rem;
+	grid-template-areas:
+		'title title'
+		'passwordLabel passwordLabel'
+		'password password'
+		'emailLabel emailLabel'
+		'email email';
+`;
+
+const changeEmailForm: FormStateType = {
 	titles: {
-		title: 'Change password',
+		title: 'Change email',
 	},
 	fields: [
 		{
 			type: 'password',
-			label: 'oldPassword',
-			displayLabel: 'Old Password',
+			label: 'password',
 			value: '',
 			isValid: false,
 			validation: {
@@ -37,15 +46,13 @@ const changePasswordForm: FormStateType = {
 			},
 		},
 		{
-			type: 'password',
-			label: 'newPassword',
-			displayLabel: 'New Password',
+			type: 'text',
+			label: 'email',
 			value: '',
 			isValid: false,
 			validation: {
 				required: true,
-				minLen: 6,
-				maxLen: 12,
+				type: 'email',
 			},
 		},
 	],
@@ -53,32 +60,30 @@ const changePasswordForm: FormStateType = {
 };
 
 interface LinkDispatchToProps {
-	changePasswordStart: typeof changePasswordStart;
+	changeEmailStart: typeof changeEmailStart;
 	clearError: typeof clearError;
 }
 interface LinkStateToProps extends Pick<UserState, 'error'> {}
 interface OwnProps {}
 type Props = LinkDispatchToProps & OwnProps & LinkStateToProps;
 
-const ChangePassword: React.FC<Props> = ({
-	changePasswordStart,
+const ChangeEmail: React.FC<Props> = ({
+	changeEmailStart,
 	clearError,
 	error,
 }) => {
-	const [state, setState] = useState(changePasswordForm);
+	const [state, setState] = useState(changeEmailForm);
 	const { goBack } = useHistory();
 
 	const onSubmit = () => {
 		if (!state.isFormValid) return;
 
-		const oldPassword = state.fields.find(
-			(field) => field.label === 'oldPassword'
-		)!.value as string;
-		const newPassword = state.fields.find(
-			(field) => field.label === 'newPassword'
-		)!.value as string;
+		const email = state.fields.find((field) => field.label === 'email')!
+			.value as string;
+		const password = state.fields.find((field) => field.label === 'password')!
+			.value as string;
 
-		changePasswordStart(oldPassword, newPassword);
+		changeEmailStart(email, password);
 	};
 
 	return error?.label === 'unknown' ? (
@@ -92,24 +97,24 @@ const ChangePassword: React.FC<Props> = ({
 		</WithModel>
 	) : (
 		<WithModel>
-			<ChangePasswordWrapper>
+			<ChangeEmailWrapper>
 				<Form
 					gridCss={gridCss}
 					state={state}
 					setState={setState}
-					fieldNetworkError={error?.type === 'changePassword' ? error : null}
+					fieldNetworkError={error?.type === 'changeEmail' ? error : null}
 				/>
 				<UpdateButton onClick={onSubmit} disabled={!state.isFormValid}>
 					update
 				</UpdateButton>
-			</ChangePasswordWrapper>
+			</ChangeEmailWrapper>
 		</WithModel>
 	);
 };
 
 const mapDispatchToProps = (dispatch: Dispatch): LinkDispatchToProps => ({
-	changePasswordStart: (oldPass, newPass) =>
-		dispatch(changePasswordStart(oldPass, newPass)),
+	changeEmailStart: (email, password) =>
+		dispatch(changeEmailStart(email, password)),
 	clearError: () => dispatch(clearError()),
 });
 
@@ -121,4 +126,4 @@ const mapStateToProps = createStructuredSelector<
 	error: selectError,
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(ChangePassword);
+export default connect(mapStateToProps, mapDispatchToProps)(ChangeEmail);

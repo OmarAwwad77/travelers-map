@@ -1,5 +1,5 @@
 import { call, apply, takeLatest, all, put } from 'redux-saga/effects';
-import { SagaIterator, Saga } from 'redux-saga';
+import { SagaIterator } from 'redux-saga';
 import {
 	auth,
 	googleProvider,
@@ -9,23 +9,58 @@ import {
 	DocumentSnapshot,
 	getCurrentUser,
 	EmailAuthProvider,
+	GoogleAuthProvider,
 } from '../../firebase/firebase.utils';
 import {
 	EMAIL_SIGN_IN_START,
+	GOOGLE_SIGN_IN_START,
+	CHANGE_PASSWORD_START,
+	SIGN_UP_START,
+	DELETE_ACCOUNT_START,
+	CHANGE_EMAIL_START,
 	EmailSignInStart,
 	SignUpStart,
 	User,
-	GOOGLE_SIGN_IN_START,
-	SIGN_UP_START,
-	CHANGE_PASSWORD_START,
 	ChangePasswordStart,
+	ChangeEmailStart,
+	DeleteAccountStart,
+	DbUser,
 } from './user.types';
-import { signInSuccess, signInFailure, signUpFailure } from '../root.actions';
-import { changePasswordFailure, changePasswordSuccess } from './user.actions';
+import {
+	signInSuccess,
+	signInFailure,
+	signUpFailure,
+	changePasswordFailure,
+	changePasswordSuccess,
+	changeEmailSuccess,
+	changeEmailFailure,
+	deleteAccountSuccess,
+	deleteAccountFailure,
+} from '../root.actions';
+
+const defaultUserImg =
+	'https://firebasestorage.googleapis.com/v0/b/connect-c44e6.appspot.com/o/images%2Fuser.svg?alt=media&token=ef7689a1-9619-4265-bd81-674e50437dd5';
 
 function* putUserOnSuccess(appUser: User): SagaIterator {
 	yield put(signInSuccess(appUser));
 	localStorage.setItem('user', JSON.stringify(appUser));
+}
+
+function* reAuthSaga(password: string): SagaIterator {
+	const firebaseUser: FirebaseUser = yield call(getCurrentUser);
+
+	// re-authenticate user
+	const credentials = yield apply(
+		EmailAuthProvider,
+		EmailAuthProvider.credential,
+		[firebaseUser.email!, password]
+	);
+
+	yield apply(firebaseUser, firebaseUser.reauthenticateWithCredential, [
+		credentials,
+	]);
+
+	return firebaseUser;
 }
 
 function* emailSignInSaga({
@@ -39,7 +74,14 @@ function* emailSignInSaga({
 		);
 		const doc: DocumentSnapshot = yield call(getUserDocFromDb, user.uid);
 		if (doc.exists) {
-			const appUser: User = doc.data() as User;
+			const dbUser = doc.data() as DbUser;
+			const appUser: User = {
+				displayName: dbUser.displayName,
+				email: user.email!,
+				uid: user.uid,
+				providerId: user.providerData[0]?.providerId!,
+				url: dbUser.profileImg,
+			};
 			yield call(putUserOnSuccess, appUser);
 		} else {
 			throw { code: 'auth/user-not-found' };
@@ -98,16 +140,29 @@ function* googleSignInSaga(): SagaIterator {
 
 		const doc: DocumentSnapshot = yield call(getUserDocFromDb, user.uid);
 		if (doc.exists) {
-			const user: User = doc.data() as User;
-			yield put(signInSuccess(user));
+			const dbUser = doc.data() as DbUser;
+			const appUser: User = {
+				email: user.email!,
+				uid: user.uid,
+				displayName: dbUser.displayName,
+				providerId: user.providerData[0]?.providerId!,
+				url: dbUser.profileImg,
+			};
+			yield put(signInSuccess(appUser));
 		} else {
 			const appUser: User = {
 				email: user.email!,
 				uid: user.uid,
 				displayName: user.email!.substring(0, user.email!.indexOf('@')),
+				providerId: user.providerData[0]?.providerId!,
+				url: defaultUserImg,
+			};
+			const dbUser: DbUser = {
+				displayName: appUser.displayName,
+				profileImg: appUser.url,
 			};
 
-			yield call(createUserDocInDb, appUser);
+			yield call(createUserDocInDb, dbUser, user.uid);
 			yield put(signInSuccess(appUser));
 		}
 	} catch (error) {
@@ -145,9 +200,15 @@ function* signUpSaga({
 			displayName,
 			email: user.email!,
 			uid: user.uid,
+			providerId: user.providerData[0]?.providerId!,
+			url: defaultUserImg,
+		};
+		const dbUser: DbUser = {
+			displayName,
+			profileImg: defaultUserImg,
 		};
 
-		yield call(createUserDocInDb, appUser);
+		yield call(createUserDocInDb, dbUser, user.uid);
 		yield put(signInSuccess(appUser));
 	} catch (error) {
 		switch (error.code) {
@@ -198,19 +259,8 @@ function* changePasswordSaga({
 	newPassword,
 }: ChangePasswordStart): SagaIterator {
 	try {
-		// get user
-		const firebaseUser: FirebaseUser = yield call(getCurrentUser);
-
-		// re-authenticate user
-		const credentials = yield apply(
-			EmailAuthProvider,
-			EmailAuthProvider.credential,
-			[firebaseUser.email!, oldPassword]
-		);
-
-		yield apply(firebaseUser, firebaseUser.reauthenticateWithCredential, [
-			credentials,
-		]);
+		// get current user and reAuthenticate
+		const firebaseUser: FirebaseUser = yield call(reAuthSaga, oldPassword);
 
 		// change password
 		yield apply(firebaseUser, firebaseUser.updatePassword, [newPassword]);
@@ -240,6 +290,82 @@ function* changePasswordSaga({
 	}
 }
 
+function* changeEmailSaga({
+	newEmail,
+	password,
+}: ChangeEmailStart): SagaIterator {
+	try {
+		// get current user and reAuthenticate
+		const firebaseUser: FirebaseUser = yield call(reAuthSaga, password);
+
+		//change email
+		yield apply(firebaseUser, firebaseUser.updateEmail, [newEmail]);
+
+		yield put(changeEmailSuccess(newEmail));
+	} catch (error) {
+		switch (error.code) {
+			case 'auth/wrong-password':
+				yield put(
+					changeEmailFailure({
+						label: 'password',
+						message: 'The Password is Invalid.',
+						type: 'changeEmail',
+					})
+				);
+				break;
+
+			default:
+				yield put(
+					changeEmailFailure({
+						label: 'unknown',
+						message: 'something went wrong. try again later',
+						type: 'changeEmail',
+					})
+				);
+		}
+	}
+}
+
+function* deleteAccountSaga({ password }: DeleteAccountStart): SagaIterator {
+	try {
+		// get current user and reAuthenticate
+		let firebaseUser: FirebaseUser;
+		if (password) {
+			firebaseUser = yield call(reAuthSaga, password);
+		} else {
+			firebaseUser = yield call(getCurrentUser);
+			yield apply(firebaseUser, firebaseUser.reauthenticateWithPopup, [
+				GoogleAuthProvider,
+			]);
+		}
+
+		yield apply(firebaseUser, firebaseUser.delete, []);
+		yield put(deleteAccountSuccess());
+	} catch (error) {
+		console.log(error);
+		switch (error.code) {
+			case 'auth/wrong-password':
+				yield put(
+					deleteAccountFailure({
+						label: 'password',
+						message: 'The Password is Invalid.',
+						type: 'deleteAccount',
+					})
+				);
+				break;
+
+			default:
+				yield put(
+					deleteAccountFailure({
+						label: 'unknown',
+						message: 'something went wrong. try again later',
+						type: 'deleteAccount',
+					})
+				);
+		}
+	}
+}
+
 function* onEmailSignInSaga(): SagaIterator {
 	yield takeLatest(EMAIL_SIGN_IN_START, emailSignInSaga);
 }
@@ -256,12 +382,22 @@ function* onChangePasswordSaga(): SagaIterator {
 	yield takeLatest(CHANGE_PASSWORD_START, changePasswordSaga);
 }
 
+function* onChangeEmailSaga(): SagaIterator {
+	yield takeLatest(CHANGE_EMAIL_START, changeEmailSaga);
+}
+
+function* onDeleteAccountSaga(): SagaIterator {
+	yield takeLatest(DELETE_ACCOUNT_START, deleteAccountSaga);
+}
+
 export function* userSagas(): SagaIterator {
 	yield all([
 		call(onEmailSignInSaga),
 		call(onGoogleSignInSaga),
 		call(onSignUpSaga),
 		call(onChangePasswordSaga),
+		call(onChangeEmailSaga),
+		call(onDeleteAccountSaga),
 	]);
 }
 

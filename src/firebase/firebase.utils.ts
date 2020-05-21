@@ -25,6 +25,7 @@ export const db = firebase.firestore();
 export const auth = firebase.auth();
 export const storageRef = firebase.storage().ref();
 export const EmailAuthProvider = firebase.auth.EmailAuthProvider;
+export const GoogleAuthProvider = new firebase.auth.GoogleAuthProvider();
 
 export const getCurrentUser = () => {
 	return new Promise<User | null>((res, rej) => {
@@ -41,15 +42,18 @@ export const getCurrentUser = () => {
 	});
 };
 
-export const createUserDocInDb = (user: AppUser) => {
-	return db.collection('users').doc(user.uid!).set(user);
+export const createUserDocInDb = (
+	user: { displayName: string },
+	uid: string
+) => {
+	return db.collection('users').doc(uid).set(user);
 };
 
 export const getUserDocFromDb = (uid: string) => {
 	return db.collection('users').doc(uid).get();
 };
 
-export const uploadImage = (file: File) => {
+export const uploadImage = (file: File | Blob) => {
 	return new Promise<string>(async (resolve) => {
 		const snapshot = await storageRef.child(`images/${Date.now()}`).put(file);
 
