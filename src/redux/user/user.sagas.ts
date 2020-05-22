@@ -1,4 +1,4 @@
-import { call, apply, takeLatest, all, put } from 'redux-saga/effects';
+import { call, apply, takeLatest, all, put, select } from 'redux-saga/effects';
 import { SagaIterator } from 'redux-saga';
 import {
 	auth,
@@ -10,6 +10,8 @@ import {
 	getCurrentUser,
 	EmailAuthProvider,
 	GoogleAuthProvider,
+	updateProfile,
+	uploadImage,
 } from '../../firebase/firebase.utils';
 import {
 	EMAIL_SIGN_IN_START,
@@ -25,6 +27,8 @@ import {
 	ChangeEmailStart,
 	DeleteAccountStart,
 	DbUser,
+	UPDATE_PROFILE_START,
+	UpdateProfileStart,
 } from './user.types';
 import {
 	signInSuccess,
@@ -37,6 +41,7 @@ import {
 	deleteAccountSuccess,
 	deleteAccountFailure,
 } from '../root.actions';
+import { updateProfileFailure, updateProfileSuccess } from './user.actions';
 
 const defaultUserImg =
 	'https://firebasestorage.googleapis.com/v0/b/connect-c44e6.appspot.com/o/images%2Fuser.svg?alt=media&token=ef7689a1-9619-4265-bd81-674e50437dd5';
@@ -329,6 +334,7 @@ function* changeEmailSaga({
 function* deleteAccountSaga({ password }: DeleteAccountStart): SagaIterator {
 	try {
 		// get current user and reAuthenticate
+
 		let firebaseUser: FirebaseUser;
 		if (password) {
 			firebaseUser = yield call(reAuthSaga, password);
@@ -366,6 +372,36 @@ function* deleteAccountSaga({ password }: DeleteAccountStart): SagaIterator {
 	}
 }
 
+function* updateProfileSage({
+	displayName,
+	file,
+	userId,
+}: UpdateProfileStart): SagaIterator {
+	const updatedProfile: DbUser = {
+		displayName,
+		profileImg: '',
+	};
+	try {
+		if (typeof file === 'string') {
+			updatedProfile.profileImg = file;
+		} else {
+			const url: string = yield call(uploadImage, file);
+			updatedProfile.profileImg = url;
+		}
+		yield call(updateProfile, updatedProfile, userId);
+		yield put(updateProfileSuccess());
+	} catch (error) {
+		console.log(error);
+		yield put(
+			updateProfileFailure({
+				label: 'unknown',
+				message: 'something went wrong. try again later',
+				type: 'updateProfile',
+			})
+		);
+	}
+}
+
 function* onEmailSignInSaga(): SagaIterator {
 	yield takeLatest(EMAIL_SIGN_IN_START, emailSignInSaga);
 }
@@ -390,6 +426,10 @@ function* onDeleteAccountSaga(): SagaIterator {
 	yield takeLatest(DELETE_ACCOUNT_START, deleteAccountSaga);
 }
 
+function* onUpdateProfileSaga(): SagaIterator {
+	yield takeLatest(UPDATE_PROFILE_START, updateProfileSage);
+}
+
 export function* userSagas(): SagaIterator {
 	yield all([
 		call(onEmailSignInSaga),
@@ -398,6 +438,7 @@ export function* userSagas(): SagaIterator {
 		call(onChangePasswordSaga),
 		call(onChangeEmailSaga),
 		call(onDeleteAccountSaga),
+		call(onUpdateProfileSaga),
 	]);
 }
 

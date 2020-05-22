@@ -26,7 +26,16 @@ export {
 	deleteAccountStart,
 	deleteAccountSuccess,
 	deleteAccountFailure,
+	updateProfileStart,
+	updateProfileSuccess,
+	updateProfileFailure,
 	clearError,
 } from './user/user.actions';
+
+export {
+	fetchPlacesFailure,
+	fetchPlacesStart,
+	fetchPlacesSuccess,
+} from './news-feed/news-feed.actions';
 
 export type StoreActions = MapActions | UserActions;

@@ -88,6 +88,26 @@ export const deleteAccountFailure = (error: ErrorMessage): UserActions => ({
 	type: 'DELETE_ACCOUNT_FAILURE',
 });
 
+export const updateProfileStart = (
+	displayName: string,
+	file: Blob | string,
+	userId: string
+): UserActions => ({
+	displayName,
+	file,
+	userId,
+	type: 'UPDATE_PROFILE_START',
+});
+
+export const updateProfileSuccess = (): UserActions => ({
+	type: 'UPDATE_PROFILE_SUCCESS',
+});
+
+export const updateProfileFailure = (error: ErrorMessage): UserActions => ({
+	error,
+	type: 'UPDATE_PROFILE_FAILURE',
+});
+
 export const clearError = (): UserActions => ({
 	type: 'CLEAR_ERROR',
 });

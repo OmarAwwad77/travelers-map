@@ -20,6 +20,7 @@ const userReducer = (state = initialState, action: UserActions): UserState => {
 		case 'CHANGE_EMAIL_FAILURE':
 		case 'CHANGE_PASSWORD_FAILURE':
 		case 'DELETE_ACCOUNT_FAILURE':
+		case 'UPDATE_PROFILE_FAILURE':
 			return {
 				...state,
 				error: action.error,
@@ -30,6 +31,9 @@ const userReducer = (state = initialState, action: UserActions): UserState => {
 		case 'EMAIL_SIGN_IN_START':
 		case 'SIGN_UP_START':
 		case 'CHANGE_PASSWORD_START':
+		case 'CHANGE_EMAIL_START':
+		case 'DELETE_ACCOUNT_START':
+		case 'UPDATE_PROFILE_START':
 			return {
 				...state,
 				error: null,

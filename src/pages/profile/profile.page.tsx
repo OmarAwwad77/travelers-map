@@ -1,8 +1,5 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import { Route, useRouteMatch, useHistory } from 'react-router-dom';
-import { createStructuredSelector } from 'reselect';
-import { Dispatch } from 'redux';
 
 import { PostsArea } from '../../components/news-feed/news-feed.styles';
 import SideBar from '../../components/sidebar/sidebar';
@@ -13,9 +10,7 @@ import ChangeEmail from '../../components/change-email/change-email';
 import ChangePassword from '../../components/change-password/change-password';
 import DeleteAccount from '../../components/delete-account/delete-account';
 import EditProfile from '../../components/edit-profile/edit-profile';
-import { AppState } from '../../redux/root.reducer';
-import { selectUserProviderId } from '../../redux/user/user.selectors';
-import { deleteAccountStart } from '../../redux/root.actions';
+
 import {
 	EditLink,
 	Wrapper,
@@ -24,16 +19,9 @@ import {
 	EditLinksWrapper,
 } from './profile.page.styles';
 
-interface LinkStateToProps {
-	userProviderId: string;
-}
-interface LinkDispatchToProps {
-	deleteAccountStart: typeof deleteAccountStart;
-}
 interface OwnProps {}
-type Props = LinkStateToProps & OwnProps & LinkDispatchToProps;
-
-const Profile: React.FC<Props> = ({ userProviderId, deleteAccountStart }) => {
+type Props = OwnProps;
+const Profile: React.FC<Props> = () => {
 	const { path } = useRouteMatch();
 	const { push } = useHistory();
 	const nestedRoutes = (
@@ -45,22 +33,21 @@ const Profile: React.FC<Props> = ({ userProviderId, deleteAccountStart }) => {
 			/>
 			<Route path={`${path}/change-email`} exact component={ChangeEmail} />
 			<Route path={`${path}/edit-profile`} exact component={EditProfile} />
-			{userProviderId === 'password' && (
+			<Route path={`${path}/delete-account`} exact component={DeleteAccount} />
+			{/* {userProviderId === 'password' && (
 				<Route
 					path={`${path}/delete-account`}
 					exact
 					component={DeleteAccount}
 				/>
-			)}
+			)} */}
 		</>
 	);
 
 	return (
 		<Wrapper>
 			{nestedRoutes}
-			<PostsArea>
-				<Post />
-			</PostsArea>
+			<PostsArea>{/* <Post /> */}</PostsArea>
 			<SideBarWrapper>
 				<SideBar title='Edit Profile'>
 					<TabsWrapper>
@@ -90,10 +77,13 @@ const Profile: React.FC<Props> = ({ userProviderId, deleteAccountStart }) => {
 									</EditLink>
 
 									<EditLink
+										// onClick={() => {
+										// 	userProviderId === 'password'
+										// 		? push(`${path}/delete-account`)
+										// 		: deleteAccountStart();
+										// }}
 										onClick={() => {
-											userProviderId === 'password'
-												? push(`${path}/delete-account`)
-												: deleteAccountStart();
+											push(`${path}/delete-account`);
 										}}
 									>
 										delete account
@@ -108,16 +98,4 @@ const Profile: React.FC<Props> = ({ userProviderId, deleteAccountStart }) => {
 	);
 };
 
-const mapStateToProps = createStructuredSelector<
-	AppState,
-	OwnProps,
-	LinkStateToProps
->({
-	userProviderId: selectUserProviderId,
-});
-
-const mapDispatchToProps = (dispatch: Dispatch): LinkDispatchToProps => ({
-	deleteAccountStart: (password) => dispatch(deleteAccountStart(password)),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(Profile);
+export default Profile;

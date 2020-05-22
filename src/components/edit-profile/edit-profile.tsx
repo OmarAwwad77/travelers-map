@@ -1,4 +1,5 @@
 import React, { useState, useRef, ChangeEvent } from 'react';
+import { useHistory } from 'react-router-dom';
 import { connect } from 'react-redux';
 
 import AvatarEditor, { Editor } from '../avatar-editor/avatar-editor';
@@ -13,21 +14,35 @@ import { uploadImage } from '../../firebase/firebase.utils';
 import { createStructuredSelector } from 'reselect';
 import { AppState } from '../../redux/root.reducer';
 import { UserState } from '../../redux/user/user.types';
-import { selectUser } from '../../redux/user/user.selectors';
+import { selectUser, selectError } from '../../redux/user/user.selectors';
+import { Dispatch } from 'redux';
+import { updateProfileStart, clearError } from '../../redux/root.actions';
+import { ErrorMessage } from '../../hoc/with-error/with-error';
 
 interface ProfileImageState {
 	url: string;
 	errorMessage: null | string;
 }
 
-interface LinkStateToProps extends Pick<UserState, 'user'> {}
+interface LinkStateToProps extends Pick<UserState, 'user' | 'error'> {}
+interface LinkDispatchToProps {
+	updateProfileStart: typeof updateProfileStart;
+	clearError: typeof clearError;
+}
 interface OwnProps {}
-type Props = OwnProps & LinkStateToProps;
-const EditProfile: React.FC<Props> = ({ user }) => {
-	const [state, setState] = useState({
-		displayName: '',
-		isValid: false,
+type Props = OwnProps & LinkStateToProps & LinkDispatchToProps;
+const EditProfile: React.FC<Props> = ({
+	user,
+	updateProfileStart,
+	error,
+	clearError,
+}) => {
+	const [name, setName] = useState({
+		displayName: user!.displayName,
+		isValid: true,
 	});
+
+	const { goBack } = useHistory();
 
 	const [profileImg, setProfileImg] = useState<ProfileImageState>({
 		url: user!.url,
@@ -38,15 +53,16 @@ const EditProfile: React.FC<Props> = ({ user }) => {
 
 	const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
 		const val = e.target.value;
-		setState((prevState) => ({
-			...prevState,
+		setName((prevState) => ({
 			displayName: val,
 			isValid: val !== '',
 		}));
 	};
 
 	const onProfileImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
+		e.preventDefault();
 		const file = e.target.files?.[0];
+		console.log(file);
 		if (!file) return;
 
 		// validate file
@@ -99,19 +115,38 @@ const EditProfile: React.FC<Props> = ({ user }) => {
 	};
 
 	const onSubmit = () => {
-		const { displayName, url } = user!;
+		if (!isValid) return;
+		const { displayName } = name;
+		const { uid } = user!;
+		let img: Blob | string =
+			'https://firebasestorage.googleapis.com/v0/b/connect-c44e6.appspot.com/o/images%2Fuser.svg?alt=media&token=ef7689a1-9619-4265-bd81-674e50437dd5';
 		if (editorRef.current) {
-			editorRef.current.getImage().toBlob(async (blob) => {
-				const url = await uploadImage(blob!);
-				console.log(url);
+			// both name and url
+			const canvasElement = editorRef.current.getImage();
+			console.log(canvasElement);
+			canvasElement.toBlob((blob) => {
+				img = blob!;
+				console.log(img);
+				updateProfileStart(displayName, img, uid);
 			});
+		} else {
+			updateProfileStart(displayName, img, uid);
 		}
 	};
 
-	const { displayName, isValid } = state;
+	const { displayName, isValid } = name;
 	const { url, errorMessage } = profileImg;
 
-	return (
+	return error?.label === 'unknown' ? (
+		<WithModel
+			backDropOnClick={() => {
+				clearError();
+				goBack();
+			}}
+		>
+			<ErrorMessage>{error.message}</ErrorMessage>
+		</WithModel>
+	) : (
 		<WithModel>
 			<Wrapper>
 				<AvatarEditor
@@ -144,6 +179,13 @@ const mapStateToProps = createStructuredSelector<
 	LinkStateToProps
 >({
 	user: selectUser,
+	error: selectError,
 });
 
-export default connect(mapStateToProps)(EditProfile);
+const mapDispatchToProps = (dispatch: Dispatch): LinkDispatchToProps => ({
+	updateProfileStart: (displayName, file, userId) =>
+		dispatch(updateProfileStart(displayName, file, userId)),
+	clearError: () => dispatch(clearError()),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(EditProfile);

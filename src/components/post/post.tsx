@@ -20,8 +20,15 @@ import {
 	PlaceName,
 	Divider,
 } from './post.styles';
+import { Place } from '../../redux/news-feed/news-feed.types';
 
-const Post = () => {
+interface OwnProps {
+	place: Place;
+}
+type Props = OwnProps;
+
+const Post: React.FC<Props> = ({ place }) => {
+	const { placeImages, placeName } = place;
 	return (
 		<Wrapper>
 			<PostHeader>
@@ -32,13 +39,13 @@ const Post = () => {
 				</IconWithText>
 			</PostHeader>
 			<PostContent>
-				<Slider urls={[paris]} width='100%' height='100%' />
+				<Slider urls={placeImages} width='100%' height='100%' />
 			</PostContent>
 			<PostFooter>
 				<IconWithText gridArea='likes'>
 					<LikeIcon /> 3.5k
 				</IconWithText>
-				<PlaceName>Paris, France</PlaceName>
+				<PlaceName>{placeName}</PlaceName>
 				<IconWithText gridArea='comments'>
 					<CommentIcon /> 905
 				</IconWithText>

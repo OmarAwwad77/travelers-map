@@ -23,3 +23,33 @@ export const gridCss = css`
 		'newPasswordLabel newPasswordLabel'
 		'newPassword newPassword';
 `;
+
+export const Confirm = styled.div`
+	padding: 2rem;
+	display: flex;
+	flex-direction: column;
+`;
+
+export const ConfirmationMessage = styled.span`
+	font-size: 1.8rem;
+	text-transform: capitalize;
+`;
+
+export const ButtonsWrapper = styled.div`
+	margin-top: 3rem;
+	width: 100%;
+	display: flex;
+	justify-content: space-evenly;
+`;
+export const Cancel = styled.button`
+	outline: none;
+	border: none;
+	border-radius: 1rem;
+	padding: 1rem 2.5rem;
+	color: #fff;
+	background: ${(p) => p.theme.colors.secondary2};
+`;
+
+export const Proceed = styled(Cancel)`
+	background: red;
+`;

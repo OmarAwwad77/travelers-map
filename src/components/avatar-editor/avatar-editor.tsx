@@ -19,11 +19,12 @@ interface OwnProps {
 type Props = OwnProps;
 const AvatarEditor = React.forwardRef<Editor, Props>((props, ref) => {
 	const { inputId, onChange, url, onCancel, errorMessage } = props;
+
 	return (
 		<>
 			<Wrapper>
 				<ImageUploadWrapper withUrl={!!url}>
-					<input id={inputId} type='file' onChange={onChange} />
+					<input key={url} id={inputId} type='file' onChange={onChange} />
 					{url ? (
 						<Editor
 							image={url}
@@ -33,6 +34,7 @@ const AvatarEditor = React.forwardRef<Editor, Props>((props, ref) => {
 							borderRadius={100}
 							scale={1}
 							color={[255, 255, 255, 0.6]}
+							crossOrigin='anonymous'
 						/>
 					) : (
 						<>

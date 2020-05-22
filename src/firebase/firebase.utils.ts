@@ -3,7 +3,8 @@ import { User } from 'firebase';
 import 'firebase/auth';
 import 'firebase/storage';
 import 'firebase/firestore';
-import { User as AppUser } from '../redux/user/user.types';
+import { User as AppUser, DbUser } from '../redux/user/user.types';
+import { Place } from '../redux/news-feed/news-feed.types';
 
 const config = {
 	apiKey: 'AIzaSyCqTuRU04Iv39jAhk5jxrLDBYUDVkXRcd4',
@@ -42,6 +43,9 @@ export const getCurrentUser = () => {
 	});
 };
 
+export const updateProfile = (updatedProfile: DbUser, userId: string) =>
+	db.collection('users').doc(userId).update(updatedProfile);
+
 export const createUserDocInDb = (
 	user: { displayName: string },
 	uid: string
@@ -60,6 +64,27 @@ export const uploadImage = (file: File | Blob) => {
 		const url = await snapshot.task.snapshot.ref.getDownloadURL();
 		resolve(url);
 	});
+};
+
+// citiesRef.where('country', 'in', ['USA', 'Japan']);
+// https://firebase.google.com/docs/firestore/query-data/queries
+export const getFeatures = async () => {
+	const querySnapshot = await db.collection('features').get();
+	let places: Place[] = [];
+	querySnapshot.forEach((doc) => {
+		doc.data().userFeatures.map((feature: any) => {
+			places.push({
+				placeCoords: feature.properties.placeCoords,
+				placeId: feature.properties.placeId,
+				placeDesc: feature.properties.placeDesc,
+				placeImages: feature.properties.placeImages,
+				placeName: feature.properties.placeName,
+				tripId: feature.properties.tripId,
+				userId: doc.id,
+			});
+		});
+	});
+	return places;
 };
 
 interface PlaceToAdd {
@@ -92,20 +117,3 @@ export const addPlace = async (place: PlaceToAdd) => {
 		console.log('error adding a place', place);
 	}
 };
-
-// trips:{
-// 	trip:
-// 		{
-// 			tripName:// got it
-// 			userId //got it
-// 			places:[
-// 				{
-// 					id:// got it
-// 					coords:// got it
-// 					placeDesc: //got it
-// 					images: []// got it
-// 				}
-// 			]
-// 		}
-
-// 		}

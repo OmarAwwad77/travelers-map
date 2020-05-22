@@ -14,7 +14,8 @@ export interface ErrorMessage {
 		| 'sign-up'
 		| 'changePassword'
 		| 'changeEmail'
-		| 'deleteAccount';
+		| 'deleteAccount'
+		| 'updateProfile';
 }
 
 export interface DbUser {
@@ -52,6 +53,9 @@ export const CHANGE_EMAIL_FAILURE = 'CHANGE_EMAIL_FAILURE';
 export const DELETE_ACCOUNT_START = 'DELETE_ACCOUNT_START';
 export const DELETE_ACCOUNT_SUCCESS = 'DELETE_ACCOUNT_SUCCESS';
 export const DELETE_ACCOUNT_FAILURE = 'DELETE_ACCOUNT_FAILURE';
+export const UPDATE_PROFILE_START = 'UPDATE_PROFILE_START';
+export const UPDATE_PROFILE_SUCCESS = 'UPDATE_PROFILE_SUCCESS';
+export const UPDATE_PROFILE_FAILURE = 'UPDATE_PROFILE_FAILURE';
 export const CLEAR_ERROR = 'CLEAR_ERROR';
 
 export interface GoogleSignInStart {
@@ -128,6 +132,22 @@ export interface DeleteAccountFailure {
 	error: ErrorMessage;
 }
 
+export interface UpdateProfileStart {
+	type: typeof UPDATE_PROFILE_START;
+	displayName: string;
+	file: Blob | string;
+	userId: string;
+}
+
+export interface UpdateProfileSuccess {
+	type: typeof UPDATE_PROFILE_SUCCESS;
+}
+
+export interface UpdateProfileFailure {
+	type: typeof UPDATE_PROFILE_FAILURE;
+	error: ErrorMessage;
+}
+
 export interface ClearError {
 	type: typeof CLEAR_ERROR;
 }
@@ -148,4 +168,7 @@ export type UserActions =
 	| DeleteAccountStart
 	| DeleteAccountSuccess
 	| DeleteAccountFailure
+	| UpdateProfileStart
+	| UpdateProfileSuccess
+	| UpdateProfileFailure
 	| ClearError;

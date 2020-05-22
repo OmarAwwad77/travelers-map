@@ -6,7 +6,8 @@ import { UserState } from '../../redux/user/user.types';
 
 export const ErrorMessage = styled.div`
 	text-transform: capitalize;
-	font-size: 1.8rem;
+	color: red;
+	font-size: 2rem;
 	font-weight: 600;
 	padding: 5rem;
 `;
