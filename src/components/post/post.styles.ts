@@ -37,7 +37,7 @@ export const PostFooter = styled.div`
 	align-items: center;
 `;
 
-export const PostAvatar = styled(UserAvatar)`
+export const PostAvatar = styled(UserAvatar)<{ url: string }>`
 	width: 5rem;
 	height: 5rem;
 `;
@@ -65,6 +65,7 @@ export const IconWithText = styled.span<{ gridArea?: string }>`
 `;
 
 export const PlaceName = styled.span`
+	text-transform: capitalize;
 	text-align: center;
 	grid-area: placeName;
 	font-size: 1.6rem;

@@ -21,4 +21,7 @@ export const getPlacesFromFeatures = (features: Feature[]): Place[] =>
 			placeCoords: feature.properties?.placeCoords,
 			placeImages: feature.properties?.placeImages,
 			tripId: feature.properties?.tripId,
+			createdAt: feature.properties?.createdAt,
+			likes: feature.properties?.likes,
+			userId: feature.properties?.userId,
 		}));

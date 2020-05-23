@@ -34,7 +34,7 @@ export const CommentDate = styled.span`
 	opacity: 0.8;
 `;
 
-export const CommentAvatar = styled(PostAvatar)`
+export const CommentAvatar = styled(PostAvatar)<{ url: string }>`
 	grid-area: 1 / 1 / -1/ 2;
 `;
 

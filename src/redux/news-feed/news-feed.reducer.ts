@@ -1,7 +1,7 @@
 import { NewsFeedState, NewsFeedActions } from './news-feed.types';
 
 const initialState: NewsFeedState = {
-	places: [],
+	posts: [],
 	users: [],
 	loading: false,
 	error: null,
@@ -12,21 +12,21 @@ const newsFeedReducer = (
 	action: NewsFeedActions
 ): NewsFeedState => {
 	switch (action.type) {
-		case 'FETCH_PLACES_START':
+		case 'FETCH_POSTS_START':
 			return {
 				...state,
 				loading: true,
 				error: null,
 			};
 
-		case 'FETCH_PLACES_SUCCESS':
+		case 'FETCH_POSTS_SUCCESS':
 			return {
 				...state,
-				places: action.places,
+				posts: action.posts,
 				loading: false,
 			};
 
-		case 'FETCH_PLACES_FAILURE':
+		case 'FETCH_POSTS_FAILURE':
 			return {
 				...state,
 				error: action.error,

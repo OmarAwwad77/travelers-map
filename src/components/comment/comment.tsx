@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Comment as CommentType } from '../../redux/news-feed/news-feed.types';
 
 import AddComment from '../add-comment/add-comment';
 import {
@@ -13,24 +14,32 @@ import {
 
 interface OwnProps {
 	nested?: boolean;
+	userImg: string;
+	userName: string;
+	comment: string;
+	comments: CommentType[];
+	createdAt: number;
 }
 type Props = OwnProps;
 
-const Comment: React.FC<Props> = ({ nested }) => {
+const Comment: React.FC<Props> = ({
+	nested,
+	userName,
+	comment,
+	userImg,
+	createdAt,
+	comments,
+}) => {
 	const [replying, setReplying] = useState(false);
 	const [viewReplies, setViewReplies] = useState(false);
-	const comments = [1, 2];
 
 	return (
 		<Wrapper>
 			<Grid nested={nested}>
-				<CommentAvatar />
-				<CommentDate>25 minutes ago</CommentDate>
-				<CommentOwner>omar awwad</CommentOwner>
-				<CommentText>
-					this is a comment left by this user this is a comment left by this
-					user this is a comment left by this user
-				</CommentText>
+				<CommentAvatar url={userImg} />
+				<CommentDate>{createdAt}</CommentDate>
+				<CommentOwner>{userName}</CommentOwner>
+				<CommentText>{comment}</CommentText>
 				{!nested && (
 					<CommentFooter>
 						<span onClick={() => setViewReplies(!viewReplies)}>
@@ -43,7 +52,11 @@ const Comment: React.FC<Props> = ({ nested }) => {
 			{replying && !nested && (
 				<AddComment url='https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50' />
 			)}
-			{!nested && viewReplies && comments.map((comm) => <Comment nested />)}
+			{!nested &&
+				viewReplies &&
+				comments.map((comment) => (
+					<Comment key={comment.commentId} {...comment} nested />
+				))}
 		</Wrapper>
 	);
 };

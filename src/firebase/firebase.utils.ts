@@ -4,7 +4,7 @@ import 'firebase/auth';
 import 'firebase/storage';
 import 'firebase/firestore';
 import { User as AppUser, DbUser } from '../redux/user/user.types';
-import { Place } from '../redux/news-feed/news-feed.types';
+import { Post } from '../redux/news-feed/news-feed.types';
 
 const config = {
 	apiKey: 'AIzaSyCqTuRU04Iv39jAhk5jxrLDBYUDVkXRcd4',
@@ -20,6 +20,7 @@ firebase.initializeApp(config);
 
 export type FirebaseUser = User;
 export type DocumentSnapshot = firestore.DocumentSnapshot;
+export type QuerySnapshot = firestore.QuerySnapshot;
 export const googleProvider = new firebase.auth.GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: 'select_account' });
 export const db = firebase.firestore();
@@ -68,24 +69,13 @@ export const uploadImage = (file: File | Blob) => {
 
 // citiesRef.where('country', 'in', ['USA', 'Japan']);
 // https://firebase.google.com/docs/firestore/query-data/queries
-export const getFeatures = async () => {
-	const querySnapshot = await db.collection('features').get();
-	let places: Place[] = [];
-	querySnapshot.forEach((doc) => {
-		doc.data().userFeatures.map((feature: any) => {
-			places.push({
-				placeCoords: feature.properties.placeCoords,
-				placeId: feature.properties.placeId,
-				placeDesc: feature.properties.placeDesc,
-				placeImages: feature.properties.placeImages,
-				placeName: feature.properties.placeName,
-				tripId: feature.properties.tripId,
-				userId: doc.id,
-			});
-		});
-	});
-	return places;
-};
+export const getCommentsForPost = (postId: string) =>
+	db.collection('comments').where('postId', '==', postId.toString()).get();
+
+export const getCommentById = (id: string) =>
+	db.collection('comments').doc(id).get();
+
+export const getFeatures = () => db.collection('features').get();
 
 interface PlaceToAdd {
 	tripId?: string;

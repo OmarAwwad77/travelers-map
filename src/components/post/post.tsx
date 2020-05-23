@@ -20,22 +20,47 @@ import {
 	PlaceName,
 	Divider,
 } from './post.styles';
-import { Place } from '../../redux/news-feed/news-feed.types';
+import {
+	Post as PostType,
+	Comment as CommentType,
+} from '../../redux/news-feed/news-feed.types';
 
 interface OwnProps {
-	place: Place;
+	post: PostType;
 }
 type Props = OwnProps;
 
-const Post: React.FC<Props> = ({ place }) => {
-	const { placeImages, placeName } = place;
+const Post: React.FC<Props> = ({ post }) => {
+	const {
+		placeImages,
+		placeName,
+		likes,
+		createdAt,
+		userDisplayName,
+		userImg,
+		comments,
+	} = post;
+
+	const getCommentsCount = () => {
+		const countArr = (comment: CommentType) => {
+			let count = 1;
+			if (comment.comments.length === 0) return count;
+			comment.comments.forEach(
+				(comment) => (count = count + countArr(comment))
+			);
+			return count;
+		};
+		let count = 0;
+		comments.forEach((comm) => (count += countArr(comm)));
+		return count;
+	};
 	return (
 		<Wrapper>
 			<PostHeader>
-				<PostAvatar />
-				<PostOwner>Omar Awwad</PostOwner>
+				<PostAvatar url={userImg} />
+				<PostOwner>{userDisplayName}</PostOwner>
 				<IconWithText>
-					<ClockIcon /> 1 hour ago
+					<ClockIcon /> {createdAt}
 				</IconWithText>
 			</PostHeader>
 			<PostContent>
@@ -43,11 +68,11 @@ const Post: React.FC<Props> = ({ place }) => {
 			</PostContent>
 			<PostFooter>
 				<IconWithText gridArea='likes'>
-					<LikeIcon /> 3.5k
+					<LikeIcon /> {likes.length}
 				</IconWithText>
 				<PlaceName>{placeName}</PlaceName>
 				<IconWithText gridArea='comments'>
-					<CommentIcon /> 905
+					<CommentIcon /> {getCommentsCount()}
 				</IconWithText>
 				<IconWithText gridArea='map'>
 					<MapIcon /> map
@@ -59,7 +84,16 @@ const Post: React.FC<Props> = ({ place }) => {
 			<Divider />
 			<AddComment url='https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50' />
 			<Divider />
-			<Comment />
+			{comments.map((comment) => (
+				<Comment
+					key={comment.commentId}
+					userImg={comment.userImg}
+					comment={comment.comment}
+					userName={comment.userName}
+					createdAt={comment.createdAt}
+					comments={comment.comments}
+				/>
+			))}
 		</Wrapper>
 	);
 };

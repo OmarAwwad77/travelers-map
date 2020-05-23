@@ -10,6 +10,9 @@ export interface Place {
 	placeImages: string[];
 	placeCoords: Coords;
 	tripId: number;
+	createdAt: number;
+	likes: string[];
+	userId: string;
 }
 
 export interface Trip {

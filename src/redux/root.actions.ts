@@ -33,9 +33,9 @@ export {
 } from './user/user.actions';
 
 export {
-	fetchPlacesFailure,
-	fetchPlacesStart,
-	fetchPlacesSuccess,
+	fetchPostsFailure,
+	fetchPostsStart,
+	fetchPostsSuccess,
 } from './news-feed/news-feed.actions';
 
 export type StoreActions = MapActions | UserActions;

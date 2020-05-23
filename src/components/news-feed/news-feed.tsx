@@ -6,30 +6,30 @@ import SideBar from '../sidebar/sidebar';
 import User from '../user/user';
 import { Wrapper, PostsArea, SideBarWrapper } from './news-feed.styles';
 import { NewsFeedState } from '../../redux/news-feed/news-feed.types';
-import { fetchPlacesStart } from '../../redux/root.actions';
+import { fetchPostsStart } from '../../redux/root.actions';
 import { createStructuredSelector } from 'reselect';
 import { AppState } from '../../redux/root.reducer';
-import { selectPlaces } from '../../redux/news-feed/news-feed.selectors';
+import { selectPosts } from '../../redux/news-feed/news-feed.selectors';
 import { Dispatch } from 'redux';
 
-interface LinkStateToProps extends Pick<NewsFeedState, 'places'> {}
+interface LinkStateToProps extends Pick<NewsFeedState, 'posts'> {}
 interface LinkDispatchToProps {
-	fetchPlacesStart: typeof fetchPlacesStart;
+	fetchPostsStart: typeof fetchPostsStart;
 }
 interface OwnProps {}
 type Props = OwnProps & LinkDispatchToProps & LinkStateToProps;
 
-const NewsFeed: React.FC<Props> = ({ fetchPlacesStart, places }) => {
+const NewsFeed: React.FC<Props> = ({ fetchPostsStart, posts }) => {
 	useEffect(() => {
-		fetchPlacesStart();
+		fetchPostsStart();
 	}, []);
 
 	return (
 		<Wrapper>
 			<PostsArea>
-				{places.map(
-					(place, i) => i <= 1 && <Post key={place.placeId} place={place} />
-				)}
+				{posts.map((post, i) => (
+					<Post key={post.placeId} post={post} />
+				))}
 			</PostsArea>
 			<SideBarWrapper>
 				<SideBar title='popular Travelers'>
@@ -47,11 +47,11 @@ const mapStateToProps = createStructuredSelector<
 	OwnProps,
 	LinkStateToProps
 >({
-	places: selectPlaces,
+	posts: selectPosts,
 });
 
 const mapDispatchToProps = (dispatch: Dispatch): LinkDispatchToProps => ({
-	fetchPlacesStart: () => dispatch(fetchPlacesStart()),
+	fetchPostsStart: () => dispatch(fetchPostsStart()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(NewsFeed);

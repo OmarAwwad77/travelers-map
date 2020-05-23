@@ -11,7 +11,7 @@ import {
 const User = () => {
 	return (
 		<Wrapper>
-			<UserAvatar />
+			<UserAvatar url='' />
 			<UserContent>
 				<UserName>Omar Awwad</UserName>
 				<FollowButton>Follow</FollowButton>

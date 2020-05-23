@@ -226,6 +226,9 @@ const AddPlace: React.FC<Props> = ({
 				placeCoords: placeCoords as Coords,
 				placeDesc: description,
 				placeImages: urls,
+				createdAt: Date.now(),
+				likes: [],
+				userId: '1',
 			});
 
 			setMarkerToAdd(null);

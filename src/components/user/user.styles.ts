@@ -12,9 +12,8 @@ export const Wrapper = styled.div`
 	margin: 0 auto;
 `;
 
-export const UserAvatar = styled.div`
-	background: url('https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50')
-		center/cover no-repeat;
+export const UserAvatar = styled.div<{ url: string }>`
+	background: url(${(p) => p.url}) center/cover no-repeat;
 	width: 7rem;
 	height: 7rem;
 	border-radius: 50%;

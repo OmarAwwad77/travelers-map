@@ -3,9 +3,9 @@ import { AppState } from '../root.reducer';
 
 export const selectNewsFeedState = (state: AppState) => state.newsFeedState;
 
-export const selectPlaces = createSelector(
+export const selectPosts = createSelector(
 	[selectNewsFeedState],
-	(newsFeed) => newsFeed.places
+	(newsFeed) => newsFeed.posts
 );
 
 export const selectUsers = createSelector(

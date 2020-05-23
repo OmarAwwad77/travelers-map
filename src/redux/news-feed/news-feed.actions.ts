@@ -1,16 +1,15 @@
-import { NewsFeedActions } from './news-feed.types';
-import { Place } from '../news-feed/news-feed.types';
+import { NewsFeedActions, Post } from './news-feed.types';
 
-export const fetchPlacesStart = (): NewsFeedActions => ({
-	type: 'FETCH_PLACES_START',
+export const fetchPostsStart = (): NewsFeedActions => ({
+	type: 'FETCH_POSTS_START',
 });
 
-export const fetchPlacesSuccess = (places: Place[]): NewsFeedActions => ({
-	places,
-	type: 'FETCH_PLACES_SUCCESS',
+export const fetchPostsSuccess = (posts: Post[]): NewsFeedActions => ({
+	posts,
+	type: 'FETCH_POSTS_SUCCESS',
 });
 
-export const fetchPlacesFailure = (error: string): NewsFeedActions => ({
+export const fetchPostsFailure = (error: string): NewsFeedActions => ({
 	error,
-	type: 'FETCH_PLACES_FAILURE',
+	type: 'FETCH_POSTS_FAILURE',
 });
