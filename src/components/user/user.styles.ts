@@ -29,10 +29,12 @@ export const UserContent = styled.div`
 
 export const UserName = styled.span`
 	font-weight: 600;
+	text-transform: capitalize;
 `;
 
 export const FollowButton = styled(HeroButton)`
-	padding: 1rem 3rem;
+	padding: 1rem 2rem;
+	width: 11.5rem;
 	border-radius: 1rem;
 	text-transform: capitalize;
 `;

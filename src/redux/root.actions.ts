@@ -29,6 +29,9 @@ export {
 	updateProfileStart,
 	updateProfileSuccess,
 	updateProfileFailure,
+	toggleFollowUserFailure,
+	toggleFollowUserStart,
+	toggleFollowUserSuccess,
 	clearError,
 } from './user/user.actions';
 
@@ -36,6 +39,15 @@ export {
 	fetchPostsFailure,
 	fetchPostsStart,
 	fetchPostsSuccess,
+	fetchUsersStart,
+	fetchUsersSuccess,
+	fetchUsersFailure,
+	addCommentStart,
+	addCommentFailure,
+	addCommentSuccess,
+	likePostToggleStart,
+	likePostToggleSuccess,
+	likePostToggleFailure,
 } from './news-feed/news-feed.actions';
 
 export type StoreActions = MapActions | UserActions;

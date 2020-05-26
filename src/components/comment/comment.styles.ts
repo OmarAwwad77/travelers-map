@@ -46,11 +46,15 @@ export const CommentText = styled.p`
 export const CommentFooter = styled.div`
 	grid-area: 4 / 2 / 5 / 3;
 	display: flex;
-	justify-content: space-around;
-	text-decoration: underline;
+	/* justify-content: space-around; */
 	font-size: 1.3rem;
 	margin-top: 0.5rem;
-	span {
+
+	& > span {
 		cursor: pointer;
+		text-decoration: underline;
+		&:hover {
+			color: ${(p) => p.theme.colors.secondary1};
+		}
 	}
 `;

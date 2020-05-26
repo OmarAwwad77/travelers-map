@@ -1,4 +1,14 @@
-import { call, apply, takeLatest, all, put, select } from 'redux-saga/effects';
+import {
+	call,
+	apply,
+	takeLatest,
+	all,
+	put,
+	select,
+	debounce,
+	take,
+	delay,
+} from 'redux-saga/effects';
 import { SagaIterator } from 'redux-saga';
 import {
 	auth,
@@ -12,6 +22,8 @@ import {
 	GoogleAuthProvider,
 	updateProfile,
 	uploadImage,
+	toggleFollowUser,
+	updateTargetUser,
 } from '../../firebase/firebase.utils';
 import {
 	EMAIL_SIGN_IN_START,
@@ -29,6 +41,8 @@ import {
 	DbUser,
 	UPDATE_PROFILE_START,
 	UpdateProfileStart,
+	TOGGLE_FOLLOW_USER_START,
+	ToggleFollowUserStart,
 } from './user.types';
 import {
 	signInSuccess,
@@ -41,7 +55,12 @@ import {
 	deleteAccountSuccess,
 	deleteAccountFailure,
 } from '../root.actions';
-import { updateProfileFailure, updateProfileSuccess } from './user.actions';
+import {
+	updateProfileFailure,
+	updateProfileSuccess,
+	toggleFollowUserSuccess,
+} from './user.actions';
+import { selectUserId } from './user.selectors';
 
 const defaultUserImg =
 	'https://firebasestorage.googleapis.com/v0/b/connect-c44e6.appspot.com/o/images%2Fuser.svg?alt=media&token=ef7689a1-9619-4265-bd81-674e50437dd5';
@@ -84,6 +103,8 @@ function* emailSignInSaga({
 				displayName: dbUser.displayName,
 				email: user.email!,
 				uid: user.uid,
+				follows: dbUser.follows,
+				followers: dbUser.followers,
 				providerId: user.providerData[0]?.providerId!,
 				url: dbUser.profileImg,
 			};
@@ -149,6 +170,8 @@ function* googleSignInSaga(): SagaIterator {
 			const appUser: User = {
 				email: user.email!,
 				uid: user.uid,
+				followers: dbUser.followers,
+				follows: dbUser.follows,
 				displayName: dbUser.displayName,
 				providerId: user.providerData[0]?.providerId!,
 				url: dbUser.profileImg,
@@ -158,6 +181,8 @@ function* googleSignInSaga(): SagaIterator {
 			const appUser: User = {
 				email: user.email!,
 				uid: user.uid,
+				followers: [],
+				follows: [],
 				displayName: user.email!.substring(0, user.email!.indexOf('@')),
 				providerId: user.providerData[0]?.providerId!,
 				url: defaultUserImg,
@@ -165,6 +190,8 @@ function* googleSignInSaga(): SagaIterator {
 			const dbUser: DbUser = {
 				displayName: appUser.displayName,
 				profileImg: appUser.url,
+				followers: [],
+				follows: [],
 			};
 
 			yield call(createUserDocInDb, dbUser, user.uid);
@@ -205,12 +232,16 @@ function* signUpSaga({
 			displayName,
 			email: user.email!,
 			uid: user.uid,
+			followers: [],
+			follows: [],
 			providerId: user.providerData[0]?.providerId!,
 			url: defaultUserImg,
 		};
 		const dbUser: DbUser = {
 			displayName,
 			profileImg: defaultUserImg,
+			follows: [],
+			followers: [],
 		};
 
 		yield call(createUserDocInDb, dbUser, user.uid);
@@ -377,7 +408,7 @@ function* updateProfileSage({
 	file,
 	userId,
 }: UpdateProfileStart): SagaIterator {
-	const updatedProfile: DbUser = {
+	const updatedProfile: Partial<DbUser> = {
 		displayName,
 		profileImg: '',
 	};
@@ -399,6 +430,23 @@ function* updateProfileSage({
 				type: 'updateProfile',
 			})
 		);
+	}
+}
+
+function* toggleFollowUserSaga({
+	targetUserId,
+	followed,
+}: ToggleFollowUserStart): SagaIterator {
+	const currentUserId = yield select(selectUserId);
+	try {
+		console.log(targetUserId, followed);
+		yield all([
+			call(toggleFollowUser, currentUserId, targetUserId, followed),
+			call(updateTargetUser, targetUserId, currentUserId, followed),
+		]);
+		yield put(toggleFollowUserSuccess(targetUserId, followed));
+	} catch (error) {
+		console.log(error);
 	}
 }
 
@@ -430,6 +478,15 @@ function* onUpdateProfileSaga(): SagaIterator {
 	yield takeLatest(UPDATE_PROFILE_START, updateProfileSage);
 }
 
+function* onToggleFollowUserSaga(): SagaIterator {
+	// yield takeLatest( TOGGLE_FOLLOW_USER_START, toggleFollowUserSaga);
+	while (true) {
+		const action = yield take(TOGGLE_FOLLOW_USER_START);
+		yield call(toggleFollowUserSaga, action);
+		yield delay(500);
+	}
+}
+
 export function* userSagas(): SagaIterator {
 	yield all([
 		call(onEmailSignInSaga),
@@ -439,6 +496,7 @@ export function* userSagas(): SagaIterator {
 		call(onChangeEmailSaga),
 		call(onDeleteAccountSaga),
 		call(onUpdateProfileSaga),
+		call(onToggleFollowUserSaga),
 	]);
 }
 

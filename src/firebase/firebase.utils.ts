@@ -4,7 +4,8 @@ import 'firebase/auth';
 import 'firebase/storage';
 import 'firebase/firestore';
 import { User as AppUser, DbUser } from '../redux/user/user.types';
-import { Post } from '../redux/news-feed/news-feed.types';
+import { Post, DbComment } from '../redux/news-feed/news-feed.types';
+import { Feature } from 'react-leaflet-draw';
 
 const config = {
 	apiKey: 'AIzaSyCqTuRU04Iv39jAhk5jxrLDBYUDVkXRcd4',
@@ -19,8 +20,12 @@ const config = {
 firebase.initializeApp(config);
 
 export type FirebaseUser = User;
+export type DocumentReference = firestore.DocumentReference;
 export type DocumentSnapshot = firestore.DocumentSnapshot;
+
 export type QuerySnapshot = firestore.QuerySnapshot;
+export const arrayUnion = firestore.FieldValue.arrayUnion;
+export const arrayRemove = firestore.FieldValue.arrayRemove;
 export const googleProvider = new firebase.auth.GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: 'select_account' });
 export const db = firebase.firestore();
@@ -44,15 +49,16 @@ export const getCurrentUser = () => {
 	});
 };
 
-export const updateProfile = (updatedProfile: DbUser, userId: string) =>
-	db.collection('users').doc(userId).update(updatedProfile);
+export const updateProfile = (
+	updatedProfile: Partial<DbUser>,
+	userId: string
+) => db.collection('users').doc(userId).update(updatedProfile);
 
-export const createUserDocInDb = (
-	user: { displayName: string },
-	uid: string
-) => {
+export const createUserDocInDb = (user: DbUser, uid: string) => {
 	return db.collection('users').doc(uid).set(user);
 };
+
+export const getUsers = () => db.collection('users').get();
 
 export const getUserDocFromDb = (uid: string) => {
 	return db.collection('users').doc(uid).get();
@@ -75,7 +81,84 @@ export const getCommentsForPost = (postId: string) =>
 export const getCommentById = (id: string) =>
 	db.collection('comments').doc(id).get();
 
-export const getFeatures = () => db.collection('features').get();
+export const addCommentToDb = (comment: DbComment) =>
+	db.collection('comments').add(comment);
+
+export const addNestedComment = (
+	commentRef: DocumentReference,
+	commentId: string
+) =>
+	commentRef.update({
+		comments: arrayUnion(commentId),
+	});
+
+export const toggleLikingPost = async (
+	liked: boolean,
+	postOwnerId: string,
+	postId: string,
+	userId: string
+) => {
+	const featureDoc = await db.collection('features').doc(postOwnerId).get();
+
+	if (featureDoc.exists) {
+		const userFeatures: Feature[] = featureDoc.data()?.userFeatures;
+		const placeIdToUpdate = userFeatures.findIndex(
+			(feature) => feature.properties?.id === +postId
+		);
+		console.log(placeIdToUpdate);
+		const updatedUserFeatures = userFeatures.map((feature, i) => {
+			if (i === placeIdToUpdate) {
+				return {
+					...feature,
+					properties: {
+						...feature.properties,
+						likes: liked
+							? feature.properties?.likes.filter((id: string) => id !== userId)
+							: [...feature.properties?.likes, userId],
+					},
+				};
+			} else {
+				return feature;
+			}
+		});
+
+		await featureDoc.ref.update({
+			userFeatures: updatedUserFeatures,
+		});
+	}
+};
+
+export const toggleFollowUser = async (
+	currentUserId: string,
+	targetUserId: string,
+	followed: boolean
+) => {
+	const userDocRef = await db.collection('users').doc(currentUserId);
+	const action = followed ? arrayRemove : arrayUnion;
+
+	await userDocRef.update({
+		follows: action(targetUserId),
+	});
+};
+
+export const updateTargetUser = async (
+	targetUserId: string,
+	currentUserId: string,
+	followed: boolean
+) => {
+	const userDocRef = await db.collection('users').doc(targetUserId);
+	const action = followed ? arrayRemove : arrayUnion;
+
+	await userDocRef.update({
+		followers: action(currentUserId),
+	});
+};
+
+export const getFeatures = (userFollows: string[]) =>
+	db
+		.collection('features')
+		.where(firestore.FieldPath.documentId(), 'in', userFollows)
+		.get();
 
 interface PlaceToAdd {
 	tripId?: string;

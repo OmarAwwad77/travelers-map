@@ -13,6 +13,7 @@ const App = () => {
 	return (
 		<Layout>
 			<Route path='/profile' component={Profile} />
+
 			<Route path='/sign' component={Sign} />
 			<Route path='/' exact component={Main} />
 			<Route path='/map' component={Map} />

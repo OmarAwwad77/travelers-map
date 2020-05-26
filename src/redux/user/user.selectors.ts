@@ -25,6 +25,11 @@ export const selectUserProviderId = createSelector(
 	(user) => user?.providerId!
 );
 
+export const selectUserFollowsArr = createSelector(
+	[selectUser],
+	(user) => user?.follows
+);
+
 export const selectIsAuth = createSelector(
 	[selectUserState],
 	(userState) => !!userState.user

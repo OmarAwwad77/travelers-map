@@ -1,10 +1,21 @@
-import { UserState, UserActions } from './user.types';
+import { UserState, UserActions, User } from './user.types';
 
 const initialState: UserState = {
 	user: null,
 	loading: false,
 	error: null,
 };
+
+const updateUserFollowsArr = (
+	user: User,
+	targetUserId: string,
+	followed: boolean
+): User => ({
+	...user,
+	follows: followed
+		? user.follows.filter((id) => id !== targetUserId)
+		: [...user.follows, targetUserId],
+});
 
 const userReducer = (state = initialState, action: UserActions): UserState => {
 	switch (action.type) {
@@ -53,6 +64,16 @@ const userReducer = (state = initialState, action: UserActions): UserState => {
 			return {
 				...state,
 				user: null,
+			};
+
+		case 'TOGGLE_FOLLOW_USER_SUCCESS':
+			return {
+				...state,
+				user: updateUserFollowsArr(
+					state.user!,
+					action.targetUserId,
+					action.followed
+				),
 			};
 
 		case 'CLEAR_ERROR':

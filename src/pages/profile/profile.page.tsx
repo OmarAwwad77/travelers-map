@@ -52,7 +52,7 @@ const Profile: React.FC<Props> = () => {
 				<SideBar title='Edit Profile'>
 					<TabsWrapper>
 						<Tabs>
-							<Tab name='following'>
+							{/* <Tab name='following'>
 								{[1, 2, 3].map((val) => (
 									<User key={val} />
 								))}
@@ -61,7 +61,7 @@ const Profile: React.FC<Props> = () => {
 								{[1, 2, 3].map((val) => (
 									<User key={val} />
 								))}
-							</Tab>
+							</Tab> */}
 							<Tab name='Edit'>
 								<EditLinksWrapper>
 									<EditLink onClick={() => push(`${path}/edit-profile`)}>

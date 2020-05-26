@@ -4,8 +4,11 @@ export const Wrapper = styled.div`
 	margin: 0 auto;
 	width: 90%;
 	padding: 1rem;
-	display: flex;
-	justify-content: center;
+	display: grid;
+	grid-template-columns: max-content;
+	grid-template-areas:
+		'avatar input'
+		'avatar buttons';
 
 	& > input {
 		font-family: inherit;
@@ -22,8 +25,16 @@ export const Wrapper = styled.div`
 `;
 
 export const Avatar = styled.div<{ url: string }>`
+	grid-area: avatar;
 	background: url(${(p) => p.url}) center/cover no-repeat;
 	width: 5rem;
 	height: 5rem;
 	border-radius: 50%;
+`;
+
+export const ButtonsWrapper = styled.div`
+	grid-area: buttons;
+	justify-self: center;
+	/* display: flex;
+	flex-direction: column; */
 `;

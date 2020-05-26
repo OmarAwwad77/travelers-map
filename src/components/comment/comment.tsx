@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Comment as CommentType } from '../../redux/news-feed/news-feed.types';
+import TimeAgo from 'react-timeago';
 
 import AddComment from '../add-comment/add-comment';
 import {
@@ -19,6 +20,8 @@ interface OwnProps {
 	comment: string;
 	comments: CommentType[];
 	createdAt: number;
+	commentId: string;
+	postId: string;
 }
 type Props = OwnProps;
 
@@ -29,6 +32,8 @@ const Comment: React.FC<Props> = ({
 	userImg,
 	createdAt,
 	comments,
+	commentId,
+	postId,
 }) => {
 	const [replying, setReplying] = useState(false);
 	const [viewReplies, setViewReplies] = useState(false);
@@ -37,20 +42,34 @@ const Comment: React.FC<Props> = ({
 		<Wrapper>
 			<Grid nested={nested}>
 				<CommentAvatar url={userImg} />
-				<CommentDate>{createdAt}</CommentDate>
+				<CommentDate>
+					<TimeAgo date={createdAt} />
+				</CommentDate>
 				<CommentOwner>{userName}</CommentOwner>
 				<CommentText>{comment}</CommentText>
 				{!nested && (
 					<CommentFooter>
-						<span onClick={() => setViewReplies(!viewReplies)}>
-							View replies
-						</span>
+						{comments.length !== 0 && (
+							<span
+								style={{ marginRight: '1rem' }}
+								onClick={() => setViewReplies(!viewReplies)}
+							>
+								View replies
+							</span>
+						)}
 						<span onClick={() => setReplying(!replying)}>reply</span>
 					</CommentFooter>
 				)}
 			</Grid>
 			{replying && !nested && (
-				<AddComment url='https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50' />
+				<AddComment
+					postId={postId}
+					replyToId={commentId}
+					onCommentAdded={() => {
+						setReplying(false);
+						setViewReplies(true);
+					}}
+				/>
 			)}
 			{!nested &&
 				viewReplies &&

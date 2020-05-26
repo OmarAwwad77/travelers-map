@@ -5,7 +5,7 @@ import { Prompt, useLocation, useHistory } from 'react-router-dom';
 import { AppState } from '../../redux/root.reducer';
 import styled from 'styled-components';
 import LeafletMap from './leaflet-map/leaflet-map';
-import { MapState, Trip } from '../../redux/map/map.types';
+import { MapState, Trip, Coords } from '../../redux/map/map.types';
 import {
 	selectPlaces,
 	selectTrips,
@@ -19,10 +19,12 @@ import { StoreActions, setTrips, setPlaces } from '../../redux/root.actions';
 import SideBar, { SideBarTrip } from './sidebar/sidebar';
 import { getSideBarTrips, getPlacesFromFeatures } from './map.util';
 import MenuIcon from '../menu-icon/menu-icon';
+import { selectUser } from '../../redux/user/user.selectors';
+import { UserState } from '../../redux/user/user.types';
 
-const Wrapper = styled.div`
+const Wrapper = styled.div<{ withTargetUser: boolean }>`
 	position: relative;
-	height: 100vh;
+	height: ${(p) => (p.withTargetUser ? '100%' : '100vh')};
 	overflow: hidden;
 	z-index: 1;
 `;
@@ -40,15 +42,20 @@ const MenuIconWrapper = styled.div`
 	background: #fff;
 `;
 
-interface LinkStateToProps extends Omit<MapState, 'markerToAdd'> {}
+interface LinkStateToProps
+	extends Omit<MapState, 'markerToAdd'>,
+		Pick<UserState, 'user'> {}
 interface LinkDispatchToProps {
 	setTrips: typeof setTrips;
 	setPlaces: typeof setPlaces;
 }
-interface OwnProps {}
+interface OwnProps {
+	targetUserId?: string;
+	placeToShow?: Coords;
+}
 type Props = LinkStateToProps & OwnProps & LinkDispatchToProps;
 
-const userId = '1';
+// let userId = 'rFoyR1X9TDePcjWsQwq8xr9PBpF3
 
 const Map: React.FC<Props> = ({
 	places,
@@ -56,6 +63,9 @@ const Map: React.FC<Props> = ({
 	setTrips,
 	setPlaces,
 	config,
+	targetUserId,
+	placeToShow,
+	user,
 }) => {
 	const [dbFeatures, setDbFeatures] = useState<Feature[]>([]);
 	const [sideBarTrips, setSideBarTrips] = useState<SideBarTrip[]>([]);
@@ -65,6 +75,7 @@ const Map: React.FC<Props> = ({
 	const { pathname } = useLocation();
 	const { push } = useHistory();
 
+	const userId = targetUserId ?? user!.uid;
 	useEffect(() => {
 		const fetchMapData = async () => {
 			const featuresDoc = await db.collection('features').doc(userId).get();
@@ -127,19 +138,19 @@ const Map: React.FC<Props> = ({
 			<MenuIconWrapper>
 				<MenuIcon
 					dir='left'
-					// toggleSideBar={() => setShowSideBar(!showSideBar)}
-					toggleSideBar={() => push('/')}
+					toggleSideBar={() => setShowSideBar(!showSideBar)}
 				/>
 			</MenuIconWrapper>
 			<SideBar show={showSideBar} trips={sideBarTrips} />
-			<Wrapper>
+			<Wrapper withTargetUser={!!targetUserId}>
 				<LeafletMap
+					withTargetUser={!!targetUserId}
 					places={places}
 					dbFeatures={dbFeatures}
 					onSave={onSave}
 					onChange={setChangesSaved}
 					setPlaces={setPlaces}
-					config={config}
+					config={placeToShow ? { center: placeToShow, zoom: 7 } : config}
 				/>
 			</Wrapper>
 		</>
@@ -154,6 +165,7 @@ const mapStateToProps = createStructuredSelector<
 	places: selectPlaces,
 	trips: selectTrips,
 	config: selectMapConfig,
+	user: selectUser,
 });
 
 const mapDispatchToProps = (

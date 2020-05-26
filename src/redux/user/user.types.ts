@@ -4,6 +4,8 @@ export interface User {
 	uid: string;
 	providerId: string;
 	url: string;
+	follows: string[];
+	followers: string[];
 }
 
 export interface ErrorMessage {
@@ -21,6 +23,8 @@ export interface ErrorMessage {
 export interface DbUser {
 	displayName: string;
 	profileImg: string;
+	follows: string[];
+	followers: string[];
 }
 
 export interface UserState {
@@ -56,6 +60,9 @@ export const DELETE_ACCOUNT_FAILURE = 'DELETE_ACCOUNT_FAILURE';
 export const UPDATE_PROFILE_START = 'UPDATE_PROFILE_START';
 export const UPDATE_PROFILE_SUCCESS = 'UPDATE_PROFILE_SUCCESS';
 export const UPDATE_PROFILE_FAILURE = 'UPDATE_PROFILE_FAILURE';
+export const TOGGLE_FOLLOW_USER_START = 'TOGGLE_FOLLOW_USER_START';
+export const TOGGLE_FOLLOW_USER_SUCCESS = 'TOGGLE_FOLLOW_USER_SUCCESS';
+export const TOGGLE_FOLLOW_USER_FAILURE = 'TOGGLE_FOLLOW_USER_FAILURE';
 export const CLEAR_ERROR = 'CLEAR_ERROR';
 
 export interface GoogleSignInStart {
@@ -148,6 +155,23 @@ export interface UpdateProfileFailure {
 	error: ErrorMessage;
 }
 
+export interface ToggleFollowUserStart {
+	type: typeof TOGGLE_FOLLOW_USER_START;
+	targetUserId: string;
+	followed: boolean;
+}
+
+export interface ToggleFollowUserSuccess {
+	type: typeof TOGGLE_FOLLOW_USER_SUCCESS;
+	targetUserId: string;
+	followed: boolean;
+}
+
+export interface ToggleFollowUserFailure {
+	type: typeof TOGGLE_FOLLOW_USER_FAILURE;
+	error: string;
+}
+
 export interface ClearError {
 	type: typeof CLEAR_ERROR;
 }
@@ -171,4 +195,7 @@ export type UserActions =
 	| UpdateProfileStart
 	| UpdateProfileSuccess
 	| UpdateProfileFailure
+	| ToggleFollowUserStart
+	| ToggleFollowUserSuccess
+	| ToggleFollowUserFailure
 	| ClearError;

@@ -45,6 +45,7 @@ interface OwnProps extends Pick<MapState, 'places'> {
 	setPlaces: typeof setPlaces;
 	onChange: React.Dispatch<SetStateAction<boolean>>;
 	config: MapConfig;
+	withTargetUser?: boolean;
 }
 type Props = OwnProps;
 
@@ -61,6 +62,7 @@ const LeafletMap: React.FC<Props> = ({
 	config,
 	setPlaces,
 	onChange,
+	withTargetUser,
 }) => {
 	const [mapStyle, setMapStyle] = useState<MapStyle>('Light');
 	const [geoJson, setGeoJson] = useState<GeoJSON>(initialGeoState);
@@ -176,25 +178,29 @@ const LeafletMap: React.FC<Props> = ({
 		<Wrapper>
 			<Map center={config.center} zoom={config.zoom}>
 				{getMapStyle(mapStyle)}
+
 				<FeatureGroup key={Date.now()} ref={onFeatureGroupReady}>
-					<EditControl
-						onCreated={onMarkerCreated}
-						onEditStop={onEditStop}
-						onDeleteStop={onEditStop}
-						position='topright'
-						draw={{
-							circle: false,
-							rectangle: false,
-							circlemarker: false,
-							polygon: false,
-							polyline: {
-								shapeOptions: {
-									opacity: 0.2,
-									weight: 10,
+					{!withTargetUser && (
+						<EditControl
+							onCreated={onMarkerCreated}
+							onEditStop={onEditStop}
+							onDeleteStop={onEditStop}
+							position='topright'
+							draw={{
+								circle: false,
+								rectangle: false,
+								circlemarker: false,
+								polygon: false,
+								polyline: {
+									shapeOptions: {
+										opacity: 0.2,
+										weight: 10,
+									},
 								},
-							},
-						}}
-					/>
+							}}
+						/>
+					)}
+
 					{geoJson.features.map((feature) => {
 						return mapGeoJsonToLayers(feature);
 					})}
@@ -207,9 +213,11 @@ const LeafletMap: React.FC<Props> = ({
 					onChangeHandler={setMapStyle}
 				/>
 			</DropDownWrapper>
-			<SaveIconWrapper onClick={saveMapData}>
-				<SaveIcon style={{ width: '100%' }} />
-			</SaveIconWrapper>
+			{!withTargetUser && (
+				<SaveIconWrapper onClick={saveMapData}>
+					<SaveIcon style={{ width: '100%', color: '#464646' }} />
+				</SaveIconWrapper>
+			)}
 		</Wrapper>
 	);
 };

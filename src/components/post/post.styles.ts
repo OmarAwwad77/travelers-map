@@ -79,3 +79,15 @@ export const Divider = styled(SlideBarDivider)`
 	margin-top: 0;
 	margin-bottom: 1rem;
 `;
+
+export const ShowMore = styled.span`
+	font-size: 1.5rem;
+	text-align: center;
+	text-transform: capitalize;
+	text-decoration: underline;
+	margin: 0.5rem;
+	cursor: pointer;
+	&:hover {
+		color: ${(p) => p.theme.colors.secondary1};
+	}
+`;

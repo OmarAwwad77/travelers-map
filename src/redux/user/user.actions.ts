@@ -108,6 +108,29 @@ export const updateProfileFailure = (error: ErrorMessage): UserActions => ({
 	type: 'UPDATE_PROFILE_FAILURE',
 });
 
+export const toggleFollowUserStart = (
+	targetUserId: string,
+	followed: boolean
+): UserActions => ({
+	targetUserId,
+	followed,
+	type: 'TOGGLE_FOLLOW_USER_START',
+});
+
+export const toggleFollowUserSuccess = (
+	targetUserId: string,
+	followed: boolean
+): UserActions => ({
+	targetUserId,
+	followed,
+	type: 'TOGGLE_FOLLOW_USER_SUCCESS',
+});
+
+export const toggleFollowUserFailure = (error: string): UserActions => ({
+	error,
+	type: 'TOGGLE_FOLLOW_USER_FAILURE',
+});
+
 export const clearError = (): UserActions => ({
 	type: 'CLEAR_ERROR',
 });

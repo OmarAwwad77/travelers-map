@@ -42,6 +42,8 @@ export type ImageUpload = {
 	errorMessage: string | null;
 };
 
+const userId = 'b1EO0UrZOdW3J948w6TFLk2uKVQ2';
+
 const defaultOption = 'choose a trip';
 
 interface OwnProps {}
@@ -228,7 +230,7 @@ const AddPlace: React.FC<Props> = ({
 				placeImages: urls,
 				createdAt: Date.now(),
 				likes: [],
-				userId: '1',
+				userId: userId,
 			});
 
 			setMarkerToAdd(null);
