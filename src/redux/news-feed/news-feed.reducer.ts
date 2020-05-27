@@ -10,6 +10,7 @@ import { User } from '../user/user.types';
 const initialState: NewsFeedState = {
 	posts: [],
 	users: [],
+	strangerPosts: [],
 	loading: false,
 	error: null,
 };
@@ -149,6 +150,18 @@ const newsFeedReducer = (
 			return {
 				...state,
 				posts: action.posts,
+				error: action.error,
+			};
+
+		case 'FETCH_USER_POSTS_SUCCESS':
+			return {
+				...state,
+				strangerPosts: action.posts,
+			};
+
+		case 'FETCH_USER_POSTS_FAILURE':
+			return {
+				...state,
 				error: action.error,
 			};
 

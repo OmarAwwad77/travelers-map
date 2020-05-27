@@ -18,7 +18,7 @@ export const selectUser = createSelector(
 	(userState) => userState.user
 );
 
-export const selectUserId = createSelector([selectUser], (user) => user?.uid);
+export const selectUserId = createSelector([selectUser], (user) => user!.uid);
 
 export const selectUserProviderId = createSelector(
 	[selectUser],

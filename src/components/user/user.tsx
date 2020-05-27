@@ -1,4 +1,5 @@
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 import { connect } from 'react-redux';
 
 import { Dispatch } from 'redux';
@@ -29,10 +30,12 @@ const User: React.FC<Props> = ({
 	followed,
 	toggleFollowUserStart,
 }) => {
+	const { push } = useHistory();
+
 	return (
 		<Wrapper>
-			<UserAvatar url={userImg} />
-			<UserContent>
+			<UserAvatar onClick={() => push(`/user/${userId}`)} url={userImg} />
+			<UserContent onClick={() => push(`/user/${userId}`)}>
 				<UserName>{displayName}</UserName>
 				<FollowButton onClick={() => toggleFollowUserStart(userId, followed)}>
 					{followed ? 'UnFollow' : 'Follow'}

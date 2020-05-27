@@ -13,4 +13,5 @@ export const SignButton = styled.button<{ google?: boolean }>`
 	border: ${(p) => p.google && '1px solid #ddd'};
 	display: flex;
 	justify-content: center;
+	align-items: center;
 `;

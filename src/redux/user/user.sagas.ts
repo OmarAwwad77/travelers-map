@@ -5,7 +5,6 @@ import {
 	all,
 	put,
 	select,
-	debounce,
 	take,
 	delay,
 } from 'redux-saga/effects';
@@ -24,6 +23,10 @@ import {
 	uploadImage,
 	toggleFollowUser,
 	updateTargetUser,
+	deleteUserFeatures,
+	deleteUserFromDb,
+	deleteUserTrips,
+	deleteUserComments,
 } from '../../firebase/firebase.utils';
 import {
 	EMAIL_SIGN_IN_START,
@@ -43,6 +46,7 @@ import {
 	UpdateProfileStart,
 	TOGGLE_FOLLOW_USER_START,
 	ToggleFollowUserStart,
+	SIGN_OUT,
 } from './user.types';
 import {
 	signInSuccess,
@@ -60,7 +64,7 @@ import {
 	updateProfileSuccess,
 	toggleFollowUserSuccess,
 } from './user.actions';
-import { selectUserId } from './user.selectors';
+import { selectUserId, selectUser } from './user.selectors';
 
 const defaultUserImg =
 	'https://firebasestorage.googleapis.com/v0/b/connect-c44e6.appspot.com/o/images%2Fuser.svg?alt=media&token=ef7689a1-9619-4265-bd81-674e50437dd5';
@@ -68,6 +72,14 @@ const defaultUserImg =
 function* putUserOnSuccess(appUser: User): SagaIterator {
 	yield put(signInSuccess(appUser));
 	localStorage.setItem('user', JSON.stringify(appUser));
+}
+
+function* updateLocalStorageUser(updatedFields: Partial<User>): SagaIterator {
+	const storageUser: User = yield JSON.parse(localStorage.getItem('user')!);
+	localStorage.setItem(
+		'user',
+		JSON.stringify({ ...storageUser, ...updatedFields })
+	);
 }
 
 function* reAuthSaga(password: string): SagaIterator {
@@ -176,7 +188,7 @@ function* googleSignInSaga(): SagaIterator {
 				providerId: user.providerData[0]?.providerId!,
 				url: dbUser.profileImg,
 			};
-			yield put(signInSuccess(appUser));
+			yield call(putUserOnSuccess, appUser);
 		} else {
 			const appUser: User = {
 				email: user.email!,
@@ -195,7 +207,7 @@ function* googleSignInSaga(): SagaIterator {
 			};
 
 			yield call(createUserDocInDb, dbUser, user.uid);
-			yield put(signInSuccess(appUser));
+			yield call(putUserOnSuccess, appUser);
 		}
 	} catch (error) {
 		if (error.code === 'auth/popup-closed-by-user') {
@@ -245,7 +257,8 @@ function* signUpSaga({
 		};
 
 		yield call(createUserDocInDb, dbUser, user.uid);
-		yield put(signInSuccess(appUser));
+
+		yield call(putUserOnSuccess, appUser);
 	} catch (error) {
 		switch (error.code) {
 			case 'auth/email-already-in-use':
@@ -337,6 +350,10 @@ function* changeEmailSaga({
 		//change email
 		yield apply(firebaseUser, firebaseUser.updateEmail, [newEmail]);
 
+		// update localStorage User
+		yield call(updateLocalStorageUser, { email: newEmail });
+
+		// update the state
 		yield put(changeEmailSuccess(newEmail));
 	} catch (error) {
 		switch (error.code) {
@@ -365,7 +382,6 @@ function* changeEmailSaga({
 function* deleteAccountSaga({ password }: DeleteAccountStart): SagaIterator {
 	try {
 		// get current user and reAuthenticate
-
 		let firebaseUser: FirebaseUser;
 		if (password) {
 			firebaseUser = yield call(reAuthSaga, password);
@@ -376,7 +392,19 @@ function* deleteAccountSaga({ password }: DeleteAccountStart): SagaIterator {
 			]);
 		}
 
+		const userId = firebaseUser.uid;
+
 		yield apply(firebaseUser, firebaseUser.delete, []);
+		// delete user's features
+		yield call(deleteUserFeatures, userId);
+		// delete user form db
+		yield call(deleteUserFromDb, userId);
+		// delete user trips
+		yield call(deleteUserTrips, userId);
+		// delete user comments
+		yield call(deleteUserComments, userId);
+		// delete auth user
+
 		yield put(deleteAccountSuccess());
 	} catch (error) {
 		console.log(error);
@@ -420,7 +448,19 @@ function* updateProfileSage({
 			updatedProfile.profileImg = url;
 		}
 		yield call(updateProfile, updatedProfile, userId);
-		yield put(updateProfileSuccess());
+
+		// update localStorage User
+		yield call(updateLocalStorageUser, {
+			url: updatedProfile.profileImg,
+			displayName: updatedProfile.displayName,
+		});
+
+		yield put(
+			updateProfileSuccess(
+				updatedProfile.profileImg!,
+				updatedProfile.displayName!
+			)
+		);
 	} catch (error) {
 		console.log(error);
 		yield put(
@@ -439,11 +479,11 @@ function* toggleFollowUserSaga({
 }: ToggleFollowUserStart): SagaIterator {
 	const currentUserId = yield select(selectUserId);
 	try {
-		console.log(targetUserId, followed);
 		yield all([
 			call(toggleFollowUser, currentUserId, targetUserId, followed),
 			call(updateTargetUser, targetUserId, currentUserId, followed),
 		]);
+
 		yield put(toggleFollowUserSuccess(targetUserId, followed));
 	} catch (error) {
 		console.log(error);
@@ -460,6 +500,13 @@ function* onGoogleSignInSaga(): SagaIterator {
 
 function* onSignUpSaga(): SagaIterator {
 	yield takeLatest(SIGN_UP_START, signUpSaga);
+}
+
+function* onSignOutSaga(): SagaIterator {
+	while (true) {
+		yield take(SIGN_OUT);
+		yield apply(auth, auth.signOut, []);
+	}
 }
 
 function* onChangePasswordSaga(): SagaIterator {
@@ -497,11 +544,6 @@ export function* userSagas(): SagaIterator {
 		call(onDeleteAccountSaga),
 		call(onUpdateProfileSaga),
 		call(onToggleFollowUserSaga),
+		call(onSignOutSaga),
 	]);
 }
-
-// type: 'SIGN_IN_FAILURE',
-// error: {
-// 					message: 'something went wrong. try again later',
-// 					label: 'unknown',
-// 				}

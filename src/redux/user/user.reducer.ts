@@ -10,15 +10,36 @@ const updateUserFollowsArr = (
 	user: User,
 	targetUserId: string,
 	followed: boolean
-): User => ({
-	...user,
-	follows: followed
-		? user.follows.filter((id) => id !== targetUserId)
-		: [...user.follows, targetUserId],
-});
+): User => {
+	const updatedUser = {
+		...user,
+		follows: followed
+			? user.follows.filter((id) => id !== targetUserId)
+			: [...user.follows, targetUserId],
+	};
+	localStorage.setItem('user', JSON.stringify(updatedUser));
+	return updatedUser;
+};
+
+const setCurrentUser = (): User | null => {
+	const storageUser = localStorage.getItem('user');
+	if (!storageUser) return null;
+	return JSON.parse(storageUser) as User;
+};
+
+const signOut = () => {
+	localStorage.removeItem('user');
+	return null;
+};
 
 const userReducer = (state = initialState, action: UserActions): UserState => {
 	switch (action.type) {
+		case 'SET_CURRENT_USER':
+			return {
+				...state,
+				user: setCurrentUser(),
+			};
+
 		case 'SIGN_IN_SUCCESS':
 			return {
 				...state,
@@ -60,10 +81,20 @@ const userReducer = (state = initialState, action: UserActions): UserState => {
 				},
 			};
 
+		case 'UPDATE_PROFILE_SUCCESS':
+			return {
+				...state,
+				user: {
+					...state.user!,
+					url: action.url,
+					displayName: action.displayName,
+				},
+			};
+
 		case 'DELETE_ACCOUNT_SUCCESS':
 			return {
 				...state,
-				user: null,
+				user: signOut(),
 			};
 
 		case 'TOGGLE_FOLLOW_USER_SUCCESS':
@@ -74,6 +105,12 @@ const userReducer = (state = initialState, action: UserActions): UserState => {
 					action.targetUserId,
 					action.followed
 				),
+			};
+
+		case 'SIGN_OUT':
+			return {
+				...state,
+				user: signOut(),
 			};
 
 		case 'CLEAR_ERROR':

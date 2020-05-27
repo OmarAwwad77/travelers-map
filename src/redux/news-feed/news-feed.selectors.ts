@@ -12,3 +12,8 @@ export const selectUsers = createSelector(
 	[selectNewsFeedState],
 	(newsFeed) => newsFeed.users
 );
+
+export const selectStrangerPosts = createSelector(
+	[selectNewsFeedState],
+	(newsFeed) => newsFeed.strangerPosts
+);

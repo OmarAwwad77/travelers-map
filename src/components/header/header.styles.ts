@@ -2,7 +2,6 @@ import styled from 'styled-components';
 
 export const LogoWrapper = styled.div`
 	display: flex;
-	justify-content: center;
 	align-items: center;
 	height: 5rem;
 	cursor: pointer;

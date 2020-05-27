@@ -90,3 +90,18 @@ export const likePostToggleFailure = (
 	posts,
 	type: 'LIKE_POST_TOGGLE_FAILURE',
 });
+
+export const fetchUserPostsStart = (userId: string): NewsFeedActions => ({
+	userId,
+	type: 'FETCH_USER_POSTS_START',
+});
+
+export const fetchUserPostSuccess = (posts: Post[]): NewsFeedActions => ({
+	posts,
+	type: 'FETCH_USER_POSTS_SUCCESS',
+});
+
+export const fetchUserPostsFailure = (error: string): NewsFeedActions => ({
+	error,
+	type: 'FETCH_USER_POSTS_FAILURE',
+});

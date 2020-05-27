@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import { Prompt, useLocation, useHistory } from 'react-router-dom';
+import { Prompt, useLocation, useHistory, Route } from 'react-router-dom';
 import { AppState } from '../../redux/root.reducer';
 import styled from 'styled-components';
 import LeafletMap from './leaflet-map/leaflet-map';
@@ -16,6 +16,8 @@ import { db } from '../../firebase/firebase.utils';
 import { transformFeaturesForMap } from './leaflet-map/leaflet-map.util';
 import { Dispatch } from 'redux';
 import { StoreActions, setTrips, setPlaces } from '../../redux/root.actions';
+import AddPlace from '../add-place/add-place';
+import PlaceDetails from '../place-details/place-details';
 import SideBar, { SideBarTrip } from './sidebar/sidebar';
 import { getSideBarTrips, getPlacesFromFeatures } from './map.util';
 import MenuIcon from '../menu-icon/menu-icon';
@@ -126,6 +128,8 @@ const Map: React.FC<Props> = ({
 
 	return (
 		<>
+			<Route path='/map/add-place' exact component={AddPlace} />
+			<Route path='/map/place-details/:placeId' component={PlaceDetails} />
 			<Prompt
 				message={(loc) =>
 					loc.pathname.startsWith('/map')

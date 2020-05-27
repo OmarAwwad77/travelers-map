@@ -25,7 +25,7 @@ export const TravelerSvg = styled(Traveler)`
 
 export const Title = styled.h1`
 	grid-area: title;
-	font-size: 4rem;
+	font-size: 5rem;
 	font-weight: 700;
 	text-align: center;
 	text-transform: capitalize;

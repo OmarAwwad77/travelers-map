@@ -42,12 +42,14 @@ export interface SignUpCredentials extends SignInCredentials {
 	displayName: string;
 }
 
+export const SET_CURRENT_USER = 'SET_CURRENT_USER';
 export const GOOGLE_SIGN_IN_START = 'GOOGLE_SIGN_IN_START';
 export const EMAIL_SIGN_IN_START = 'EMAIL_SIGN_IN_START';
 export const SIGN_IN_SUCCESS = 'SIGN_IN_SUCCESS';
 export const SIGN_IN_FAILURE = 'SIGN_IN_FAILURE';
 export const SIGN_UP_START = 'SIGN_UP_START';
 export const SIGN_UP_FAILURE = 'SIGN_UP_FAILURE';
+export const SIGN_OUT = 'SIGN_OUT';
 export const CHANGE_PASSWORD_START = 'CHANGE_PASSWORD_START';
 export const CHANGE_PASSWORD_SUCCESS = 'CHANGE_PASSWORD_SUCCESS';
 export const CHANGE_PASSWORD_FAILURE = 'CHANGE_PASSWORD_FAILURE';
@@ -64,6 +66,10 @@ export const TOGGLE_FOLLOW_USER_START = 'TOGGLE_FOLLOW_USER_START';
 export const TOGGLE_FOLLOW_USER_SUCCESS = 'TOGGLE_FOLLOW_USER_SUCCESS';
 export const TOGGLE_FOLLOW_USER_FAILURE = 'TOGGLE_FOLLOW_USER_FAILURE';
 export const CLEAR_ERROR = 'CLEAR_ERROR';
+
+export interface SetCurrentUser {
+	type: typeof SET_CURRENT_USER;
+}
 
 export interface GoogleSignInStart {
 	type: typeof GOOGLE_SIGN_IN_START;
@@ -92,6 +98,10 @@ export interface SignUpStart {
 export interface SignUpFailure {
 	type: typeof SIGN_UP_FAILURE;
 	error: ErrorMessage;
+}
+
+export interface SignOut {
+	type: typeof SIGN_OUT;
 }
 
 export interface ChangePasswordStart {
@@ -148,6 +158,8 @@ export interface UpdateProfileStart {
 
 export interface UpdateProfileSuccess {
 	type: typeof UPDATE_PROFILE_SUCCESS;
+	url: string;
+	displayName: string;
 }
 
 export interface UpdateProfileFailure {
@@ -177,12 +189,14 @@ export interface ClearError {
 }
 
 export type UserActions =
+	| SetCurrentUser
 	| GoogleSignInStart
 	| EmailSignInStart
 	| SignInSuccess
 	| SignInFailure
 	| SignUpStart
 	| SignUpFailure
+	| SignOut
 	| ChangePasswordStart
 	| ChangePasswordSuccess
 	| ChangePasswordFailure

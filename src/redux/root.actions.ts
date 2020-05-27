@@ -11,12 +11,14 @@ export {
 } from './map/map.actions';
 
 export {
+	setCurrentUser,
 	emailSignInStart,
 	googleSignInStart,
 	signInSuccess,
 	signInFailure,
 	signUpStart,
 	signUpFailure,
+	signOut,
 	changePasswordStart,
 	changePasswordFailure,
 	changePasswordSuccess,
@@ -48,6 +50,9 @@ export {
 	likePostToggleStart,
 	likePostToggleSuccess,
 	likePostToggleFailure,
+	fetchUserPostSuccess,
+	fetchUserPostsFailure,
+	fetchUserPostsStart,
 } from './news-feed/news-feed.actions';
 
 export type StoreActions = MapActions | UserActions;

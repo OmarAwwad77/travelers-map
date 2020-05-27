@@ -154,6 +154,9 @@ export const updateTargetUser = async (
 	});
 };
 
+export const getFeaturesById = (userId: string) =>
+	db.collection('features').doc(userId).get();
+
 export const getFeatures = (userFollows: string[]) =>
 	db
 		.collection('features')
@@ -189,4 +192,58 @@ export const addPlace = async (place: PlaceToAdd) => {
 	} catch (error) {
 		console.log('error adding a place', place);
 	}
+};
+
+export const deleteUserFeatures = async (userId: string) => {
+	const doc = await db.collection('features').doc(userId).get();
+	if (doc.exists) {
+		return doc.ref.delete();
+	}
+};
+
+export const deleteUserFromDb = async (userId: string) => {
+	const doc = await db.collection('users').doc(userId).get();
+	if (doc.exists) {
+		return doc.ref.delete();
+	}
+};
+
+export const deleteUserTrips = async (userId: string) => {
+	const doc = await db.collection('trips').doc(userId).get();
+	if (doc.exists) {
+		return doc.ref.delete();
+	}
+};
+
+export const deleteUserComments = async (userId: string) => {
+	const queryDocs = await db
+		.collection('comments')
+		.where('userId', '==', userId)
+		.get();
+
+	let outerToDelete = queryDocs.docs.map((doc) => doc.id);
+	const nestedToDelete = await Promise.all<string[]>(
+		queryDocs.docs.map(
+			async (doc) =>
+				await Promise.all<string>(
+					doc
+						.data()
+						?.comments.map(
+							async (commentId: string) =>
+								await (await db.collection('comments').doc(commentId).get()).id
+						)
+				)
+		)
+	);
+	const idsToDelete = new Set([
+		...outerToDelete,
+		...nestedToDelete.reduce((acc, curr) => [...acc, ...curr], []),
+	]);
+
+	idsToDelete.forEach((id) =>
+		db
+			.collection('comments')
+			.doc(id as string)
+			.delete()
+	);
 };

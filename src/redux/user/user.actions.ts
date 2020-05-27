@@ -6,6 +6,10 @@ import {
 	SignUpCredentials,
 } from './user.types';
 
+export const setCurrentUser = (): UserActions => ({
+	type: 'SET_CURRENT_USER',
+});
+
 export const emailSignInStart = (
 	credentials: SignInCredentials
 ): UserActions => ({
@@ -35,6 +39,10 @@ export const signUpStart = (credentials: SignUpCredentials): UserActions => ({
 export const signUpFailure = (error: ErrorMessage): UserActions => ({
 	error,
 	type: 'SIGN_UP_FAILURE',
+});
+
+export const signOut = (): UserActions => ({
+	type: 'SIGN_OUT',
 });
 
 export const changePasswordStart = (
@@ -99,7 +107,12 @@ export const updateProfileStart = (
 	type: 'UPDATE_PROFILE_START',
 });
 
-export const updateProfileSuccess = (): UserActions => ({
+export const updateProfileSuccess = (
+	url: string,
+	displayName: string
+): UserActions => ({
+	url,
+	displayName,
 	type: 'UPDATE_PROFILE_SUCCESS',
 });
 

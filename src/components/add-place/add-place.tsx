@@ -29,9 +29,10 @@ import {
 	addTrip,
 	setMarkerToAdd,
 } from '../../redux/root.actions';
-import { Place, Trip, Coords, MapState } from '../../redux/map/map.types';
+import { Coords, MapState } from '../../redux/map/map.types';
 import { AppState } from '../../redux/root.reducer';
 import { selectTrips, selectMarkerToAdd } from '../../redux/map/map.selectors';
+import { selectUserId } from '../../redux/user/user.selectors';
 
 export type Ids = 'main' | 'extra1';
 export type ImageUpload = {
@@ -42,8 +43,6 @@ export type ImageUpload = {
 	errorMessage: string | null;
 };
 
-const userId = 'b1EO0UrZOdW3J948w6TFLk2uKVQ2';
-
 const defaultOption = 'choose a trip';
 
 interface OwnProps {}
@@ -53,7 +52,9 @@ interface LinkDispatchToProps {
 	addTrip: typeof addTrip;
 	setMarkerToAdd: typeof setMarkerToAdd;
 }
-interface LinkStateToProps extends Pick<MapState, 'trips' | 'markerToAdd'> {}
+interface LinkStateToProps extends Pick<MapState, 'trips' | 'markerToAdd'> {
+	userId: string;
+}
 
 type Props = OwnProps & LinkDispatchToProps & LinkStateToProps;
 const AddPlace: React.FC<Props> = ({
@@ -62,6 +63,7 @@ const AddPlace: React.FC<Props> = ({
 	trips,
 	markerToAdd,
 	setMarkerToAdd,
+	userId,
 }) => {
 	const [tripDropdown, setTripDropdown] = useState(defaultOption);
 	const [tripOptions, setTripOptions] = useState<string[]>([]);
@@ -304,6 +306,7 @@ const mapStateToProps = createStructuredSelector<
 	LinkStateToProps
 >({
 	trips: selectTrips,
+	userId: selectUserId,
 	markerToAdd: selectMarkerToAdd,
 });
 

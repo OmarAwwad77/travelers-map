@@ -17,6 +17,7 @@ export const UserAvatar = styled.div<{ url: string }>`
 	width: 7rem;
 	height: 7rem;
 	border-radius: 50%;
+	cursor: pointer;
 `;
 
 export const UserContent = styled.div`
@@ -30,6 +31,7 @@ export const UserContent = styled.div`
 export const UserName = styled.span`
 	font-weight: 600;
 	text-transform: capitalize;
+	cursor: pointer;
 `;
 
 export const FollowButton = styled(HeroButton)`

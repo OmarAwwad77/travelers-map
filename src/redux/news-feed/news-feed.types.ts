@@ -34,6 +34,7 @@ export interface Post extends Place {
 export interface NewsFeedState {
 	posts: Post[];
 	users: User[];
+	strangerPosts: Post[];
 	loading: boolean;
 	error: string | null;
 }
@@ -50,6 +51,9 @@ export const ADD_COMMENT_FAILURE = 'ADD_COMMENT_FAILURE';
 export const LIKE_POST_TOGGLE_START = 'LIKE_POST_TOGGLE_START';
 export const LIKE_POST_TOGGLE_SUCCESS = 'LIKE_POST_TOGGLE_SUCCESS';
 export const LIKE_POST_TOGGLE_FAILURE = 'LIKE_POST_TOGGLE_FAILURE';
+export const FETCH_USER_POSTS_START = 'FETCH_USER_POSTS_START';
+export const FETCH_USER_POSTS_SUCCESS = 'FETCH_USER_POSTS_SUCCESS';
+export const FETCH_USER_POSTS_FAILURE = 'FETCH_USER_POSTS_FAILURE';
 
 export interface FetchPostsStart {
 	type: typeof FETCH_POSTS_START;
@@ -120,6 +124,21 @@ export interface LikePostToggleFailure {
 	posts: Post[];
 }
 
+export interface FetchUserPostsStart {
+	type: typeof FETCH_USER_POSTS_START;
+	userId: string;
+}
+
+export interface FetchUserPostsSuccess {
+	type: typeof FETCH_USER_POSTS_SUCCESS;
+	posts: Post[];
+}
+
+export interface FetchUserPostsFailure {
+	type: typeof FETCH_USER_POSTS_FAILURE;
+	error: string;
+}
+
 export type NewsFeedActions =
 	| FetchPostsStart
 	| FetchPostsSuccess
@@ -132,4 +151,7 @@ export type NewsFeedActions =
 	| AddCommentFailure
 	| LikePostToggleStart
 	| LikePostToggleSuccess
-	| LikePostToggleFailure;
+	| LikePostToggleFailure
+	| FetchUserPostsStart
+	| FetchUserPostsSuccess
+	| FetchUserPostsFailure;

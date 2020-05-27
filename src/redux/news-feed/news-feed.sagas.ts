@@ -21,6 +21,7 @@ import {
 	addNestedComment,
 	toggleLikingPost,
 	getUsers,
+	getFeaturesById,
 } from '../../firebase/firebase.utils';
 import {
 	Post,
@@ -33,6 +34,8 @@ import {
 	LikePostToggleStart,
 	User,
 	FETCH_USERS_START,
+	FetchUserPostsStart,
+	FETCH_USER_POSTS_START,
 } from './news-feed.types';
 import {
 	fetchPostsSuccess,
@@ -40,6 +43,8 @@ import {
 	likePostToggleSuccess,
 	likePostToggleFailure,
 	fetchUsersSuccess,
+	fetchUserPostSuccess,
+	fetchUserPostsFailure,
 } from './news-feed.actions';
 import {
 	selectUserId,
@@ -183,20 +188,36 @@ function* likePostToggleSaga({
 	}
 }
 
+function* fetchUserPostsSaga({ userId }: FetchUserPostsStart): SagaIterator {
+	try {
+		const featureDoc: DocumentSnapshot = yield call(getFeaturesById, userId);
+		if (featureDoc.exists) {
+			const posts: Post[] = yield call(getFeaturesFromDocSaga, featureDoc);
+			yield put(fetchUserPostSuccess(posts));
+		}
+	} catch (error) {
+		yield put(fetchUserPostsFailure(error.message));
+	}
+}
+
 function* onFetchPostsSaga(): SagaIterator {
 	yield take(FETCH_POSTS_START);
 	const userFollowsArr: string[] = yield select(selectUserFollowsArr);
 	try {
-		const querySnapshot: QuerySnapshot = yield call(
-			getFeatures,
-			userFollowsArr
-		);
-		const posts = ((yield all(
-			querySnapshot.docs.map((doc) => call(getFeaturesFromDocSaga, doc))
-		)) as Post[][]).reduce<Post[]>((acc, curr) => [...acc, ...curr], []);
-		console.log(posts);
+		if (userFollowsArr.length !== 0) {
+			const querySnapshot: QuerySnapshot = yield call(
+				getFeatures,
+				userFollowsArr
+			);
+			const posts = ((yield all(
+				querySnapshot.docs.map((doc) => call(getFeaturesFromDocSaga, doc))
+			)) as Post[][]).reduce((acc, curr) => [...acc, ...curr], []);
+			console.log(posts);
 
-		yield put(fetchPostsSuccess(posts));
+			yield put(fetchPostsSuccess(posts));
+		} else {
+			yield put(fetchPostsSuccess([]));
+		}
 	} catch (error) {
 		console.log(error);
 	}
@@ -211,20 +232,26 @@ function* onLikePostToggleSaga(): SagaIterator {
 }
 
 function* onFetchUsersSaga(): SagaIterator {
-	yield take(FETCH_USERS_START);
-	const userId: string = yield select(selectUserId);
-	try {
-		const usersQuery: QuerySnapshot = yield call(getUsers);
-		let users: User[] = [];
-		usersQuery.forEach(
-			(doc) =>
-				doc.id !== userId &&
-				users.push({ userId: doc.id, ...(doc.data() as DbUser) })
-		);
-		yield put(fetchUsersSuccess(users));
-	} catch (error) {
-		console.log(error);
+	while (true) {
+		yield take(FETCH_USERS_START);
+		const userId: string = yield select(selectUserId);
+		try {
+			const usersQuery: QuerySnapshot = yield call(getUsers);
+			let users: User[] = [];
+			usersQuery.forEach(
+				(doc) =>
+					doc.id !== userId &&
+					users.push({ userId: doc.id, ...(doc.data() as DbUser) })
+			);
+			yield put(fetchUsersSuccess(users));
+		} catch (error) {
+			console.log(error);
+		}
 	}
+}
+
+function* onFetchUserPostsSaga(): SagaIterator {
+	yield takeLatest(FETCH_USER_POSTS_START, fetchUserPostsSaga);
 }
 
 export function* newsFeedSagas(): SagaIterator {
@@ -233,5 +260,6 @@ export function* newsFeedSagas(): SagaIterator {
 		call(onAddCommentSaga),
 		call(onLikePostToggleSaga),
 		call(onFetchUsersSaga),
+		call(onFetchUserPostsSaga),
 	]);
 }

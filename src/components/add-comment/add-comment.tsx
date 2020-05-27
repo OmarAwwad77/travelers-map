@@ -52,6 +52,8 @@ const AddComment: React.FC<Props> = ({
 						onClick={() => {
 							addCommentStart(replyToId, comment, postId);
 							onCommentAdded?.();
+							setShowButtons(false);
+							setComment('');
 						}}
 					>
 						Comment
