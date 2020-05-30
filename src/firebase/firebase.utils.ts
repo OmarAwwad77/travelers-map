@@ -247,3 +247,23 @@ export const deleteUserComments = async (userId: string) => {
 			.delete()
 	);
 };
+
+export const fetchFollowers = async (followersArr: string[]) => {
+	if (!followersArr.length) return [];
+	const followersQuery = await db
+		.collection('users')
+		.where(firestore.FieldPath.documentId(), 'in', followersArr)
+		.get();
+
+	return followersQuery.docs;
+};
+
+export const fetchFollows = async (followsArr: string[]) => {
+	if (!followsArr.length) return [];
+	const followsQuery = await db
+		.collection('users')
+		.where(firestore.FieldPath.documentId(), 'in', followsArr)
+		.get();
+
+	return followsQuery.docs;
+};

@@ -1,6 +1,21 @@
 import { NewsFeedActions, Post, DbComment, User } from './news-feed.types';
 import { User as CurrentUser } from '../user/user.types';
 
+export const fetchMyPostsStart = (userId: string): NewsFeedActions => ({
+	userId,
+	type: 'FETCH_MY_POSTS_START',
+});
+
+export const fetchMyPostsSuccess = (myPosts: Post[]): NewsFeedActions => ({
+	myPosts,
+	type: 'FETCH_MY_POSTS_SUCCESS',
+});
+
+export const fetchMyPostsFailure = (error: string): NewsFeedActions => ({
+	error,
+	type: 'FETCH_MY_POSTS_FAILURE',
+});
+
 export const fetchPostsStart = (): NewsFeedActions => ({
 	type: 'FETCH_POSTS_START',
 });
@@ -91,8 +106,12 @@ export const likePostToggleFailure = (
 	type: 'LIKE_POST_TOGGLE_FAILURE',
 });
 
-export const fetchUserPostsStart = (userId: string): NewsFeedActions => ({
+export const fetchUserPostsStart = (
+	userId: string,
+	forCurrentUser?: boolean
+): NewsFeedActions => ({
 	userId,
+	forCurrentUser,
 	type: 'FETCH_USER_POSTS_START',
 });
 
@@ -104,4 +123,11 @@ export const fetchUserPostSuccess = (posts: Post[]): NewsFeedActions => ({
 export const fetchUserPostsFailure = (error: string): NewsFeedActions => ({
 	error,
 	type: 'FETCH_USER_POSTS_FAILURE',
+});
+
+export const toggleShowScrollButton = (
+	isVisible: boolean
+): NewsFeedActions => ({
+	isVisible,
+	type: 'TOGGLE_SHOW_SCROLL_BUTTON',
 });

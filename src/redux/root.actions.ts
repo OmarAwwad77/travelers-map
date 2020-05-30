@@ -38,6 +38,9 @@ export {
 } from './user/user.actions';
 
 export {
+	fetchMyPostsStart,
+	fetchMyPostsSuccess,
+	fetchMyPostsFailure,
 	fetchPostsFailure,
 	fetchPostsStart,
 	fetchPostsSuccess,
@@ -53,6 +56,7 @@ export {
 	fetchUserPostSuccess,
 	fetchUserPostsFailure,
 	fetchUserPostsStart,
+	toggleShowScrollButton,
 } from './news-feed/news-feed.actions';
 
 export type StoreActions = MapActions | UserActions;

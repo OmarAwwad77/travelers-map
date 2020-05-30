@@ -1,21 +1,40 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import VisibilitySensor from 'react-visibility-sensor';
 
 import { ReactComponent as Logo } from '../../assets/icons/logo.svg';
 import NavItems from '../nav-items/nav-items';
+import { toggleShowScrollButton } from '../../redux/root.actions';
 import { Wrapper, LogoWrapper } from './header.styles';
+import { Dispatch } from 'redux';
+/**
+ *
+ */
 
-const Header = () => {
+interface LinkDispatchToProps {
+	toggleShowScrollButton: typeof toggleShowScrollButton;
+}
+type Props = LinkDispatchToProps;
+
+const Header: React.FC<Props> = ({ toggleShowScrollButton }) => {
 	return (
-		<Wrapper>
-			<LogoWrapper>
-				<Logo height='100%' width='5rem' />
-				<span>traveler's map</span>
-			</LogoWrapper>
-			<nav>
-				<NavItems />
-			</nav>
-		</Wrapper>
+		<VisibilitySensor partialVisibility onChange={toggleShowScrollButton}>
+			<Wrapper id='header'>
+				<LogoWrapper>
+					<Logo height='100%' width='5rem' />
+					<span>traveler's map</span>
+				</LogoWrapper>
+				<nav>
+					<NavItems />
+				</nav>
+			</Wrapper>
+		</VisibilitySensor>
 	);
 };
 
-export default Header;
+const mapDispatchToProps = (dispatch: Dispatch): LinkDispatchToProps => ({
+	toggleShowScrollButton: (isVisible) =>
+		dispatch(toggleShowScrollButton(isVisible)),
+});
+
+export default connect(null, mapDispatchToProps)(Header);

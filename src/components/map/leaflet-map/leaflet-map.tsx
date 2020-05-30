@@ -11,6 +11,9 @@ import {
 	DropDownWrapper,
 	Wrapper,
 	SaveIconWrapper,
+	LocateMe,
+	LocateMeIcon,
+	AddPlaceByName,
 } from './leaflet-map.styles';
 import {
 	EditControl,
@@ -28,6 +31,7 @@ import {
 	transformFeaturesForUpload,
 	getMapData,
 	getProperties,
+	locateMe,
 } from './leaflet-map.util';
 import { MapStyle, getMapStyle } from './leaflet-map.themes';
 
@@ -46,6 +50,7 @@ interface OwnProps extends Pick<MapState, 'places'> {
 	onChange: React.Dispatch<SetStateAction<boolean>>;
 	config: MapConfig;
 	withTargetUser?: boolean;
+	markersToAdd?: Coords[];
 }
 type Props = OwnProps;
 
@@ -63,11 +68,11 @@ const LeafletMap: React.FC<Props> = ({
 	setPlaces,
 	onChange,
 	withTargetUser,
+	markersToAdd,
 }) => {
 	const [mapStyle, setMapStyle] = useState<MapStyle>('Light');
 	const [geoJson, setGeoJson] = useState<GeoJSON>(initialGeoState);
 
-	console.log('leaflet map');
 	useEffect(() => {
 		setGeoJson({
 			...geoJson,
@@ -78,6 +83,12 @@ const LeafletMap: React.FC<Props> = ({
 		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [places]);
+
+	useEffect(() => {
+		if (markersToAdd?.length) {
+			setGeoJson({ ...geoJson });
+		}
+	}, [markersToAdd]);
 
 	useEffect(() => {
 		const newMarkerAdded: boolean =
@@ -151,6 +162,12 @@ const LeafletMap: React.FC<Props> = ({
 		alert('check firebase');
 	};
 
+	const addMyCurrentLocation = () => {
+		onChange(false);
+
+		locateMe(geoJson, setGeoJson);
+	};
+
 	const onMarkerCreated = (e: CreatedEvent) => {
 		if (!editableFG) {
 			return;
@@ -213,6 +230,10 @@ const LeafletMap: React.FC<Props> = ({
 					onChangeHandler={setMapStyle}
 				/>
 			</DropDownWrapper>
+			<LocateMe onClick={addMyCurrentLocation}>
+				Add My Location <LocateMeIcon />
+			</LocateMe>
+			<AddPlaceByName placeholder='add place by name' />
 			{!withTargetUser && (
 				<SaveIconWrapper onClick={saveMapData}>
 					<SaveIcon style={{ width: '100%', color: '#464646' }} />

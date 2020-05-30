@@ -45,6 +45,9 @@ const NewsFeed: React.FC<Props> = ({
 				{posts.map((post, i) => (
 					<Post currentUser={currentUser!} key={post.placeId} post={post} />
 				))}
+				<div
+					style={{ marginTop: '10rem', height: '10rem', width: '10rem' }}
+				></div>
 			</PostsArea>
 			<SideBarWrapper>
 				<SideBar title='popular Travelers'>

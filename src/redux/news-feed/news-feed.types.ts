@@ -35,10 +35,15 @@ export interface NewsFeedState {
 	posts: Post[];
 	users: User[];
 	strangerPosts: Post[];
+	myPosts: Post[];
 	loading: boolean;
 	error: string | null;
+	showScrollButton: boolean;
 }
 
+export const FETCH_MY_POSTS_START = 'FETCH_MY_POSTS_START';
+export const FETCH_MY_POSTS_SUCCESS = 'FETCH_MY_POSTS_SUCCESS';
+export const FETCH_MY_POSTS_FAILURE = 'FETCH_MY_POSTS_FAILURE';
 export const FETCH_POSTS_START = 'FETCH_POSTS_START';
 export const FETCH_POSTS_SUCCESS = 'FETCH_POSTS_SUCCESS';
 export const FETCH_POSTS_FAILURE = 'FETCH_POSTS_FAILURE';
@@ -54,6 +59,22 @@ export const LIKE_POST_TOGGLE_FAILURE = 'LIKE_POST_TOGGLE_FAILURE';
 export const FETCH_USER_POSTS_START = 'FETCH_USER_POSTS_START';
 export const FETCH_USER_POSTS_SUCCESS = 'FETCH_USER_POSTS_SUCCESS';
 export const FETCH_USER_POSTS_FAILURE = 'FETCH_USER_POSTS_FAILURE';
+export const TOGGLE_SHOW_SCROLL_BUTTON = 'TOGGLE_SHOW_SCROLL_BUTTON';
+
+export interface FetchMyPostsStart {
+	type: typeof FETCH_MY_POSTS_START;
+	userId: string;
+}
+
+export interface FetchMyPostsSuccess {
+	type: typeof FETCH_MY_POSTS_SUCCESS;
+	myPosts: Post[];
+}
+
+export interface FetchMyPostsFailure {
+	type: typeof FETCH_MY_POSTS_FAILURE;
+	error: string;
+}
 
 export interface FetchPostsStart {
 	type: typeof FETCH_POSTS_START;
@@ -127,6 +148,7 @@ export interface LikePostToggleFailure {
 export interface FetchUserPostsStart {
 	type: typeof FETCH_USER_POSTS_START;
 	userId: string;
+	forCurrentUser?: boolean;
 }
 
 export interface FetchUserPostsSuccess {
@@ -139,7 +161,15 @@ export interface FetchUserPostsFailure {
 	error: string;
 }
 
+export interface ShowScrollButton {
+	type: typeof TOGGLE_SHOW_SCROLL_BUTTON;
+	isVisible: boolean;
+}
+
 export type NewsFeedActions =
+	| FetchMyPostsStart
+	| FetchMyPostsSuccess
+	| FetchMyPostsFailure
 	| FetchPostsStart
 	| FetchPostsSuccess
 	| FetchPostsFailure
@@ -154,4 +184,5 @@ export type NewsFeedActions =
 	| LikePostToggleFailure
 	| FetchUserPostsStart
 	| FetchUserPostsSuccess
-	| FetchUserPostsFailure;
+	| FetchUserPostsFailure
+	| ShowScrollButton;

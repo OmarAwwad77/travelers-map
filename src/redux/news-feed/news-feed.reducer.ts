@@ -11,8 +11,10 @@ const initialState: NewsFeedState = {
 	posts: [],
 	users: [],
 	strangerPosts: [],
+	myPosts: [],
 	loading: false,
 	error: null,
+	showScrollButton: false,
 };
 
 const updatePostsLikeStatus = (
@@ -163,6 +165,24 @@ const newsFeedReducer = (
 			return {
 				...state,
 				error: action.error,
+			};
+
+		case 'FETCH_MY_POSTS_SUCCESS':
+			return {
+				...state,
+				myPosts: action.myPosts,
+			};
+
+		case 'FETCH_MY_POSTS_FAILURE':
+			return {
+				...state,
+				error: action.error,
+			};
+
+		case 'TOGGLE_SHOW_SCROLL_BUTTON':
+			return {
+				...state,
+				showScrollButton: !action.isVisible,
 			};
 
 		default:

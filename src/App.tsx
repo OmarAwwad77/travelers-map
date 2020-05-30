@@ -15,8 +15,11 @@ import { UserState, User } from './redux/user/user.types';
 import { createStructuredSelector } from 'reselect';
 import { AppState } from './redux/root.reducer';
 import { selectUser } from './redux/user/user.selectors';
-import StrangerProfile from './components/strange-profile/strange-profile';
+import StrangerProfile from './pages/stranger-profile/stranger-profile.page';
 
+/**
+ *
+ */
 interface LinkStateToProps extends Pick<UserState, 'user'> {}
 interface LinkDispatchToProps {
 	setCurrentUser: typeof setCurrentUser;

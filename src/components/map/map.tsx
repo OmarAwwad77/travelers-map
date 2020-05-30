@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import { Prompt, useLocation, useHistory, Route } from 'react-router-dom';
 import { AppState } from '../../redux/root.reducer';
-import styled from 'styled-components';
 import LeafletMap from './leaflet-map/leaflet-map';
 import { MapState, Trip, Coords } from '../../redux/map/map.types';
 import {
@@ -23,26 +22,11 @@ import { getSideBarTrips, getPlacesFromFeatures } from './map.util';
 import MenuIcon from '../menu-icon/menu-icon';
 import { selectUser } from '../../redux/user/user.selectors';
 import { UserState } from '../../redux/user/user.types';
+import { BackButton, Wrapper, MenuIconWrapper } from './map.styles';
 
-const Wrapper = styled.div<{ withTargetUser: boolean }>`
-	position: relative;
-	height: ${(p) => (p.withTargetUser ? '100%' : '100vh')};
-	overflow: hidden;
-	z-index: 1;
-`;
-
-const MenuIconWrapper = styled.div`
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	z-index: 3;
-	position: absolute;
-	top: 2rem;
-	left: 1rem;
-	width: 3rem;
-	height: 3rem;
-	background: #fff;
-`;
+/**
+ *
+ */
 
 interface LinkStateToProps
 	extends Omit<MapState, 'markerToAdd'>,
@@ -57,8 +41,9 @@ interface OwnProps {
 }
 type Props = LinkStateToProps & OwnProps & LinkDispatchToProps;
 
-// let userId = 'rFoyR1X9TDePcjWsQwq8xr9PBpF3
-
+/**
+ *
+ */
 const Map: React.FC<Props> = ({
 	places,
 	trips,
@@ -139,6 +124,7 @@ const Map: React.FC<Props> = ({
 						: true
 				}
 			/>
+			<BackButton>&#8592;</BackButton>
 			<MenuIconWrapper>
 				<MenuIcon
 					dir='left'

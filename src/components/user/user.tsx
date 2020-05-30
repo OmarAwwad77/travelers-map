@@ -37,7 +37,12 @@ const User: React.FC<Props> = ({
 			<UserAvatar onClick={() => push(`/user/${userId}`)} url={userImg} />
 			<UserContent onClick={() => push(`/user/${userId}`)}>
 				<UserName>{displayName}</UserName>
-				<FollowButton onClick={() => toggleFollowUserStart(userId, followed)}>
+				<FollowButton
+					onClick={(e) => {
+						e.stopPropagation();
+						toggleFollowUserStart(userId, followed);
+					}}
+				>
 					{followed ? 'UnFollow' : 'Follow'}
 				</FollowButton>
 			</UserContent>

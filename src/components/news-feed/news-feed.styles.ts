@@ -9,8 +9,8 @@ export const Wrapper = styled.div`
 
 export const PostsArea = styled.div`
 	width: 70%;
-	overflow-y: scroll;
-	height: calc(100vh - 13rem);
+	/* overflow-y: scroll;
+	height: calc(100vh - 13rem); */
 	padding: 5rem;
 	display: flex;
 	flex-direction: column;

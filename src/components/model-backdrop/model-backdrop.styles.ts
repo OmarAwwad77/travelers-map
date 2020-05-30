@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 export const Model = styled.div`
-	position: absolute;
+	position: fixed;
 	z-index: 4;
 	top: 50%;
 	left: 50%;

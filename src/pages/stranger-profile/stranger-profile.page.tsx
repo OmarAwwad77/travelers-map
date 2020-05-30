@@ -3,10 +3,17 @@ import { connect } from 'react-redux';
 import { useParams, Redirect } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { UserAvatar, UserName, FollowButton } from '../user/user.styles';
-import SideBar from '../sidebar/sidebar';
+import {
+	UserAvatar,
+	UserName,
+	FollowButton,
+} from '../../components/user/user.styles';
+import SideBar from '../../components/sidebar/sidebar';
 import { Dispatch } from 'redux';
-import { fetchUserPostsStart } from '../../redux/root.actions';
+import {
+	fetchUserPostsStart,
+	toggleFollowUserStart,
+} from '../../redux/root.actions';
 import { NewsFeedState } from '../../redux/news-feed/news-feed.types';
 import { createStructuredSelector } from 'reselect';
 import { AppState } from '../../redux/root.reducer';
@@ -14,8 +21,8 @@ import {
 	selectStrangerPosts,
 	selectUsers,
 } from '../../redux/news-feed/news-feed.selectors';
-import { PostsArea } from '../news-feed/news-feed.styles';
-import Post from '../post/post';
+import { PostsArea } from '../../components/news-feed/news-feed.styles';
+import Post from '../../components/post/post';
 import { selectUser } from '../../redux/user/user.selectors';
 import { UserState } from '../../redux/user/user.types';
 
@@ -49,6 +56,7 @@ const Button = styled(FollowButton)`
 
 interface LinkDispatchToProps {
 	fetchUserPostsStart: typeof fetchUserPostsStart;
+	toggleFollowUserStart: typeof toggleFollowUserStart;
 }
 interface LinkStateToProps
 	extends Pick<NewsFeedState, 'strangerPosts' | 'users'>,
@@ -59,6 +67,7 @@ type Props = LinkDispatchToProps & LinkStateToProps & OwnProps;
 const StrangerProfile: React.FC<Props> = ({
 	strangerPosts,
 	fetchUserPostsStart,
+	toggleFollowUserStart,
 	user,
 	users,
 }) => {
@@ -91,7 +100,13 @@ const StrangerProfile: React.FC<Props> = ({
 					<Avatar url={url!} />
 					<Name>{name!}</Name>
 
-					<Button>Follow</Button>
+					<Button
+						onClick={() =>
+							toggleFollowUserStart(id, user!.follows.includes(id))
+						}
+					>
+						{user!.follows.includes(id) ? 'UnFollow' : 'Follow'}
+					</Button>
 				</SideBar>
 			</SidebarWrapper>
 		</Wrapper>
@@ -100,6 +115,8 @@ const StrangerProfile: React.FC<Props> = ({
 
 const mapDispatchToProps = (dispatch: Dispatch): LinkDispatchToProps => ({
 	fetchUserPostsStart: (userId) => dispatch(fetchUserPostsStart(userId)),
+	toggleFollowUserStart: (userId, followed) =>
+		dispatch(toggleFollowUserStart(userId, followed)),
 });
 
 const mapStateToProps = createStructuredSelector<

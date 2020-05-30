@@ -2,6 +2,7 @@ import { Feature, GeoJSON } from 'react-leaflet-draw';
 import { FeatureGroup } from 'leaflet';
 import { Dispatch, SetStateAction } from 'react';
 import { Place } from '../../../redux/map/map.types';
+import { v4 as uuidv4 } from 'uuid';
 
 type NestedCoords = number[][];
 type FlatCoords = number[];
@@ -109,4 +110,43 @@ export const getProperties = (feature: Feature, places: Place[]) => {
 	} else {
 		return feature.properties;
 	}
+};
+
+export const locateMe = (
+	state: GeoJSON,
+	setState: Dispatch<SetStateAction<GeoJSON>>
+) => {
+	if (navigator.geolocation) {
+		navigator.geolocation.getCurrentPosition(({ coords }) => {
+			const updatedState = addMarkerProgrammatically(state, [
+				coords.latitude,
+				coords.longitude,
+			]);
+			setState(updatedState);
+		});
+	} else {
+		alert('Geolocation is not supported by this browser.');
+	}
+};
+
+export const addMarkerProgrammatically = (
+	state: GeoJSON,
+	coords: Coords
+): GeoJSON => {
+	return {
+		...state,
+		features: [
+			...state.features,
+			{
+				type: 'Feature',
+				properties: {
+					id: uuidv4(),
+				},
+				geometry: {
+					type: 'Point',
+					coordinates: coords,
+				},
+			},
+		],
+	};
 };

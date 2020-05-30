@@ -10,5 +10,6 @@ export const Wrapper = styled.div`
 	max-width: 70%;
 	width: 28rem;
 	padding: 3rem 1rem;
+	padding-top: 9rem;
 	overflow-y: auto;
 `;

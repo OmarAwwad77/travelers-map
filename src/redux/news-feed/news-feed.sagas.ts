@@ -45,6 +45,8 @@ import {
 	fetchUsersSuccess,
 	fetchUserPostSuccess,
 	fetchUserPostsFailure,
+	fetchMyPostsSuccess,
+	fetchMyPostsFailure,
 } from './news-feed.actions';
 import {
 	selectUserId,
@@ -188,20 +190,34 @@ function* likePostToggleSaga({
 	}
 }
 
-function* fetchUserPostsSaga({ userId }: FetchUserPostsStart): SagaIterator {
+function* fetchUserPostsSaga({
+	userId,
+	forCurrentUser,
+}: FetchUserPostsStart): SagaIterator {
 	try {
 		const featureDoc: DocumentSnapshot = yield call(getFeaturesById, userId);
 		if (featureDoc.exists) {
 			const posts: Post[] = yield call(getFeaturesFromDocSaga, featureDoc);
-			yield put(fetchUserPostSuccess(posts));
+			yield put(
+				forCurrentUser
+					? fetchMyPostsSuccess(posts)
+					: fetchUserPostSuccess(posts)
+			);
+		} else {
+			yield put(
+				forCurrentUser ? fetchMyPostsSuccess([]) : fetchUserPostSuccess([])
+			);
 		}
 	} catch (error) {
-		yield put(fetchUserPostsFailure(error.message));
+		if (forCurrentUser) {
+			yield put(fetchMyPostsFailure(error.message));
+		} else {
+			yield put(fetchUserPostsFailure(error.message));
+		}
 	}
 }
 
-function* onFetchPostsSaga(): SagaIterator {
-	yield take(FETCH_POSTS_START);
+function* fetchPostsSaga(): SagaIterator {
 	const userFollowsArr: string[] = yield select(selectUserFollowsArr);
 	try {
 		if (userFollowsArr.length !== 0) {
@@ -221,6 +237,10 @@ function* onFetchPostsSaga(): SagaIterator {
 	} catch (error) {
 		console.log(error);
 	}
+}
+
+function* onFetchPostsSaga(): SagaIterator {
+	yield takeLatest(FETCH_POSTS_START, fetchPostsSaga);
 }
 
 function* onAddCommentSaga(): SagaIterator {
