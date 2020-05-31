@@ -13,6 +13,7 @@ import {
 	ImageUploadsWrapper,
 	SaveButton,
 	PlaceName,
+	PlaceAddress,
 } from './add-place.styles';
 import WithModel from '../../hoc/With-model/With-model';
 import DropDown from '../drop-down/drop-down';
@@ -69,6 +70,7 @@ const AddPlace: React.FC<Props> = ({
 	const [tripOptions, setTripOptions] = useState<string[]>([]);
 	const [tripInput, setTripInput] = useState('');
 	const [placeName, setPlaceName] = useState('');
+	const [placeAddress, setPlaceAddress] = useState('');
 	const [description, setDescription] = useState('');
 	const [isFormValid, setIsFormValid] = useState(false);
 	const [imageUploads, setImageUploads] = useState<ImageUpload[]>([
@@ -93,16 +95,44 @@ const AddPlace: React.FC<Props> = ({
 		const tripDropdownUntouched = tripDropdown === defaultOption;
 		const tripNameEmpty = tripDropdownUntouched && tripInputEmpty;
 		const placeNameEmpty = placeName === '';
+		const placeAddressEmpty = placeAddress === '';
 		const descriptionEmpty = description === '';
 		const mainImageEmpty =
 			imageUploads.find((image) => image.id === 'main')?.file === null;
 
-		if (tripNameEmpty || descriptionEmpty || mainImageEmpty || placeNameEmpty) {
+		if (
+			tripNameEmpty ||
+			descriptionEmpty ||
+			mainImageEmpty ||
+			placeNameEmpty ||
+			placeAddressEmpty
+		) {
 			setIsFormValid(false);
 		} else {
 			setIsFormValid(true);
 		}
-	}, [imageUploads, description, tripInput, tripDropdown, placeName]);
+	}, [
+		imageUploads,
+		description,
+		tripInput,
+		tripDropdown,
+		placeName,
+		placeAddress,
+	]);
+
+	useEffect(() => {
+		async function fetchAddress() {
+			const [lat, lng] = markerToAdd?.markerCoords as number[];
+
+			const res = await fetch(
+				`https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lng}&key=0c29999ba52f470c8a5e04f8b053e77f`
+			);
+
+			const data = await res.json();
+			setPlaceAddress(data.results[0].formatted);
+		}
+		fetchAddress();
+	}, []);
 
 	useEffect(() => {
 		setTripOptions(trips.map((trip) => trip.tripName));
@@ -226,6 +256,7 @@ const AddPlace: React.FC<Props> = ({
 			addPlace({
 				placeId,
 				placeName,
+				placeAddress: placeAddress,
 				tripId,
 				placeCoords: placeCoords as Coords,
 				placeDesc: description,
@@ -237,6 +268,11 @@ const AddPlace: React.FC<Props> = ({
 
 			setMarkerToAdd(null);
 		});
+	};
+
+	const placeAddressOnChange = (e: ChangeEvent<HTMLInputElement>) => {
+		const val = e.target.value;
+		setPlaceAddress(val);
 	};
 
 	return markerToAdd ? (
@@ -263,6 +299,11 @@ const AddPlace: React.FC<Props> = ({
 					value={placeName}
 					onChange={onPlaceNameChange}
 					placeholder='add place name'
+				/>
+				<PlaceAddress
+					placeholder='place address'
+					value={placeAddress}
+					onChange={placeAddressOnChange}
 				/>
 				<TripDescription
 					placeholder='Place Description'

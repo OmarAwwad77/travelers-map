@@ -91,7 +91,10 @@ function* getCommentSaga(id: string): SagaIterator {
 	}
 }
 
-function* getPlacesFromFeatureSaga(feature: any): SagaIterator<Post | Error> {
+function* getPlacesFromFeatureSaga(
+	feature: any
+): SagaIterator<Post | Error | null> {
+	if (!feature.properties.userId) return null;
 	const userDoc: DocumentSnapshot = yield call(
 		getUserDocFromDb,
 		feature.properties.userId
@@ -114,6 +117,7 @@ function* getPlacesFromFeatureSaga(feature: any): SagaIterator<Post | Error> {
 			placeDesc: feature.properties.placeDesc,
 			placeImages: feature.properties.placeImages,
 			placeName: feature.properties.placeName,
+			placeAddress: feature.properties.placeAddress,
 			tripId: feature.properties.tripId,
 			userId: feature.properties.userId,
 			createdAt: feature.properties.createdAt,
@@ -200,8 +204,8 @@ function* fetchUserPostsSaga({
 			const posts: Post[] = yield call(getFeaturesFromDocSaga, featureDoc);
 			yield put(
 				forCurrentUser
-					? fetchMyPostsSuccess(posts)
-					: fetchUserPostSuccess(posts)
+					? fetchMyPostsSuccess(posts.filter((val) => val !== null))
+					: fetchUserPostSuccess(posts.filter((val) => val !== null))
 			);
 		} else {
 			yield put(

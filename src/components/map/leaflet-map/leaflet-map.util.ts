@@ -3,6 +3,7 @@ import { FeatureGroup } from 'leaflet';
 import { Dispatch, SetStateAction } from 'react';
 import { Place } from '../../../redux/map/map.types';
 import { v4 as uuidv4 } from 'uuid';
+import { PlaceInputResults } from './leaflet-map';
 
 type NestedCoords = number[][];
 type FlatCoords = number[];
@@ -149,4 +150,26 @@ export const addMarkerProgrammatically = (
 			},
 		],
 	};
+};
+
+export const fetchPlaceByAddress = async (address: string) => {
+	const res = await fetch(
+		`https://api.opencagedata.com/geocode/v1/json?q=${address}&key=0c29999ba52f470c8a5e04f8b053e77f`
+	);
+	const data = await res.json();
+	const fetchedResults: {
+		formatted: string;
+		components: { country: string; city?: string; state?: string };
+		geometry: { lat: number; lng: number };
+	}[] = data.results;
+
+	const results: PlaceInputResults = {};
+	for (let place of fetchedResults) {
+		results[
+			`${place.components.country}, ${
+				place.components.city ?? place.components.state
+			}`
+		] = place.geometry;
+	}
+	return results;
 };

@@ -45,6 +45,7 @@ const App: React.FC<Props> = ({ setCurrentUser, user }) => {
 				<Route path='/profile' component={Profile} />
 				<Route path='/user/:id' component={StrangerProfile} />
 				<Route path='/map' component={Map} />
+
 				<Route
 					path='/'
 					exact

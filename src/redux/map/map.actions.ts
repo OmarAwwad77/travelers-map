@@ -10,6 +10,11 @@ export const addTrip = (trip: Trip): MapActions => ({
 	type: 'ADD_TRIP',
 });
 
+export const deleteTrip = (trip: Trip): MapActions => ({
+	trip,
+	type: 'DELETE_TRIP',
+});
+
 export const setTrips = (trips: Trip[]): MapActions => ({
 	trips,
 	type: 'SET_TRIPS',

@@ -9,6 +9,24 @@ export const Model = styled.div`
 	background-color: #fff;
 	border-radius: 1rem;
 	overflow-y: auto;
+	::-webkit-scrollbar {
+		width: 7px;
+	}
+
+	/* Track */
+	::-webkit-scrollbar-track {
+		background: #f1f1f1;
+	}
+
+	/* Handle */
+	::-webkit-scrollbar-thumb {
+		background: #888;
+	}
+
+	/* Handle on hover */
+	::-webkit-scrollbar-thumb:hover {
+		background: #555;
+	}
 `;
 
 export const ModelClose = styled.span`

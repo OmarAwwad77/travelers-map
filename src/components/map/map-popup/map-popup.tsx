@@ -19,10 +19,16 @@ interface LinkDispatchToProps {
 interface OwnProps {
 	place?: Place;
 	markerToAdd?: MarkerToAdd;
+	withTargetUser?: boolean;
 }
 type Props = OwnProps & LinkDispatchToProps;
 
-const MapPopup: React.FC<Props> = ({ place, markerToAdd, setMarkerToAdd }) => {
+const MapPopup: React.FC<Props> = ({
+	place,
+	markerToAdd,
+	setMarkerToAdd,
+	withTargetUser,
+}) => {
 	const { path } = useRouteMatch();
 	const { push } = useHistory();
 
@@ -33,9 +39,11 @@ const MapPopup: React.FC<Props> = ({ place, markerToAdd, setMarkerToAdd }) => {
 					<>
 						<PlaceName>{place.placeName}</PlaceName>
 						<Slider width='35rem' height='25rem' urls={place.placeImages} />
-						<Link to={`${path}/place-details/${place.placeId}`}>
-							see more...
-						</Link>
+						{!withTargetUser && (
+							<Link to={`${path}/place-details/${place.placeId}`}>
+								see more...
+							</Link>
+						)}
 					</>
 				) : (
 					<AddPlaceLink

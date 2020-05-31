@@ -4,6 +4,7 @@ import { UserActions } from './user/user.types';
 export {
 	addPlace,
 	addTrip,
+	deleteTrip,
 	setTrips,
 	setPlaces,
 	setMapConfig,

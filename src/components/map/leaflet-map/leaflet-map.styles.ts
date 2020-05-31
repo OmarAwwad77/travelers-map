@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { ReactComponent as LocationIcon } from '../../../assets/icons/place.svg';
+export { ModelClose } from '../../model-backdrop/model-backdrop.styles';
 
 export const Wrapper = styled.section`
 	position: relative;
@@ -111,4 +112,34 @@ export const AddPlaceByName = styled.input`
 	outline: none;
 	border: 1px solid #ccc;
 	border-radius: 1rem;
+`;
+
+export const PlaceInputResults = styled.div<{ show: boolean }>`
+	opacity: ${(p) => (p.show ? 1 : 0)};
+	position: absolute;
+	z-index: 2;
+	top: 32px;
+	right: 5%;
+	padding: 2rem;
+	background: #fff;
+	border: 1px solid #ccc;
+	border-radius: 1rem;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	width: 20rem;
+	font-size: 1.4rem;
+	text-transform: capitalize;
+	transition: all 0.2s ease-out;
+	& > span {
+		cursor: pointer;
+		text-align: center;
+		&:not(:first-of-type) {
+			margin-top: 1rem;
+		}
+		&:hover {
+			color: ${(p) => p.theme.colors.secondary1};
+		}
+	}
 `;

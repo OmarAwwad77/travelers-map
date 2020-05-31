@@ -6,6 +6,7 @@ import 'firebase/firestore';
 import { User as AppUser, DbUser } from '../redux/user/user.types';
 import { Post, DbComment } from '../redux/news-feed/news-feed.types';
 import { Feature } from 'react-leaflet-draw';
+import { Trip } from '../redux/map/map.types';
 
 const config = {
 	apiKey: 'AIzaSyCqTuRU04Iv39jAhk5jxrLDBYUDVkXRcd4',
@@ -266,4 +267,13 @@ export const fetchFollows = async (followsArr: string[]) => {
 		.get();
 
 	return followsQuery.docs;
+};
+
+export const deleteTrip = async (trip: Trip) => {
+	const docRef = await db
+		.collection('trips')
+		.where('userTrips', 'array-contains', trip)
+		.get();
+
+	docRef.docs[0].ref.delete();
 };

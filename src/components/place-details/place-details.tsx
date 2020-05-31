@@ -24,29 +24,31 @@ type OwnProps = {
 type Props = OwnProps & LinkStateToProps;
 
 const PlaceDetails: React.FC<Props> = ({ places, post, backDropOnClick }) => {
-	const [address, setAddress] = useState<string>();
-	useEffect(() => {
-		fetch(
-			`https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lng}&key=0c29999ba52f470c8a5e04f8b053e77f`
-		)
-			.then((res) => res.json())
-			.then((data) => {
-				console.log(data.results[0]);
-				const add = data.results[0].formatted;
-				setAddress(add);
-			});
-	}, []);
+	// const [address, setAddress] = useState<string>();
+	// useEffect(() => {
+	// 	fetch(
+	// 		`https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lng}&key=0c29999ba52f470c8a5e04f8b053e77f`
+	// 	)
+	// 		.then((res) => res.json())
+	// 		.then((data) => {
+	// 			const add = data.results[0].formatted;
+	// 			setAddress(add);
+	// 		});
+	// }, []);
 
 	const { placeId } = useParams<{ placeId: string }>();
 
 	let placeName: string;
+	let placeAddress: string;
 	let placeImages: string[];
 	let placeDesc: string;
 	let placeCoords: Coords;
 
 	if (!post) {
-		const place = places.find((place) => place.placeId === +placeId)!;
+		const place = places.find((place) => place.placeId.toString() === placeId)!;
+
 		placeName = place.placeName;
+		placeAddress = place.placeAddress;
 		placeImages = place.placeImages;
 		placeCoords = place.placeCoords;
 		placeDesc = place.placeDesc;
@@ -54,12 +56,13 @@ const PlaceDetails: React.FC<Props> = ({ places, post, backDropOnClick }) => {
 		// const { placeName, placeImages, placeDesc, placeCoords } = place!;
 	} else {
 		placeName = post.placeName;
+		placeAddress = post.placeAddress;
 		placeImages = post.placeImages;
 		placeCoords = post.placeCoords;
 		placeDesc = post.placeDesc;
 	}
-	const lat = (placeCoords as [number, number])[0];
-	const lng = (placeCoords as [number, number])[1];
+	// const lat = (placeCoords as [number, number])[0];
+	// const lng = (placeCoords as [number, number])[1];
 
 	return (
 		<WithModel backDropOnClick={post && backDropOnClick}>
@@ -77,7 +80,7 @@ const PlaceDetails: React.FC<Props> = ({ places, post, backDropOnClick }) => {
 				</div>
 				<div>
 					<AddressTitle>Address</AddressTitle>
-					<span>{address}</span>
+					<span>{placeAddress}</span>
 				</div>
 			</Wrapper>
 		</WithModel>
@@ -92,4 +95,4 @@ const mapStateToProps = createStructuredSelector<
 	places: selectPlaces,
 });
 
-export default connect(mapStateToProps)(PlaceDetails);
+export default connect(mapStateToProps)(React.memo(PlaceDetails));

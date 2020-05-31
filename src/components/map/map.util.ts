@@ -17,6 +17,7 @@ export const getPlacesFromFeatures = (features: Feature[]): Place[] =>
 		.map((feature) => ({
 			placeId: feature.properties?.placeId,
 			placeName: feature.properties?.placeName,
+			placeAddress: feature.properties?.placeAddress,
 			placeDesc: feature.properties?.placeDesc,
 			placeCoords: feature.properties?.placeCoords,
 			placeImages: feature.properties?.placeImages,

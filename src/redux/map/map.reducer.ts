@@ -1,5 +1,5 @@
 import { MapState, MapActions, Place, Trip } from './map.types';
-import { addItem } from './map.util';
+import { addItem, deleteTrip } from './map.util';
 
 const initialState: MapState = {
 	trips: [],
@@ -23,6 +23,12 @@ const mapReducer = (state = initialState, action: MapActions): MapState => {
 			return {
 				...state,
 				trips: addItem(state.trips, action.trip) as Trip[],
+			};
+
+		case 'DELETE_TRIP':
+			return {
+				...state,
+				trips: deleteTrip(state.trips, action.trip),
 			};
 
 		case 'SET_TRIPS':

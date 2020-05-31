@@ -124,7 +124,7 @@ const Map: React.FC<Props> = ({
 						: true
 				}
 			/>
-			<BackButton>&#8592;</BackButton>
+			<BackButton onClick={() => push('/profile')}>&#8592;</BackButton>
 			<MenuIconWrapper>
 				<MenuIcon
 					dir='left'

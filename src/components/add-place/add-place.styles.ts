@@ -49,6 +49,10 @@ const inputStyles = css`
 	}
 `;
 
+export const PlaceAddress = styled.input`
+	${inputStyles};
+`;
+
 export const TripInput = styled.input<{ disabled: boolean }>`
 	${inputStyles};
 	cursor: ${(p) => p.disabled && 'not-allowed'};

@@ -6,6 +6,7 @@ export type Coords = LatLng | LatLngLiteral | LatLngTuple;
 export interface Place {
 	placeId: number;
 	placeName: string;
+	placeAddress: string;
 	placeDesc: string;
 	placeImages: string[];
 	placeCoords: Coords;
@@ -38,6 +39,7 @@ export interface MapState {
 
 export const ADD_PLACE = 'ADD_PLACE';
 export const ADD_TRIP = 'ADD_TRIP';
+export const DELETE_TRIP = 'DELETE_TRIP';
 export const SET_TRIPS = 'SET_TRIPS';
 export const SET_PLACES = 'SET_PLACES';
 export const SET_MAP_CONFIG = 'SET_MAP_CONFIG';
@@ -50,6 +52,11 @@ export interface AddPlace {
 
 export interface AddTrip {
 	type: typeof ADD_TRIP;
+	trip: Trip;
+}
+
+export interface DeleteTrip {
+	type: typeof DELETE_TRIP;
 	trip: Trip;
 }
 
@@ -76,6 +83,7 @@ export interface SetMarkerToAdd {
 export type MapActions =
 	| AddPlace
 	| AddTrip
+	| DeleteTrip
 	| SetTrips
 	| SetPlaces
 	| SetMapConfig

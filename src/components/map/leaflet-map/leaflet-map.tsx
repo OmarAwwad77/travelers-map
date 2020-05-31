@@ -1,4 +1,4 @@
-import React, { useState, useEffect, SetStateAction } from 'react';
+import React, { useState, useEffect, SetStateAction, ChangeEvent } from 'react';
 import {
 	MapState,
 	MapConfig,
@@ -14,6 +14,8 @@ import {
 	LocateMe,
 	LocateMeIcon,
 	AddPlaceByName,
+	PlaceInputResults,
+	ModelClose,
 } from './leaflet-map.styles';
 import {
 	EditControl,
@@ -32,15 +34,24 @@ import {
 	getMapData,
 	getProperties,
 	locateMe,
+	fetchPlaceByAddress,
+	addMarkerProgrammatically,
 } from './leaflet-map.util';
 import { MapStyle, getMapStyle } from './leaflet-map.themes';
-
 import { getPlacesFromFeatures } from '../map.util';
 import { setPlaces } from '../../../redux/root.actions';
+
+/**
+ *
+ */
 
 export interface Trip {
 	id: number;
 	tripName: string;
+}
+
+export interface PlaceInputResults {
+	[key: string]: { lat: number; lng: number };
 }
 
 interface OwnProps extends Pick<MapState, 'places'> {
@@ -72,6 +83,16 @@ const LeafletMap: React.FC<Props> = ({
 }) => {
 	const [mapStyle, setMapStyle] = useState<MapStyle>('Light');
 	const [geoJson, setGeoJson] = useState<GeoJSON>(initialGeoState);
+	const [throttle, setThrottle] = useState<{
+		till: number;
+		timeout: number | null;
+	}>({ till: 0, timeout: null });
+	const [placeInput, setPlaceInput] = useState('');
+	const [placeInputResults, setPlaceInputResults] = useState<PlaceInputResults>(
+		{}
+	);
+	const [showInputResults, setShowInputResults] = useState(false);
+	const [mapConfig, setMapConfig] = useState(config);
 
 	useEffect(() => {
 		setGeoJson({
@@ -191,9 +212,38 @@ const LeafletMap: React.FC<Props> = ({
 		setPlaces(getPlacesFromFeatures(updatedState.features));
 	};
 
+	const placeNameOnChange = (e: ChangeEvent<HTMLInputElement>) => {
+		const now = Date.now();
+		const val = e.target.value;
+		setPlaceInput(val);
+		if (throttle.till >= now) clearTimeout(throttle.timeout!);
+		const timeout = setTimeout(() => {
+			fetchPlaceByAddress(val).then((results) => {
+				setPlaceInputResults(results);
+				setShowInputResults(true);
+			});
+		}, 500);
+		setThrottle({ till: now + 500, timeout });
+	};
+
+	const onResultClicked = (key: string) => {
+		setMapConfig({
+			center: [placeInputResults[key].lat, placeInputResults[key].lng],
+			zoom: 9,
+		});
+		onChange(false);
+		setGeoJson(
+			addMarkerProgrammatically(geoJson, [
+				placeInputResults[key].lat,
+				placeInputResults[key].lng,
+			])
+		);
+		setShowInputResults(false);
+	};
+
 	return (
 		<Wrapper>
-			<Map center={config.center} zoom={config.zoom}>
+			<Map center={mapConfig.center} zoom={mapConfig.zoom}>
 				{getMapStyle(mapStyle)}
 
 				<FeatureGroup key={Date.now()} ref={onFeatureGroupReady}>
@@ -219,7 +269,7 @@ const LeafletMap: React.FC<Props> = ({
 					)}
 
 					{geoJson.features.map((feature) => {
-						return mapGeoJsonToLayers(feature);
+						return mapGeoJsonToLayers(feature, withTargetUser);
 					})}
 				</FeatureGroup>
 			</Map>
@@ -230,10 +280,31 @@ const LeafletMap: React.FC<Props> = ({
 					onChangeHandler={setMapStyle}
 				/>
 			</DropDownWrapper>
-			<LocateMe onClick={addMyCurrentLocation}>
-				Add My Location <LocateMeIcon />
-			</LocateMe>
-			<AddPlaceByName placeholder='add place by name' />
+			{!withTargetUser && (
+				<>
+					<LocateMe onClick={addMyCurrentLocation}>
+						Add My Location <LocateMeIcon />
+					</LocateMe>
+					<AddPlaceByName
+						onFocus={() => setShowInputResults(true)}
+						onBlur={() => setShowInputResults(false)}
+						value={placeInput}
+						onChange={placeNameOnChange}
+						placeholder='add place by name'
+					/>
+					<PlaceInputResults show={showInputResults}>
+						<ModelClose onClick={() => setShowInputResults(false)} />
+						{Object.keys(placeInputResults).map((key) => (
+							<span key={key} onClick={() => onResultClicked(key)}>
+								{key}
+							</span>
+						))}
+						{Object.keys(placeInputResults).length === 0 && (
+							<span>no results</span>
+						)}
+					</PlaceInputResults>
+				</>
+			)}
 			{!withTargetUser && (
 				<SaveIconWrapper onClick={saveMapData}>
 					<SaveIcon style={{ width: '100%', color: '#464646' }} />
@@ -245,7 +316,7 @@ const LeafletMap: React.FC<Props> = ({
 
 export default React.memo(LeafletMap);
 
-const mapGeoJsonToLayers = (feature: Feature) => {
+const mapGeoJsonToLayers = (feature: Feature, withTargetUser?: boolean) => {
 	const {
 		geometry: { type, coordinates },
 		properties,
@@ -267,7 +338,7 @@ const mapGeoJsonToLayers = (feature: Feature) => {
 					key={properties!.id}
 					position={coordinates as MarkerCoordinates}
 				>
-					<Popup {...popupProps}></Popup>
+					<Popup withTargetUser={withTargetUser} {...popupProps}></Popup>
 				</Marker>
 			);
 
