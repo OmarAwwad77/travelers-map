@@ -1,7 +1,7 @@
 import { Feature, GeoJSON } from 'react-leaflet-draw';
 import { FeatureGroup } from 'leaflet';
 import { Dispatch, SetStateAction } from 'react';
-import { Place } from '../../../redux/map/map.types';
+import { Place, MapConfig } from '../../../redux/map/map.types';
 import { v4 as uuidv4 } from 'uuid';
 import { PlaceInputResults } from './leaflet-map';
 
@@ -63,30 +63,76 @@ export const transformFeaturesForMap = (features: Feature[]): Feature[] =>
 		},
 	}));
 
-export const getMapData = (FG: FeatureGroup, state: GeoJSON): GeoJSON => {
+const matchLayerToState = (
+	feature: Feature,
+	id: number,
+	state: GeoJSON
+): Feature => {
+	const featureCoords = getReversedCoords(
+		feature.geometry.coordinates.map((val: number) => val.toFixed(2))
+	);
+	const stateLayer = state.features.find(
+		(feature) =>
+			feature.geometry.coordinates
+				.map((val: number) => val.toFixed(2))
+				.toString() === featureCoords.toString()
+	);
+	console.log(
+		featureCoords.toString(),
+		state.features.map((f) => f.geometry.coordinates.toString())
+	);
+	if (stateLayer) {
+		return {
+			...feature,
+			properties: stateLayer.properties,
+			geometry: stateLayer.geometry,
+		};
+	} else {
+		return {
+			...feature,
+			properties: { id },
+			geometry: {
+				...feature.geometry,
+				coordinates: getReversedCoords(feature.geometry.coordinates),
+			},
+		};
+	}
+};
+
+export const getMapData = (
+	FG: FeatureGroup,
+	state: GeoJSON,
+	editing?: boolean
+): GeoJSON => {
 	const ids: number[] = [];
 	FG.eachLayer((layer: any) => {
 		ids.push(layer._leaflet_id);
 	});
 
 	const geoJsonData = FG.toGeoJSON() as GeoJSON;
-
+	console.log(geoJsonData.features, ids);
 	return {
 		...geoJsonData,
-		features: geoJsonData.features.map((feature, i) => ({
-			...feature,
-			properties: {
-				...state.features[i]?.properties,
-				id: state.features[i]?.properties?.id ?? ids[i],
-				...(state.features[i]?.properties?.placeCoords && {
-					placeCoords: getReversedCoords(feature.geometry.coordinates),
-				}),
-			},
-			geometry: {
-				...feature.geometry,
-				coordinates: getReversedCoords(feature.geometry.coordinates),
-			},
-		})),
+		features: geoJsonData.features.map((feature, i) => {
+			if (!editing) return matchLayerToState(feature, ids[i], state);
+			return {
+				...feature,
+				properties:
+					feature.geometry.type === 'LineString'
+						? feature.properties
+						: {
+								...state.features[i]?.properties,
+								id: state.features[i]?.properties?.id ?? ids[i],
+								...(state.features[i]?.properties?.placeCoords && {
+									placeCoords: getReversedCoords(feature.geometry.coordinates),
+								}),
+						  },
+				geometry: {
+					...feature.geometry,
+					coordinates: getReversedCoords(feature.geometry.coordinates),
+				},
+			};
+		}),
 	};
 };
 
@@ -115,6 +161,7 @@ export const getProperties = (feature: Feature, places: Place[]) => {
 
 export const locateMe = (
 	state: GeoJSON,
+	setMapConfig: Dispatch<SetStateAction<MapConfig>>,
 	setState: Dispatch<SetStateAction<GeoJSON>>
 ) => {
 	if (navigator.geolocation) {
@@ -123,6 +170,10 @@ export const locateMe = (
 				coords.latitude,
 				coords.longitude,
 			]);
+			setMapConfig({
+				center: [coords.latitude, coords.longitude],
+				zoom: 9,
+			});
 			setState(updatedState);
 		});
 	} else {

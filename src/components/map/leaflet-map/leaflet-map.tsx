@@ -146,6 +146,16 @@ const LeafletMap: React.FC<Props> = ({
 	}, [dbFeatures]);
 
 	useEffect(() => {
+		x();
+	}, [config.center]);
+	const onFeatureGroupReady = (reactFGref: FeatureGroup) => {
+		if (reactFGref) {
+			editableFG = reactFGref;
+			x();
+		}
+	};
+
+	const x = () => {
 		if (editableFG) {
 			const FG = editableFG.leafletElement;
 			FG.eachLayer((layer: any) => {
@@ -156,11 +166,6 @@ const LeafletMap: React.FC<Props> = ({
 					layer.openPopup();
 				}
 			});
-		}
-	}, [config.center]);
-	const onFeatureGroupReady = (reactFGref: FeatureGroup) => {
-		if (reactFGref) {
-			editableFG = reactFGref;
 		}
 	};
 
@@ -186,7 +191,7 @@ const LeafletMap: React.FC<Props> = ({
 	const addMyCurrentLocation = () => {
 		onChange(false);
 
-		locateMe(geoJson, setGeoJson);
+		locateMe(geoJson, setMapConfig, setGeoJson);
 	};
 
 	const onMarkerCreated = (e: CreatedEvent) => {
@@ -200,16 +205,24 @@ const LeafletMap: React.FC<Props> = ({
 		}
 	};
 
-	const onEditStop = () => {
+	const saveChanges = (editing?: boolean) => {
 		if (!editableFG) {
 			return;
 		}
 		onChange(false);
 		const FG = editableFG.leafletElement;
-		const updatedState = getMapData(FG, geoJson);
+		const updatedState = getMapData(FG, geoJson, editing);
 		setGeoJson(updatedState);
 
 		setPlaces(getPlacesFromFeatures(updatedState.features));
+	};
+
+	const onEditStop = () => {
+		saveChanges(true);
+	};
+
+	const onDeleteStop = () => {
+		saveChanges();
 	};
 
 	const placeNameOnChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -227,6 +240,7 @@ const LeafletMap: React.FC<Props> = ({
 	};
 
 	const onResultClicked = (key: string) => {
+		if (!showInputResults) return;
 		setMapConfig({
 			center: [placeInputResults[key].lat, placeInputResults[key].lng],
 			zoom: 9,
@@ -251,13 +265,14 @@ const LeafletMap: React.FC<Props> = ({
 						<EditControl
 							onCreated={onMarkerCreated}
 							onEditStop={onEditStop}
-							onDeleteStop={onEditStop}
+							onDeleteStop={onDeleteStop}
 							position='topright'
 							draw={{
 								circle: false,
 								rectangle: false,
 								circlemarker: false,
 								polygon: false,
+
 								polyline: {
 									shapeOptions: {
 										opacity: 0.2,
@@ -287,7 +302,7 @@ const LeafletMap: React.FC<Props> = ({
 					</LocateMe>
 					<AddPlaceByName
 						onFocus={() => setShowInputResults(true)}
-						onBlur={() => setShowInputResults(false)}
+						// onBlur={() => setShowInputResults(false)}
 						value={placeInput}
 						onChange={placeNameOnChange}
 						placeholder='add place by name'
@@ -345,7 +360,7 @@ const mapGeoJsonToLayers = (feature: Feature, withTargetUser?: boolean) => {
 		case 'LineString':
 			return (
 				<Polyline
-					key={properties!.id}
+					key={Date.now()}
 					weight={10}
 					opacity={0.2}
 					positions={coordinates as PolylineCoordinates}

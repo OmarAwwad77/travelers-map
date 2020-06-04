@@ -29,11 +29,17 @@ import {
 	addPlace,
 	addTrip,
 	setMarkerToAdd,
+	loadingStart,
 } from '../../redux/root.actions';
 import { Coords, MapState } from '../../redux/map/map.types';
 import { AppState } from '../../redux/root.reducer';
-import { selectTrips, selectMarkerToAdd } from '../../redux/map/map.selectors';
+import {
+	selectTrips,
+	selectMarkerToAdd,
+	selectLoading,
+} from '../../redux/map/map.selectors';
 import { selectUserId } from '../../redux/user/user.selectors';
+import Spinner from '../spinner/spinner';
 
 export type Ids = 'main' | 'extra1';
 export type ImageUpload = {
@@ -49,16 +55,20 @@ const defaultOption = 'choose a trip';
 interface OwnProps {}
 
 interface LinkDispatchToProps {
+	loadingStart: typeof loadingStart;
 	addPlace: typeof addPlace;
 	addTrip: typeof addTrip;
 	setMarkerToAdd: typeof setMarkerToAdd;
 }
-interface LinkStateToProps extends Pick<MapState, 'trips' | 'markerToAdd'> {
+interface LinkStateToProps
+	extends Pick<MapState, 'trips' | 'markerToAdd' | 'loading'> {
 	userId: string;
 }
 
 type Props = OwnProps & LinkDispatchToProps & LinkStateToProps;
 const AddPlace: React.FC<Props> = ({
+	loadingStart,
+	loading,
 	addPlace,
 	addTrip,
 	trips,
@@ -235,6 +245,8 @@ const AddPlace: React.FC<Props> = ({
 			imageUpload.file && files.push(imageUpload.file);
 		});
 
+		loadingStart();
+
 		let promises: Promise<string>[] = [];
 		files.forEach(async (file) => {
 			promises.push(uploadImage(file));
@@ -276,56 +288,64 @@ const AddPlace: React.FC<Props> = ({
 	};
 
 	return markerToAdd ? (
-		<WithModel>
+		<WithModel backDropOnClick={loading ? () => {} : undefined}>
 			<Wrapper onSubmit={onFormSubmit}>
-				<TripNameWrapper>
-					<DropDownWrapper disabled={!!tripInput || tripOptions.length === 0}>
-						<DropDown
-							disabled={!!tripInput || tripOptions.length === 0}
-							list={tripOptions}
-							value={tripDropdown}
-							onChangeHandler={setTripDropdown}
-						/>
-					</DropDownWrapper>
-					<Or>or</Or>
-					<TripInput
-						disabled={tripDropdown !== defaultOption}
-						placeholder='add new trip'
-						value={tripInput}
-						onChange={onTripInputChange}
-					/>
-				</TripNameWrapper>
-				<PlaceName
-					value={placeName}
-					onChange={onPlaceNameChange}
-					placeholder='add place name'
-				/>
-				<PlaceAddress
-					placeholder='place address'
-					value={placeAddress}
-					onChange={placeAddressOnChange}
-				/>
-				<TripDescription
-					placeholder='Place Description'
-					onChange={onDescriptionChange}
-					value={description}
-				/>
-				<ImageUploadsWrapper>
-					{imageUploads.map(({ id, file, url, errorMessage, loading }) => {
-						return (
-							<ImageUpload
-								key={id}
-								inputId={id}
-								loading={loading}
-								url={url}
-								errorMessage={errorMessage}
-								onCancel={() => onImageUploadCancel(id)}
-								onChange={(e) => onImageUploadChange(e, id)}
+				{loading ? (
+					<Spinner width={'10rem'} height={'10rem'} />
+				) : (
+					<>
+						<TripNameWrapper>
+							<DropDownWrapper
+								disabled={!!tripInput || tripOptions.length === 0}
+							>
+								<DropDown
+									disabled={!!tripInput || tripOptions.length === 0}
+									list={tripOptions}
+									value={tripDropdown}
+									onChangeHandler={setTripDropdown}
+								/>
+							</DropDownWrapper>
+							<Or>or</Or>
+							<TripInput
+								disabled={tripDropdown !== defaultOption}
+								placeholder='add new trip'
+								value={tripInput}
+								onChange={onTripInputChange}
 							/>
-						);
-					})}
-				</ImageUploadsWrapper>
-				<SaveButton disabled={!isFormValid}>Save</SaveButton>
+						</TripNameWrapper>
+						<PlaceName
+							value={placeName}
+							onChange={onPlaceNameChange}
+							placeholder='add place name'
+						/>
+						<PlaceAddress
+							placeholder='place address'
+							value={placeAddress}
+							onChange={placeAddressOnChange}
+						/>
+						<TripDescription
+							placeholder='Place Description'
+							onChange={onDescriptionChange}
+							value={description}
+						/>
+						<ImageUploadsWrapper>
+							{imageUploads.map(({ id, file, url, errorMessage, loading }) => {
+								return (
+									<ImageUpload
+										key={id}
+										inputId={id}
+										loading={loading}
+										url={url}
+										errorMessage={errorMessage}
+										onCancel={() => onImageUploadCancel(id)}
+										onChange={(e) => onImageUploadChange(e, id)}
+									/>
+								);
+							})}
+						</ImageUploadsWrapper>
+						<SaveButton disabled={!isFormValid}>Save</SaveButton>
+					</>
+				)}
 			</Wrapper>
 		</WithModel>
 	) : (
@@ -336,6 +356,7 @@ const AddPlace: React.FC<Props> = ({
 const mapDispatchToProps = (
 	dispatch: Dispatch<StoreActions>
 ): LinkDispatchToProps => ({
+	loadingStart: () => dispatch(loadingStart()),
 	addPlace: (place) => dispatch(addPlace(place)),
 	addTrip: (trip) => dispatch(addTrip(trip)),
 	setMarkerToAdd: (val) => dispatch(setMarkerToAdd(val)),
@@ -349,6 +370,7 @@ const mapStateToProps = createStructuredSelector<
 	trips: selectTrips,
 	userId: selectUserId,
 	markerToAdd: selectMarkerToAdd,
+	loading: selectLoading,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AddPlace);

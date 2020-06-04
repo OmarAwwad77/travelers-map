@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { HashLink as Link } from 'react-router-hash-link';
+import NavSidebar from '../nav-sidebar/nav-sidebar';
 
 import { ReactComponent as ArrowUp } from '../../assets/icons/arrow-up.svg';
 import Header from '../header/header';
@@ -23,6 +24,7 @@ const Layout: React.FC<Props> = ({ children, showScrollButton }) => {
 	const { pathname } = useLocation();
 
 	const [showHeader, setShowHeader] = useState(true);
+	const [showNavSidebar, setShowNavSidebar] = useState(false);
 
 	useEffect(() => {
 		setShowHeader(!pathname.startsWith('/map'));
@@ -30,8 +32,9 @@ const Layout: React.FC<Props> = ({ children, showScrollButton }) => {
 
 	return (
 		<Wrapper>
-			{showHeader && <Header />}
+			{showHeader && <Header setShowNavSidebar={setShowNavSidebar} />}
 			<Content>{children}</Content>
+			<NavSidebar show={showNavSidebar} setShow={setShowNavSidebar} />
 			{showScrollButton && (
 				<HashLink
 					to='#header'
@@ -72,7 +75,7 @@ export const HashLink = styled(Link)`
 	align-items: center;
 	color: #fff;
 	overflow: hidden;
-
+	z-index: 2;
 	position: fixed;
 	bottom: 10%;
 	right: 5%;
@@ -89,4 +92,5 @@ export const HashLink = styled(Link)`
 export const Content = styled.main`
 	position: relative;
 	flex-grow: 1;
+	z-index: 1;
 `;

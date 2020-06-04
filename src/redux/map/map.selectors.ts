@@ -22,3 +22,8 @@ export const selectMarkerToAdd = createSelector(
 	[selectMapState],
 	(mapState) => mapState.markerToAdd
 );
+
+export const selectLoading = createSelector(
+	[selectMapState],
+	(mapState) => mapState.loading
+);

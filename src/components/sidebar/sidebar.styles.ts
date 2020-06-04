@@ -1,9 +1,15 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
+import MediaQueries from '../../styles/media-queries';
 
 export const Wrapper = styled.div<{ width?: string }>`
 	width: 100%;
 	height: 100%;
 	border-left: 2px solid ${(p) => p.theme.colors.mainDarker};
+	min-height: 25rem;
+	${MediaQueries.BREAK_POINT_850_PX(css`
+		border: none;
+		border-bottom: 2px solid ${(p) => p.theme.colors.mainDarker};
+	`)}
 `;
 
 export const SidBarTitle = styled.h3`

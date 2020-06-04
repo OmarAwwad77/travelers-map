@@ -275,5 +275,7 @@ export const deleteTrip = async (trip: Trip) => {
 		.where('userTrips', 'array-contains', trip)
 		.get();
 
-	docRef.docs[0].ref.delete();
+	docRef.docs[0].ref.update({
+		userTrips: arrayRemove(trip),
+	});
 };

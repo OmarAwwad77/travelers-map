@@ -2,6 +2,7 @@ import { MapActions } from './map/map.types';
 import { UserActions } from './user/user.types';
 
 export {
+	loadingStart,
 	addPlace,
 	addTrip,
 	deleteTrip,
@@ -36,6 +37,7 @@ export {
 	toggleFollowUserStart,
 	toggleFollowUserSuccess,
 	clearError,
+	resetRedirectTo,
 } from './user/user.actions';
 
 export {

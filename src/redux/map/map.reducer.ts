@@ -4,6 +4,7 @@ import { addItem, deleteTrip } from './map.util';
 const initialState: MapState = {
 	trips: [],
 	places: [],
+	loading: false,
 	markerToAdd: null,
 	config: {
 		center: [51.51, -0.06],
@@ -13,9 +14,15 @@ const initialState: MapState = {
 
 const mapReducer = (state = initialState, action: MapActions): MapState => {
 	switch (action.type) {
+		case 'LOADING_START':
+			return {
+				...state,
+				loading: true,
+			};
 		case 'ADD_PLACE':
 			return {
 				...state,
+				loading: false,
 				places: addItem(state.places, action.place) as Place[],
 			};
 

@@ -1,4 +1,5 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
+import MediaQueries from '../../styles/media-queries';
 
 import { UserAvatar, UserName } from '../user/user.styles';
 import { Divider as SlideBarDivider } from '../sidebar/sidebar.styles';
@@ -9,6 +10,10 @@ export const Wrapper = styled.div`
 	flex-direction: column;
 	border-radius: 0.3rem;
 	border: 1px solid ${(p) => p.theme.colors.mainDarker};
+
+	${MediaQueries.BREAK_POINT_500_PX(css`
+		width: 31rem;
+	`)}
 `;
 
 export const PostHeader = styled.div`
@@ -68,6 +73,7 @@ export const PlaceName = styled.span`
 	text-transform: capitalize;
 	text-align: center;
 	grid-area: placeName;
+	width: 9rem;
 	font-size: 1.6rem;
 	font-weight: 600;
 	white-space: nowrap;

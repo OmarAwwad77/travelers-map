@@ -48,7 +48,12 @@ const UserTrip: React.FC<Props> = ({
 				{places.map((place) => (
 					<PlaceWrapper
 						key={place.placeId}
-						onClick={() => setMapConfig({ zoom: 4, center: place.placeCoords })}
+						onClick={() =>
+							setMapConfig({
+								zoom: 4,
+								center: [...(place.placeCoords as any)] as any,
+							})
+						}
 					>
 						<PlaceName>{place.placeName}</PlaceName>
 						<PlaceIcon />

@@ -18,6 +18,11 @@ export const selectUser = createSelector(
 	(userState) => userState.user
 );
 
+export const selectRedirectTo = createSelector(
+	[selectUserState],
+	(userState) => userState.redirectTo
+);
+
 export const selectUserId = createSelector([selectUser], (user) => user!.uid);
 
 export const selectUserProviderId = createSelector(

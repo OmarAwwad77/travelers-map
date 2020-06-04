@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 export const Wrapper = styled.div<{ withImages: boolean }>`
-	min-width: ${(p) => p.withImages && '35rem'};
+	width: ${(p) => p.withImages && '21rem'};
 	display: flex;
 	flex-direction: column;
 	align-items: center;

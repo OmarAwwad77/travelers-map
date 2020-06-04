@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { SetStateAction } from 'react';
 import { connect } from 'react-redux';
 import VisibilitySensor from 'react-visibility-sensor';
 
@@ -14,9 +14,16 @@ import { Dispatch } from 'redux';
 interface LinkDispatchToProps {
 	toggleShowScrollButton: typeof toggleShowScrollButton;
 }
-type Props = LinkDispatchToProps;
+interface OwnProps {
+	setShowNavSidebar: React.Dispatch<SetStateAction<boolean>>;
+}
 
-const Header: React.FC<Props> = ({ toggleShowScrollButton }) => {
+type Props = LinkDispatchToProps & OwnProps;
+
+const Header: React.FC<Props> = ({
+	toggleShowScrollButton,
+	setShowNavSidebar,
+}) => {
 	return (
 		<VisibilitySensor partialVisibility onChange={toggleShowScrollButton}>
 			<Wrapper id='header'>
@@ -25,7 +32,7 @@ const Header: React.FC<Props> = ({ toggleShowScrollButton }) => {
 					<span>traveler's map</span>
 				</LogoWrapper>
 				<nav>
-					<NavItems />
+					<NavItems mainNav setShowNavSidebar={setShowNavSidebar} />
 				</nav>
 			</Wrapper>
 		</VisibilitySensor>

@@ -1,6 +1,8 @@
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 
 import paris from '../../assets/images/paris.png';
+import amsterdam from '../../assets/images/amsterdam.png';
 import {
 	Wrapper,
 	ImageComposition,
@@ -13,11 +15,13 @@ import {
 } from './show-case.styles';
 
 const ShowCase = () => {
+	const { push } = useHistory();
+
 	return (
 		<Wrapper>
 			<ImageComposition>
 				<Img url={paris} />
-				<Img url={paris} />
+				<Img url={amsterdam} />
 			</ImageComposition>
 			<TextArea>
 				<Title>Interactive maps</Title>
@@ -28,7 +32,7 @@ const ShowCase = () => {
 					with their related photographs and description texts of the various
 					places.
 				</Text>
-				<Button>
+				<Button onClick={() => push('/sign')}>
 					get a map <MapIcon />
 				</Button>
 			</TextArea>

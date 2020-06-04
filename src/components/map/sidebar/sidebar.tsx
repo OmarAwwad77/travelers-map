@@ -15,16 +15,26 @@ interface LinkDispatchToProps {
 }
 interface OwnProps {
 	trips: SideBarTrip[];
+	setShowSideBar: (show: boolean) => void;
 	show: boolean;
 }
 type Props = OwnProps & LinkDispatchToProps;
 
-const SideBar: React.FC<Props> = ({ trips, show, deleteTrip }) => {
-	const cleanedTrips = useRef(false);
+const SideBar: React.FC<Props> = ({
+	trips,
+	show,
+	deleteTrip,
+	setShowSideBar,
+}) => {
+	const currentTrips = useRef<typeof trips>();
 	useEffect(() => {
-		if (!cleanedTrips.current) {
-			cleanedTrips.current = true;
-			trips.forEach((trip) => {
+		currentTrips.current = trips;
+	}, [trips]);
+
+	useEffect(() => {
+		return () => {
+			console.log(currentTrips.current);
+			currentTrips.current!.forEach((trip) => {
 				if (trip.places.length === 0) {
 					deleteTrip({
 						tripId: trip.tripId,
@@ -32,11 +42,11 @@ const SideBar: React.FC<Props> = ({ trips, show, deleteTrip }) => {
 					});
 				}
 			});
-		}
-	}, [trips]);
+		};
+	}, []);
 
-	return show ? (
-		<Wrapper>
+	return (
+		<Wrapper show={show} onClick={() => setShowSideBar(false)}>
 			{trips.map(({ places, tripName, tripId }) =>
 				places.length === 0 ? null : (
 					<UserTrip
@@ -48,7 +58,7 @@ const SideBar: React.FC<Props> = ({ trips, show, deleteTrip }) => {
 				)
 			)}
 		</Wrapper>
-	) : null;
+	);
 };
 
 const mapDispatchToProps = (dispatch: Dispatch): LinkDispatchToProps => ({

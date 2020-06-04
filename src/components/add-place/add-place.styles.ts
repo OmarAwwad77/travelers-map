@@ -1,4 +1,5 @@
 import styled, { css } from 'styled-components';
+import MediaQueries from '../../styles/media-queries';
 
 export const Wrapper = styled.form`
 	display: flex;
@@ -13,6 +14,11 @@ export const Wrapper = styled.form`
 		width: 100%;
 		margin: 1rem 0;
 	}
+
+	${MediaQueries.BREAK_POINT_500_PX(css`
+		padding: 0.5rem 1rem;
+		width: 31.5rem;
+	`)}
 `;
 
 export const TripNameWrapper = styled.div`

@@ -98,6 +98,7 @@ const newsFeedReducer = (
 ): NewsFeedState => {
 	switch (action.type) {
 		case 'FETCH_POSTS_START':
+		case 'FETCH_USER_POSTS_START':
 			return {
 				...state,
 				loading: true,
@@ -170,6 +171,7 @@ const newsFeedReducer = (
 		case 'FETCH_MY_POSTS_SUCCESS':
 			return {
 				...state,
+				loading: false,
 				myPosts: action.myPosts,
 			};
 

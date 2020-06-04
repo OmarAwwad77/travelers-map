@@ -13,6 +13,7 @@ export const Wrapper = styled.section`
 		height: 100%;
 		z-index: 1;
 	}
+
 	.sr-only {
 		display: none;
 	}
@@ -29,7 +30,7 @@ export const DropDownWrapper = styled.div`
 	position: absolute;
 	left: 50%;
 	top: 0;
-	z-index: 2;
+	z-index: 3;
 	transform: translateX(-50%);
 `;
 
@@ -38,16 +39,16 @@ export const SaveIconWrapper = styled.div`
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	width: 2.5rem;
-	height: 2.5rem;
-	padding: 0.4rem;
+	width: 3rem;
+	height: 3rem;
+	padding: 0.7rem;
 	background: #fff;
 	position: absolute;
 	right: 1rem;
-	top: 40%;
+	top: 30%;
 	z-index: 2;
 	box-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);
-	border-radius: 4px;
+	border-radius: 2px;
 	cursor: pointer;
 
 	&::after {
@@ -70,14 +71,16 @@ export const SaveIconWrapper = styled.div`
 `;
 
 export const LocateMe = styled.a`
+	width: 17rem;
 	display: flex;
 	align-items: center;
 	text-decoration: none;
 	cursor: pointer;
 	position: absolute;
 	z-index: 2;
-	top: 0%;
-	right: 25%;
+	top: 30px;
+	right: 50%;
+	transform: translateX(50%);
 	text-transform: capitalize;
 	padding: 0.5rem 1rem;
 	background: #fff;
@@ -104,8 +107,9 @@ export const LocateMeIcon = styled(LocationIcon)`
 export const AddPlaceByName = styled.input`
 	position: absolute;
 	z-index: 2;
-	top: 0%;
-	right: 5%;
+	top: 7rem;
+	right: 50%;
+	transform: translateX(50%);
 	padding: 0.5rem 1rem;
 	font-family: inherit;
 	font-size: 1.5rem;
@@ -117,9 +121,10 @@ export const AddPlaceByName = styled.input`
 export const PlaceInputResults = styled.div<{ show: boolean }>`
 	opacity: ${(p) => (p.show ? 1 : 0)};
 	position: absolute;
-	z-index: 2;
-	top: 32px;
-	right: 5%;
+	z-index: ${(p) => (p.show ? 2 : 0)};
+	top: 10rem;
+	right: 50%;
+	transform: translateX(50%);
 	padding: 2rem;
 	background: #fff;
 	border: 1px solid #ccc;

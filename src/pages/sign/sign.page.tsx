@@ -1,12 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { Redirect } from 'react-router-dom';
 
 import SignIn from '../../components/sign/sign-in/sign-in';
 import SignUp from '../../components/sign/sign-up/sign-up';
 import { createStructuredSelector } from 'reselect';
 import { AppState } from '../../redux/root.reducer';
+import media from '../../styles/media-queries';
 import { selectIsAuth } from '../../redux/user/user.selectors';
 
 interface LinkStateToProps {
@@ -44,6 +45,24 @@ export const Wrapper = styled.section`
 	padding: 4rem;
 	display: flex;
 	justify-content: space-between;
+
+	${media.BREAK_POINT_950_PX(css`
+		flex-direction: column;
+		align-items: center;
+		padding: 0.5rem;
+		margin: 5rem 0;
+		& > * {
+			&:not(:first-child) {
+				margin-top: 5rem;
+			}
+		}
+	`)}
+
+	${media.BREAK_POINT_500_PX(css`
+		& > * {
+			max-width: 31rem;
+		}
+	`)}
 `;
 
 export const SignInWrapper = styled.div`

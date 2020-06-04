@@ -231,8 +231,9 @@ function* fetchPostsSaga(): SagaIterator {
 			);
 			const posts = ((yield all(
 				querySnapshot.docs.map((doc) => call(getFeaturesFromDocSaga, doc))
-			)) as Post[][]).reduce((acc, curr) => [...acc, ...curr], []);
-			console.log(posts);
+			)) as Post[][])
+				.reduce((acc, curr) => [...acc, ...curr], [])
+				.filter((post) => post !== null);
 
 			yield put(fetchPostsSuccess(posts));
 		} else {

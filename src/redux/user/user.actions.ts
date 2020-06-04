@@ -147,3 +147,7 @@ export const toggleFollowUserFailure = (error: string): UserActions => ({
 export const clearError = (): UserActions => ({
 	type: 'CLEAR_ERROR',
 });
+
+export const resetRedirectTo = (): UserActions => ({
+	type: 'RESET_REDIRECT_TO',
+});

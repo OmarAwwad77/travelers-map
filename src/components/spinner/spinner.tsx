@@ -4,6 +4,7 @@ import styled, { css } from 'styled-components';
 const Wrapper = styled.div<CSSProperties>`
 	width: ${(p) => p.width ?? '100%'};
 	height: ${(p) => p.height ?? '100%'};
+	margin: ${(p) => p.margin};
 	position: relative;
 
 	@-webkit-keyframes sk-bounce {
@@ -54,8 +55,14 @@ type Props = {
 	color?: string;
 	className?: string;
 } & CSSProperties;
-const Spinner: React.FC<Props> = ({ color, className, width, height }) => (
-	<Wrapper width={width} height={height} className={className}>
+const Spinner: React.FC<Props> = ({
+	color,
+	className,
+	width,
+	height,
+	margin,
+}) => (
+	<Wrapper width={width} margin={margin} height={height} className={className}>
 		<Bounce1 color={color} />
 		<Bounce2 color={color} />
 	</Wrapper>

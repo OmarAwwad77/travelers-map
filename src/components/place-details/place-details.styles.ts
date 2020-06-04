@@ -3,8 +3,8 @@ import styled, { css } from 'styled-components';
 export const Wrapper = styled.div`
 	width: 50vw;
 	max-width: 60rem;
-	min-width: 32rem;
-	padding: 1rem;
+	min-width: 29rem;
+	padding: 0.5rem 1rem;
 	display: flex;
 	flex-direction: column;
 	align-items: center;

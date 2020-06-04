@@ -1,4 +1,5 @@
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 
 import {
 	Wrapper,
@@ -10,7 +11,8 @@ import {
 
 const Hero = () => {
 	const titleText = `discover beautiful 
-  destinations  `;
+	destinations  `;
+	const { push } = useHistory();
 	return (
 		<Wrapper>
 			<TravelerSvg />
@@ -22,7 +24,7 @@ const Hero = () => {
 				globe can share beautiful destinations they have visited, follow fellow
 				travelers and exchange information all using interactive online map.
 			</HeroText>
-			<HeroButton>join now</HeroButton>
+			<HeroButton onClick={() => push('/sign')}>join now</HeroButton>
 		</Wrapper>
 	);
 };

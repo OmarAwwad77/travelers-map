@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const Wrapper = styled.div`
+export const Wrapper = styled.div<{ show: boolean }>`
 	position: absolute;
 	z-index: 2;
 	left: 0;
@@ -12,4 +12,6 @@ export const Wrapper = styled.div`
 	padding: 3rem 1rem;
 	padding-top: 9rem;
 	overflow-y: auto;
+	transform: translateX(${(p) => (p.show ? 0 : '-100%')});
+	transition: all 0.2s ease-out;
 `;

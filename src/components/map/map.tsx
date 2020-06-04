@@ -29,7 +29,7 @@ import { BackButton, Wrapper, MenuIconWrapper } from './map.styles';
  */
 
 interface LinkStateToProps
-	extends Omit<MapState, 'markerToAdd'>,
+	extends Omit<MapState, 'markerToAdd' | 'loading'>,
 		Pick<UserState, 'user'> {}
 interface LinkDispatchToProps {
 	setTrips: typeof setTrips;
@@ -124,14 +124,20 @@ const Map: React.FC<Props> = ({
 						: true
 				}
 			/>
-			<BackButton onClick={() => push('/profile')}>&#8592;</BackButton>
+			{!targetUserId && (
+				<BackButton onClick={() => push('/profile')}>&#8592;</BackButton>
+			)}
 			<MenuIconWrapper>
 				<MenuIcon
 					dir='left'
 					toggleSideBar={() => setShowSideBar(!showSideBar)}
 				/>
 			</MenuIconWrapper>
-			<SideBar show={showSideBar} trips={sideBarTrips} />
+			<SideBar
+				setShowSideBar={setShowSideBar}
+				show={showSideBar}
+				trips={sideBarTrips}
+			/>
 			<Wrapper withTargetUser={!!targetUserId}>
 				<LeafletMap
 					withTargetUser={!!targetUserId}
@@ -140,7 +146,7 @@ const Map: React.FC<Props> = ({
 					onSave={onSave}
 					onChange={setChangesSaved}
 					setPlaces={setPlaces}
-					config={placeToShow ? { center: placeToShow, zoom: 7 } : config}
+					config={config}
 				/>
 			</Wrapper>
 		</>

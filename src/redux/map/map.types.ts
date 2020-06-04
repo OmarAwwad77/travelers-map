@@ -35,8 +35,10 @@ export interface MapState {
 	places: Place[];
 	config: MapConfig;
 	markerToAdd: MarkerToAdd | null;
+	loading: boolean;
 }
 
+export const LOADING_START = 'LOADING_START';
 export const ADD_PLACE = 'ADD_PLACE';
 export const ADD_TRIP = 'ADD_TRIP';
 export const DELETE_TRIP = 'DELETE_TRIP';
@@ -44,6 +46,10 @@ export const SET_TRIPS = 'SET_TRIPS';
 export const SET_PLACES = 'SET_PLACES';
 export const SET_MAP_CONFIG = 'SET_MAP_CONFIG';
 export const SET_MARKER_TO_ADD = 'SET_MARKER_TO_ADD';
+
+export interface LoadingStart {
+	type: typeof LOADING_START;
+}
 
 export interface AddPlace {
 	type: typeof ADD_PLACE;
@@ -81,6 +87,7 @@ export interface SetMarkerToAdd {
 }
 
 export type MapActions =
+	| LoadingStart
 	| AddPlace
 	| AddTrip
 	| DeleteTrip

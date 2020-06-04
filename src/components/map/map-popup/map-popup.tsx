@@ -33,12 +33,12 @@ const MapPopup: React.FC<Props> = ({
 	const { push } = useHistory();
 
 	return (
-		<Popup minWidth={place ? 350 : 105}>
+		<Popup>
 			<Wrapper withImages={!!place}>
 				{place ? (
 					<>
 						<PlaceName>{place.placeName}</PlaceName>
-						<Slider width='35rem' height='25rem' urls={place.placeImages} />
+						<Slider width='21rem' height='18rem' urls={place.placeImages} />
 						{!withTargetUser && (
 							<Link to={`${path}/place-details/${place.placeId}`}>
 								see more...

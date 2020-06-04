@@ -1,9 +1,11 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
+import MediaQueries from '../../styles/media-queries';
 
 export const LogoWrapper = styled.div`
 	display: flex;
 	align-items: center;
 	height: 5rem;
+	min-width: 20rem;
 	cursor: pointer;
 
 	span {
@@ -22,4 +24,7 @@ export const Wrapper = styled.header`
 	${LogoWrapper} {
 		width: 30%;
 	}
+	${MediaQueries.BREAK_POINT_500_PX(css`
+		padding: 3rem 2rem 3rem;
+	`)}
 `;

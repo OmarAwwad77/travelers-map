@@ -31,6 +31,7 @@ export interface UserState {
 	user: User | null;
 	loading: boolean;
 	error: ErrorMessage | null;
+	redirectTo: string;
 }
 
 export interface SignInCredentials {
@@ -65,6 +66,7 @@ export const UPDATE_PROFILE_FAILURE = 'UPDATE_PROFILE_FAILURE';
 export const TOGGLE_FOLLOW_USER_START = 'TOGGLE_FOLLOW_USER_START';
 export const TOGGLE_FOLLOW_USER_SUCCESS = 'TOGGLE_FOLLOW_USER_SUCCESS';
 export const TOGGLE_FOLLOW_USER_FAILURE = 'TOGGLE_FOLLOW_USER_FAILURE';
+export const RESET_REDIRECT_TO = 'RESET_REDIRECT_TO';
 export const CLEAR_ERROR = 'CLEAR_ERROR';
 
 export interface SetCurrentUser {
@@ -188,6 +190,10 @@ export interface ClearError {
 	type: typeof CLEAR_ERROR;
 }
 
+export interface ResetRedirectTo {
+	type: typeof RESET_REDIRECT_TO;
+}
+
 export type UserActions =
 	| SetCurrentUser
 	| GoogleSignInStart
@@ -212,4 +218,5 @@ export type UserActions =
 	| ToggleFollowUserStart
 	| ToggleFollowUserSuccess
 	| ToggleFollowUserFailure
-	| ClearError;
+	| ClearError
+	| ResetRedirectTo;

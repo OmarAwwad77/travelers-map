@@ -4,6 +4,7 @@ const initialState: UserState = {
 	user: null,
 	loading: false,
 	error: null,
+	redirectTo: '',
 };
 
 const updateUserFollowsArr = (
@@ -75,6 +76,8 @@ const userReducer = (state = initialState, action: UserActions): UserState => {
 		case 'CHANGE_EMAIL_SUCCESS':
 			return {
 				...state,
+				loading: false,
+				redirectTo: '/profile',
 				user: {
 					...state.user!,
 					email: action.newEmail,
@@ -84,6 +87,8 @@ const userReducer = (state = initialState, action: UserActions): UserState => {
 		case 'UPDATE_PROFILE_SUCCESS':
 			return {
 				...state,
+				loading: false,
+				redirectTo: '/profile',
 				user: {
 					...state.user!,
 					url: action.url,
@@ -91,9 +96,17 @@ const userReducer = (state = initialState, action: UserActions): UserState => {
 				},
 			};
 
+		case 'CHANGE_PASSWORD_SUCCESS':
+			return {
+				...state,
+				loading: false,
+				redirectTo: '/profile',
+			};
+
 		case 'DELETE_ACCOUNT_SUCCESS':
 			return {
 				...state,
+				loading: false,
 				user: signOut(),
 			};
 
@@ -117,6 +130,12 @@ const userReducer = (state = initialState, action: UserActions): UserState => {
 			return {
 				...state,
 				error: null,
+			};
+
+		case 'RESET_REDIRECT_TO':
+			return {
+				...state,
+				redirectTo: '',
 			};
 
 		default:

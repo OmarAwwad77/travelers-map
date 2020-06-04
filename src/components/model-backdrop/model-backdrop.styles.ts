@@ -55,7 +55,7 @@ export const ModelContent = styled.div`
 	max-height: 85vh;
 `;
 
-export const Backdrop = styled.div`
+export const Backdrop = styled.div<{ hide?: boolean }>`
 	width: 100vw;
 	height: 100vh;
 	position: fixed;
@@ -63,4 +63,7 @@ export const Backdrop = styled.div`
 	top: 0;
 	left: 0;
 	background-color: rgba(0, 0, 0, 0.25);
+	opacity: ${(p) => (p.hide ? 0 : 1)};
+	visibility: ${(p) => (p.hide ? 'hidden' : 'visible')};
+	transition: all 0.2s ease-out;
 `;

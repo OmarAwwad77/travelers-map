@@ -1,5 +1,9 @@
 import { Place, Trip, MapActions, MapConfig, MarkerToAdd } from './map.types';
 
+export const loadingStart = (): MapActions => ({
+	type: 'LOADING_START',
+});
+
 export const addPlace = (place: Place): MapActions => ({
 	place,
 	type: 'ADD_PLACE',

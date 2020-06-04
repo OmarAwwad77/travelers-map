@@ -27,3 +27,8 @@ export const selectMyPosts = createSelector(
 	[selectNewsFeedState],
 	(newsFeed) => newsFeed.myPosts
 );
+
+export const selectLoading = createSelector(
+	[selectNewsFeedState],
+	(newsFeed) => newsFeed.loading
+);

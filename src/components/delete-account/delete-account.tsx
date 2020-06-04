@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
-import { css } from 'styled-components';
+import { css, useTheme } from 'styled-components';
 
 import Form from '../../components/form/form';
 import WithModel from '../../hoc/With-model/With-model';
@@ -15,9 +15,10 @@ import { UserState } from '../../redux/user/user.types';
 import {
 	selectError,
 	selectUserProviderId,
+	selectLoading,
 } from '../../redux/user/user.selectors';
 import {
-	ChangePasswordWrapper as DeleteAccountWrapper,
+	Wrapper,
 	UpdateButton,
 	ErrorMessage,
 	ButtonsWrapper,
@@ -26,6 +27,7 @@ import {
 	ConfirmationMessage,
 	Proceed,
 } from '../change-password/change-password.styles';
+import Spinner from '../spinner/spinner';
 
 export const gridCss = css`
 	gap: 1rem;
@@ -59,7 +61,7 @@ interface LinkDispatchToProps {
 	deleteAccountStart: typeof deleteAccountStart;
 	clearError: typeof clearError;
 }
-interface LinkStateToProps extends Pick<UserState, 'error'> {
+interface LinkStateToProps extends Pick<UserState, 'error' | 'loading'> {
 	userProviderId: string;
 }
 interface OwnProps {}
@@ -69,11 +71,13 @@ const DeleteAccount: React.FC<Props> = ({
 	deleteAccountStart,
 	clearError,
 	error,
+	loading,
 	userProviderId,
 }) => {
 	const [state, setState] = useState(changeEmailForm);
 	const [confirmed, setConfirmed] = useState(false);
 	const { goBack } = useHistory();
+	const { colors } = useTheme();
 
 	useEffect(() => {
 		userProviderId !== 'password' && confirmed && deleteAccountStart();
@@ -99,35 +103,44 @@ const DeleteAccount: React.FC<Props> = ({
 		</WithModel>
 	) : (
 		<WithModel>
-			<DeleteAccountWrapper>
-				{confirmed ? (
-					userProviderId === 'password' && (
-						<>
-							<Form
-								gridCss={gridCss}
-								state={state}
-								setState={setState}
-								fieldNetworkError={
-									error?.type === 'deleteAccount' ? error : null
-								}
-							/>
-							<UpdateButton onClick={onSubmit} disabled={!state.isFormValid}>
-								update
-							</UpdateButton>
-						</>
-					)
-				) : (
-					<Confirm>
-						<ConfirmationMessage>
-							are you sure you want to proceed with this deleting you account
-						</ConfirmationMessage>
-						<ButtonsWrapper>
-							<Cancel onClick={goBack}>Cancel</Cancel>
-							<Proceed onClick={() => setConfirmed(true)}>Proceed</Proceed>
-						</ButtonsWrapper>
-					</Confirm>
-				)}
-			</DeleteAccountWrapper>
+			{loading ? (
+				<Spinner
+					width={'7rem'}
+					margin={'5rem'}
+					color={colors.mainDarker}
+					height={'7rem'}
+				/>
+			) : (
+				<Wrapper>
+					{confirmed ? (
+						userProviderId === 'password' && (
+							<>
+								<Form
+									gridCss={gridCss}
+									state={state}
+									setState={setState}
+									fieldNetworkError={
+										error?.type === 'deleteAccount' ? error : null
+									}
+								/>
+								<UpdateButton onClick={onSubmit} disabled={!state.isFormValid}>
+									update
+								</UpdateButton>
+							</>
+						)
+					) : (
+						<Confirm>
+							<ConfirmationMessage>
+								are you sure you want to proceed with this deleting you account
+							</ConfirmationMessage>
+							<ButtonsWrapper>
+								<Cancel onClick={goBack}>Cancel</Cancel>
+								<Proceed onClick={() => setConfirmed(true)}>Proceed</Proceed>
+							</ButtonsWrapper>
+						</Confirm>
+					)}
+				</Wrapper>
+			)}
 		</WithModel>
 	);
 };
@@ -143,6 +156,7 @@ const mapStateToProps = createStructuredSelector<
 	LinkStateToProps
 >({
 	error: selectError,
+	loading: selectLoading,
 	userProviderId: selectUserProviderId,
 });
 

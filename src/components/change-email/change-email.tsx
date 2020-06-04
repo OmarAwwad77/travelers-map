@@ -1,23 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
-import { css } from 'styled-components';
+import { css, useTheme } from 'styled-components';
 
 import Form from '../../components/form/form';
 import WithModel from '../../hoc/With-model/With-model';
 
-import { changeEmailStart, clearError } from '../../redux/root.actions';
+import {
+	changeEmailStart,
+	clearError,
+	resetRedirectTo,
+} from '../../redux/root.actions';
 import { FormStateType } from '../form/form.types';
 import { AppState } from '../../redux/root.reducer';
 import { createStructuredSelector } from 'reselect';
 import { UserState } from '../../redux/user/user.types';
-import { selectError } from '../../redux/user/user.selectors';
 import {
-	ChangePasswordWrapper as ChangeEmailWrapper,
+	selectError,
+	selectLoading,
+	selectRedirectTo,
+} from '../../redux/user/user.selectors';
+import {
+	Wrapper,
 	UpdateButton,
 	ErrorMessage,
 } from '../change-password/change-password.styles';
+import Spinner from '../spinner/spinner';
 
 export const gridCss = css`
 	gap: 1rem;
@@ -48,6 +57,7 @@ const changeEmailForm: FormStateType = {
 		{
 			type: 'text',
 			label: 'email',
+			displayLabel: 'New Email',
 			value: '',
 			isValid: false,
 			validation: {
@@ -62,18 +72,24 @@ const changeEmailForm: FormStateType = {
 interface LinkDispatchToProps {
 	changeEmailStart: typeof changeEmailStart;
 	clearError: typeof clearError;
+	resetRedirectTo: typeof resetRedirectTo;
 }
-interface LinkStateToProps extends Pick<UserState, 'error'> {}
+interface LinkStateToProps
+	extends Pick<UserState, 'error' | 'loading' | 'redirectTo'> {}
 interface OwnProps {}
 type Props = LinkDispatchToProps & OwnProps & LinkStateToProps;
 
 const ChangeEmail: React.FC<Props> = ({
 	changeEmailStart,
 	clearError,
+	resetRedirectTo,
+	redirectTo,
+	loading,
 	error,
 }) => {
 	const [state, setState] = useState(changeEmailForm);
-	const { goBack } = useHistory();
+	const { goBack, push } = useHistory();
+	const { colors } = useTheme();
 
 	const onSubmit = () => {
 		if (!state.isFormValid) return;
@@ -86,6 +102,13 @@ const ChangeEmail: React.FC<Props> = ({
 		changeEmailStart(email, password);
 	};
 
+	useEffect(() => {
+		if (redirectTo) {
+			resetRedirectTo();
+			push(redirectTo);
+		}
+	}, [redirectTo]);
+
 	return error?.label === 'unknown' ? (
 		<WithModel
 			backDropOnClick={() => {
@@ -97,17 +120,26 @@ const ChangeEmail: React.FC<Props> = ({
 		</WithModel>
 	) : (
 		<WithModel>
-			<ChangeEmailWrapper>
-				<Form
-					gridCss={gridCss}
-					state={state}
-					setState={setState}
-					fieldNetworkError={error?.type === 'changeEmail' ? error : null}
+			{loading ? (
+				<Spinner
+					width={'7rem'}
+					margin={'5rem'}
+					color={colors.mainDarker}
+					height={'7rem'}
 				/>
-				<UpdateButton onClick={onSubmit} disabled={!state.isFormValid}>
-					update
-				</UpdateButton>
-			</ChangeEmailWrapper>
+			) : (
+				<Wrapper>
+					<Form
+						gridCss={gridCss}
+						state={state}
+						setState={setState}
+						fieldNetworkError={error?.type === 'changeEmail' ? error : null}
+					/>
+					<UpdateButton onClick={onSubmit} disabled={!state.isFormValid}>
+						update
+					</UpdateButton>
+				</Wrapper>
+			)}
 		</WithModel>
 	);
 };
@@ -116,6 +148,7 @@ const mapDispatchToProps = (dispatch: Dispatch): LinkDispatchToProps => ({
 	changeEmailStart: (email, password) =>
 		dispatch(changeEmailStart(email, password)),
 	clearError: () => dispatch(clearError()),
+	resetRedirectTo: () => dispatch(resetRedirectTo()),
 });
 
 const mapStateToProps = createStructuredSelector<
@@ -124,6 +157,8 @@ const mapStateToProps = createStructuredSelector<
 	LinkStateToProps
 >({
 	error: selectError,
+	loading: selectLoading,
+	redirectTo: selectRedirectTo,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ChangeEmail);

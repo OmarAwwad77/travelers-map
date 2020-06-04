@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Route, useRouteMatch, useHistory } from 'react-router-dom';
 import { connect } from 'react-redux';
 
-import { PostsArea } from '../../components/news-feed/news-feed.styles';
+import {
+	PostsArea,
+	Loading,
+} from '../../components/news-feed/news-feed.styles';
 import SideBar from '../../components/sidebar/sidebar';
 import Post from '../../components/post/post';
 import User from '../../components/user/user';
@@ -23,13 +26,20 @@ import { Dispatch } from 'redux';
 import { UserState, DbUser } from '../../redux/user/user.types';
 import { createStructuredSelector } from 'reselect';
 import { AppState } from '../../redux/root.reducer';
-import { selectUser } from '../../redux/user/user.selectors';
+import {
+	selectUser,
+	selectUserProviderId,
+} from '../../redux/user/user.selectors';
 import {
 	NewsFeedState,
 	User as UserType,
 } from '../../redux/news-feed/news-feed.types';
-import { selectMyPosts } from '../../redux/news-feed/news-feed.selectors';
+import {
+	selectMyPosts,
+	selectLoading,
+} from '../../redux/news-feed/news-feed.selectors';
 import { fetchFollowers, fetchFollows } from '../../firebase/firebase.utils';
+import { useTheme } from 'styled-components';
 
 /**
  *
@@ -38,11 +48,19 @@ interface LinkDispatchToProps {
 	fetchUserPostsStart: typeof fetchUserPostsStart;
 }
 interface LinkStateToProps
-	extends Pick<UserState, 'user'>,
-		Pick<NewsFeedState, 'myPosts'> {}
+	extends Pick<UserState, 'user' | 'loading'>,
+		Pick<NewsFeedState, 'myPosts'> {
+	userProviderId: string;
+}
 interface OwnProps {}
 type Props = OwnProps & LinkDispatchToProps & LinkStateToProps;
-const Profile: React.FC<Props> = ({ fetchUserPostsStart, user, myPosts }) => {
+const Profile: React.FC<Props> = ({
+	fetchUserPostsStart,
+	user,
+	myPosts,
+	loading,
+	userProviderId,
+}) => {
 	const { path } = useRouteMatch();
 	const { push } = useHistory();
 	const { uid, followers, follows } = user!;
@@ -76,16 +94,24 @@ const Profile: React.FC<Props> = ({ fetchUserPostsStart, user, myPosts }) => {
 
 	const nestedRoutes = (
 		<>
-			<Route
-				path={`${path}/change-password`}
-				exact
-				component={ChangePassword}
-			/>
-			<Route path={`${path}/change-email`} exact component={ChangeEmail} />
+			{userProviderId === 'password' && (
+				<>
+					<Route
+						path={`${path}/change-password`}
+						exact
+						component={ChangePassword}
+					/>
+					<Route path={`${path}/change-email`} exact component={ChangeEmail} />
+				</>
+			)}
+
 			<Route path={`${path}/edit-profile`} exact component={EditProfile} />
 			<Route path={`${path}/delete-account`} exact component={DeleteAccount} />
 		</>
 	);
+
+	const { colors } = useTheme();
+	if (loading) return <Loading color={colors.mainDarker} />;
 
 	return (
 		<Wrapper>
@@ -127,11 +153,27 @@ const Profile: React.FC<Props> = ({ fetchUserPostsStart, user, myPosts }) => {
 										edit profile
 									</EditLink>
 
-									<EditLink onClick={() => push(`${path}/change-password`)}>
+									<EditLink
+										{...(userProviderId !== 'password' && {
+											disabled: 'You Signed In With Google',
+										})}
+										onClick={() =>
+											userProviderId === 'password' &&
+											push(`${path}/change-password`)
+										}
+									>
 										change password
 									</EditLink>
 
-									<EditLink onClick={() => push(`${path}/change-email`)}>
+									<EditLink
+										{...(userProviderId !== 'password' && {
+											disabled: 'You Signed In With Google',
+										})}
+										onClick={() =>
+											userProviderId === 'password' &&
+											push(`${path}/change-email`)
+										}
+									>
 										change email
 									</EditLink>
 
@@ -158,7 +200,9 @@ const mapStateToProps = createStructuredSelector<
 	LinkStateToProps
 >({
 	user: selectUser,
+	userProviderId: selectUserProviderId,
 	myPosts: selectMyPosts,
+	loading: selectLoading,
 });
 const mapDispatchToProps = (dispatch: Dispatch): LinkDispatchToProps => ({
 	fetchUserPostsStart: (userId, forCurrentUser) =>

@@ -125,6 +125,7 @@ const arrowStyles = css`
 	height: 2.5rem;
 	border-radius: 50%;
 	top: 50%;
+	transform: translateY(-50%);
 	cursor: pointer;
 	z-index: 2;
 `;
