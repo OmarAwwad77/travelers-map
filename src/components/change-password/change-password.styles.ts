@@ -4,7 +4,8 @@ export { ErrorMessage } from '../../hoc/with-error/with-error';
 
 export const Wrapper = styled.div`
 	padding: 2rem;
-	width: 32rem;
+	min-width: 28rem;
+	max-width: 33rem;
 `;
 
 export const UpdateButton = styled(HeroButton)<{ disabled?: boolean }>`
@@ -25,7 +26,6 @@ export const gridCss = css`
 `;
 
 export const Confirm = styled.div`
-	padding: 2rem;
 	display: flex;
 	flex-direction: column;
 `;

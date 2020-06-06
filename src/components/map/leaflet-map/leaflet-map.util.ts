@@ -68,19 +68,25 @@ const matchLayerToState = (
 	id: number,
 	state: GeoJSON
 ): Feature => {
+	if (feature.geometry.type === 'LineString')
+		return {
+			...feature,
+			geometry: {
+				...feature.geometry,
+				coordinates: getReversedCoords(feature.geometry.coordinates),
+			},
+		};
 	const featureCoords = getReversedCoords(
 		feature.geometry.coordinates.map((val: number) => val.toFixed(2))
 	);
 	const stateLayer = state.features.find(
 		(feature) =>
+			feature.geometry.type !== 'LineString' &&
 			feature.geometry.coordinates
 				.map((val: number) => val.toFixed(2))
 				.toString() === featureCoords.toString()
 	);
-	console.log(
-		featureCoords.toString(),
-		state.features.map((f) => f.geometry.coordinates.toString())
-	);
+
 	if (stateLayer) {
 		return {
 			...feature,
@@ -110,7 +116,6 @@ export const getMapData = (
 	});
 
 	const geoJsonData = FG.toGeoJSON() as GeoJSON;
-	console.log(geoJsonData.features, ids);
 	return {
 		...geoJsonData,
 		features: geoJsonData.features.map((feature, i) => {

@@ -7,6 +7,7 @@ export type Image = {
 	type?: AnimType;
 	dir?: AnimDir;
 	default?: boolean;
+	running: boolean;
 };
 const inAnimLeft = keyframes`
   from{
@@ -114,7 +115,8 @@ export const SliderImg = styled.div<Image>`
 	left: 0;
 	backface-visibility: hidden;
 	background: url(${(p) => p.url}) center/cover no-repeat;
-	animation: ${(p) => p.type && getAnim(p.type, p.dir!)} 1s ease-in forwards;
+	animation: ${(p) => p.type && getAnim(p.type, p.dir!)}
+		${(p) => (p.running ? '1s' : '0s')} ease-in forwards;
 	z-index: ${(p) => p.default && 1};
 `;
 

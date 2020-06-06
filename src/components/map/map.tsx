@@ -14,7 +14,12 @@ import { Feature } from 'react-leaflet-draw';
 import { db } from '../../firebase/firebase.utils';
 import { transformFeaturesForMap } from './leaflet-map/leaflet-map.util';
 import { Dispatch } from 'redux';
-import { StoreActions, setTrips, setPlaces } from '../../redux/root.actions';
+import {
+	StoreActions,
+	setTrips,
+	setPlaces,
+	loadingStart,
+} from '../../redux/root.actions';
 import AddPlace from '../add-place/add-place';
 import PlaceDetails from '../place-details/place-details';
 import SideBar, { SideBarTrip } from './sidebar/sidebar';
@@ -34,6 +39,7 @@ interface LinkStateToProps
 interface LinkDispatchToProps {
 	setTrips: typeof setTrips;
 	setPlaces: typeof setPlaces;
+	loadingStart: typeof loadingStart;
 }
 interface OwnProps {
 	targetUserId?: string;
@@ -53,6 +59,7 @@ const Map: React.FC<Props> = ({
 	targetUserId,
 	placeToShow,
 	user,
+	loadingStart,
 }) => {
 	const [dbFeatures, setDbFeatures] = useState<Feature[]>([]);
 	const [sideBarTrips, setSideBarTrips] = useState<SideBarTrip[]>([]);
@@ -64,6 +71,7 @@ const Map: React.FC<Props> = ({
 
 	const userId = targetUserId ?? user!.uid;
 	useEffect(() => {
+		loadingStart();
 		const fetchMapData = async () => {
 			const featuresDoc = await db.collection('features').doc(userId).get();
 
@@ -80,6 +88,8 @@ const Map: React.FC<Props> = ({
 			if (tripsDoc.exists) {
 				const trips: Trip[] = tripsDoc.data()?.userTrips ?? [];
 				setTrips(trips);
+			} else {
+				setTrips([]);
 			}
 		};
 
@@ -95,6 +105,12 @@ const Map: React.FC<Props> = ({
 	}, [changesSaved]);
 
 	useEffect(() => {
+		return () => {
+			onbeforeunload = null;
+		};
+	}, []);
+
+	useEffect(() => {
 		setSideBarTrips(getSideBarTrips(places, trips));
 	}, [trips, places]);
 
@@ -106,7 +122,7 @@ const Map: React.FC<Props> = ({
 			await db.collection('trips').doc(userId).set({
 				userTrips: trips,
 			});
-			setChangesSaved(true);
+			// setChangesSaved(true);
 		},
 		[trips]
 	);
@@ -169,6 +185,7 @@ const mapDispatchToProps = (
 ): LinkDispatchToProps => ({
 	setTrips: (trips) => dispatch(setTrips(trips)),
 	setPlaces: (places) => dispatch(setPlaces(places)),
+	loadingStart: () => dispatch(loadingStart()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Map);

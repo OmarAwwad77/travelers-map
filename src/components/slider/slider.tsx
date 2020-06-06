@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import {
 	Wrapper,
@@ -14,6 +14,7 @@ interface AnimState {
 	out: number;
 	dir?: AnimDir;
 	lastChange: number;
+	running: boolean;
 }
 const throttle = 1000;
 
@@ -28,7 +29,16 @@ const Slider: React.FC<Props> = ({ urls, width, height, paddingTop }) => {
 		in: 0,
 		out: -1,
 		lastChange: 0,
+		running: false,
 	});
+
+	useEffect(() => {
+		if (animState.running) {
+			setTimeout(() => {
+				setAnimState((prev) => ({ ...prev, running: false }));
+			}, throttle);
+		}
+	}, [animState.running]);
 
 	const slide = (dir: AnimDir) => {
 		const newOut = animState.in;
@@ -37,10 +47,22 @@ const Slider: React.FC<Props> = ({ urls, width, height, paddingTop }) => {
 
 		if (dir === 'right') {
 			const newIn = (animState.in + 1) % urls.length;
-			setAnimState({ in: newIn, out: newOut, dir: 'left', lastChange: now });
+			setAnimState({
+				in: newIn,
+				out: newOut,
+				dir: 'left',
+				lastChange: now,
+				running: true,
+			});
 		} else {
 			const newIn = animState.in === 0 ? urls.length - 1 : animState.in - 1;
-			setAnimState({ in: newIn, out: newOut, dir: 'right', lastChange: now });
+			setAnimState({
+				in: newIn,
+				out: newOut,
+				dir: 'right',
+				lastChange: now,
+				running: true,
+			});
 		}
 	};
 
@@ -59,6 +81,7 @@ const Slider: React.FC<Props> = ({ urls, width, height, paddingTop }) => {
 					key={i}
 					url={url}
 					type={getAnimType(i)}
+					running={animState.running}
 					dir={animState.dir}
 					default={animState.out === -1 && i === 0}
 				/>
@@ -69,7 +92,7 @@ const Slider: React.FC<Props> = ({ urls, width, height, paddingTop }) => {
 			/>
 			<LeftArrow
 				disabled={arrowDisabled}
-				{...(!arrowDisabled && { onClick: () => slide('right') })}
+				{...(!arrowDisabled && { onClick: () => slide('left') })}
 			/>
 		</Wrapper>
 	);

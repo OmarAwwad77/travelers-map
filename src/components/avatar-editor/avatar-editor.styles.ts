@@ -12,6 +12,7 @@ export const Wrapper = styled.div`
 	height: 23rem;
 	display: flex;
 	flex-direction: column;
+	align-items: center;
 	justify-content: center;
 `;
 
@@ -51,4 +52,32 @@ export const ErrorMessage = styled.span`
 	height: 2rem;
 	text-align: center;
 	overflow: auto;
+`;
+
+export const RemoveImage = styled.button`
+	font-family: inherit;
+	font-weight: 600;
+	outline: none;
+	border: none;
+	background: none;
+	text-transform: capitalize;
+	font-size: 1.3rem;
+	color: #333;
+	transition: all 0.2s ease-out;
+	&:hover {
+		color: ${(p) => p.theme.colors.secondary1};
+	}
+`;
+
+export const ChangeImage = styled.label`
+	font-weight: 600;
+	font-size: 1.3rem;
+	text-transform: capitalize;
+	color: #333;
+	cursor: pointer;
+	margin-bottom: 2rem;
+	transition: all 0.2s ease-out;
+	&:hover {
+		color: ${(p) => p.theme.colors.secondary1};
+	}
 `;

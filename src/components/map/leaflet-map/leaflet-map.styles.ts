@@ -42,7 +42,7 @@ export const SaveIconWrapper = styled.div`
 	width: 3rem;
 	height: 3rem;
 	padding: 0.7rem;
-	background: #fff;
+	background: ${(p) => p.theme.colors.secondary2};
 	position: absolute;
 	right: 1rem;
 	top: 30%;

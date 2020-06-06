@@ -55,15 +55,18 @@ export const EditLink = styled.span<EditLinkProps>`
 		css`
 			&::after {
 				content: ${(p: ThemedProps<EditLinkProps>) => "'" + p.disabled + "'"};
+				width: 20rem;
 				position: absolute;
 				top: -100%;
-				left: -100%;
+				left: -50%;
+				right: -50%;
 				transition: all 0.3s ease-out;
 				opacity: 0;
 				visibility: hidden;
 				background: #fff;
 				border: 1px solid #b9b4b4;
 				font-size: 1.4rem;
+				text-align: center;
 			}
 		`}
 `;

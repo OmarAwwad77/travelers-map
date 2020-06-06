@@ -104,9 +104,8 @@ export const toggleLikingPost = async (
 	if (featureDoc.exists) {
 		const userFeatures: Feature[] = featureDoc.data()?.userFeatures;
 		const placeIdToUpdate = userFeatures.findIndex(
-			(feature) => feature.properties?.id === +postId
+			(feature) => feature.properties?.id === postId
 		);
-		console.log(placeIdToUpdate);
 		const updatedUserFeatures = userFeatures.map((feature, i) => {
 			if (i === placeIdToUpdate) {
 				return {
@@ -188,11 +187,7 @@ export const addPlace = async (place: PlaceToAdd) => {
 			],
 		};
 		await db.collection('trips').add(trip);
-
-		console.log('place added', place);
-	} catch (error) {
-		console.log('error adding a place', place);
-	}
+	} catch (error) {}
 };
 
 export const deleteUserFeatures = async (userId: string) => {
@@ -274,8 +269,9 @@ export const deleteTrip = async (trip: Trip) => {
 		.collection('trips')
 		.where('userTrips', 'array-contains', trip)
 		.get();
-
-	docRef.docs[0].ref.update({
-		userTrips: arrayRemove(trip),
-	});
+	if (docRef.docs[0].exists) {
+		docRef.docs[0].ref.update({
+			userTrips: arrayRemove(trip),
+		});
+	}
 };

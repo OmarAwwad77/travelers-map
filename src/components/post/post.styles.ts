@@ -22,6 +22,10 @@ export const PostHeader = styled.div`
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+
+	${MediaQueries.BREAK_POINT_430_PX(css`
+		padding: 0.5rem;
+	`)}
 `;
 
 export const PostContent = styled.div`
@@ -51,6 +55,9 @@ export const PostOwner = styled(UserName)`
 	font-size: initial;
 	margin-right: auto;
 	margin-left: 1.5rem;
+	${MediaQueries.BREAK_POINT_430_PX(css`
+		font-size: 1.4rem;
+	`)}
 `;
 
 export const IconWithText = styled.span<{ gridArea?: string }>`

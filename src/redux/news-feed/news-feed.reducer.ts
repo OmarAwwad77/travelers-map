@@ -19,27 +19,73 @@ const initialState: NewsFeedState = {
 
 const updatePostsLikeStatus = (
 	posts: Post[],
+	myPosts: Post[],
+	strangerPosts: Post[],
 	postId: string,
 	liked: boolean,
 	userId: string
 ) => {
-	const postToUpdateIndex = posts.findIndex((post) => post.placeId === +postId);
-	return posts.map((post, i) => {
-		if (i === postToUpdateIndex) {
-			return {
-				...post,
-				likes: liked
-					? post.likes.filter((id: string) => id !== userId)
-					: [...post.likes, userId],
-			};
-		} else {
-			return post;
-		}
-	});
+	const postToUpdate = [...posts, ...strangerPosts, ...myPosts].find(
+		(post) => post.placeId.toString() === postId
+	);
+
+	// return posts.map((post, i) => {
+	// 	if (i === postToUpdateIndex) {
+	// 		return {
+	// 			...post,
+	// 			likes: liked
+	// 			? post.likes.filter((id: string) => id !== userId)
+	// 			: [...post.likes, userId],
+	// 		};
+	// 	} else {
+	// 		return post;
+	// 	}
+	// });
+
+	return {
+		myPosts: myPosts.map((post) => {
+			if (post.placeId === postToUpdate?.placeId) {
+				return {
+					...post,
+					likes: liked
+						? post.likes.filter((id: string) => id !== userId)
+						: [...post.likes, userId],
+				};
+			} else {
+				return post;
+			}
+		}),
+		strangerPosts: strangerPosts.map((post) => {
+			if (post.placeId === postToUpdate?.placeId) {
+				return {
+					...post,
+					likes: liked
+						? post.likes.filter((id: string) => id !== userId)
+						: [...post.likes, userId],
+				};
+			} else {
+				return post;
+			}
+		}),
+		posts: posts.map((post) => {
+			if (post.placeId === postToUpdate?.placeId) {
+				return {
+					...post,
+					likes: liked
+						? post.likes.filter((id: string) => id !== userId)
+						: [...post.likes, userId],
+				};
+			} else {
+				return post;
+			}
+		}),
+	};
 };
 
 const updatePostsComments = (
 	posts: Post[],
+	myPosts: Post[],
+	strangerPosts: Post[],
 	replayToId: string,
 	dbComment: DbComment,
 	postId: string,
@@ -47,6 +93,7 @@ const updatePostsComments = (
 	user: User
 ) => {
 	// prepare comment
+
 	const { url, displayName } = user;
 	const toBeAddedComment: Comment = {
 		...dbComment,
@@ -58,7 +105,9 @@ const updatePostsComments = (
 
 	// get the post
 	const postToUpdate = {
-		...posts.find((post) => post.placeId.toString() === postId)!,
+		...[...posts, ...strangerPosts, ...myPosts].find(
+			(post) => post.placeId.toString() === postId
+		)!,
 	};
 	let updatedPost: Post;
 
@@ -84,12 +133,26 @@ const updatePostsComments = (
 		};
 	}
 
-	return posts.map((post) => {
-		if (post.placeId.toString() === postId) {
-			return updatedPost;
-		}
-		return post;
-	});
+	return {
+		myPosts: myPosts.map((post) => {
+			if (post.placeId.toString() === postId) {
+				return updatedPost;
+			}
+			return post;
+		}),
+		strangerPosts: strangerPosts.map((post) => {
+			if (post.placeId.toString() === postId) {
+				return updatedPost;
+			}
+			return post;
+		}),
+		posts: posts.map((post) => {
+			if (post.placeId.toString() === postId) {
+				return updatedPost;
+			}
+			return post;
+		}),
+	};
 };
 
 const newsFeedReducer = (
@@ -128,8 +191,10 @@ const newsFeedReducer = (
 		case 'ADD_COMMENT_SUCCESS':
 			return {
 				...state,
-				posts: updatePostsComments(
+				...updatePostsComments(
 					state.posts,
+					state.myPosts,
+					state.strangerPosts,
 					action.replayToId,
 					action.comment,
 					action.postId,
@@ -141,8 +206,10 @@ const newsFeedReducer = (
 		case 'LIKE_POST_TOGGLE_SUCCESS':
 			return {
 				...state,
-				posts: updatePostsLikeStatus(
+				...updatePostsLikeStatus(
 					state.posts,
+					state.myPosts,
+					state.strangerPosts,
 					action.postId,
 					action.liked,
 					action.userId
@@ -159,6 +226,7 @@ const newsFeedReducer = (
 		case 'FETCH_USER_POSTS_SUCCESS':
 			return {
 				...state,
+				loading: false,
 				strangerPosts: action.posts,
 			};
 

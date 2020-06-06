@@ -1,6 +1,6 @@
 import React, { useState, useRef, ChangeEvent, useEffect } from 'react';
 import { useTheme } from 'styled-components';
-import { useHistory } from 'react-router-dom';
+import { useHistory, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 
 import AvatarEditor, { Editor } from '../avatar-editor/avatar-editor';
@@ -64,7 +64,7 @@ const EditProfile: React.FC<Props> = ({
 		isValid: true,
 	});
 
-	const { goBack, push } = useHistory();
+	const { goBack } = useHistory();
 	const { colors } = useTheme();
 
 	const [profileImg, setProfileImg] = useState<ProfileImageState>({
@@ -85,7 +85,6 @@ const EditProfile: React.FC<Props> = ({
 	const onProfileImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
 		e.preventDefault();
 		const file = e.target.files?.[0];
-		console.log(file);
 		if (!file) return;
 
 		// validate file
@@ -146,12 +145,10 @@ const EditProfile: React.FC<Props> = ({
 		if (editorRef.current) {
 			// both name and url
 			const canvasElement = editorRef.current.getImage();
-			console.log(canvasElement);
 			canvasElement.toBlob((blob) => {
 				img = blob!;
-				console.log(img);
 				updateProfileStart(displayName, img, uid);
-			});
+			}, 'image/jpeg');
 		} else {
 			updateProfileStart(displayName, img, uid);
 		}
@@ -163,10 +160,10 @@ const EditProfile: React.FC<Props> = ({
 	useEffect(() => {
 		if (redirectTo) {
 			resetRedirectTo();
-			push(redirectTo);
 		}
 	}, [redirectTo]);
 
+	if (redirectTo) return <Redirect to={redirectTo} />;
 	return error?.label === 'unknown' ? (
 		<WithModel
 			backDropOnClick={() => {

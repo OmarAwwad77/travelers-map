@@ -37,9 +37,11 @@ import {
 	selectTrips,
 	selectMarkerToAdd,
 	selectLoading,
+	selectSideBarTrips,
 } from '../../redux/map/map.selectors';
 import { selectUserId } from '../../redux/user/user.selectors';
 import Spinner from '../spinner/spinner';
+import { SideBarTrip } from '../map/sidebar/sidebar';
 
 export type Ids = 'main' | 'extra1';
 export type ImageUpload = {
@@ -63,6 +65,7 @@ interface LinkDispatchToProps {
 interface LinkStateToProps
 	extends Pick<MapState, 'trips' | 'markerToAdd' | 'loading'> {
 	userId: string;
+	sidebarTrips: SideBarTrip[];
 }
 
 type Props = OwnProps & LinkDispatchToProps & LinkStateToProps;
@@ -75,6 +78,7 @@ const AddPlace: React.FC<Props> = ({
 	markerToAdd,
 	setMarkerToAdd,
 	userId,
+	sidebarTrips,
 }) => {
 	const [tripDropdown, setTripDropdown] = useState(defaultOption);
 	const [tripOptions, setTripOptions] = useState<string[]>([]);
@@ -145,8 +149,11 @@ const AddPlace: React.FC<Props> = ({
 	}, []);
 
 	useEffect(() => {
-		setTripOptions(trips.map((trip) => trip.tripName));
-	}, [trips]);
+		const tripsWithPlaces = sidebarTrips.filter(
+			(sidebarTrip) => sidebarTrip.places.length !== 0
+		);
+		setTripOptions(tripsWithPlaces.map((trip) => trip.tripName));
+	}, [sidebarTrips]);
 
 	const placeId = markerToAdd?.markerId!;
 	const placeCoords = markerToAdd?.markerCoords!;
@@ -368,6 +375,7 @@ const mapStateToProps = createStructuredSelector<
 	LinkStateToProps
 >({
 	trips: selectTrips,
+	sidebarTrips: selectSideBarTrips,
 	userId: selectUserId,
 	markerToAdd: selectMarkerToAdd,
 	loading: selectLoading,

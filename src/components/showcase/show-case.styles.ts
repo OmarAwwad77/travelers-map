@@ -46,6 +46,7 @@ export const ImageComposition = styled.div`
 
 export const Img = styled.div<{ url: string }>`
 	position: absolute;
+	cursor: pointer;
 	top: 0;
 	left: 0;
 	z-index: 0;
@@ -74,6 +75,10 @@ export const Img = styled.div<{ url: string }>`
 	${media.BREAK_POINT_430_PX(css`
 		width: 25rem;
 		height: 35rem;
+		&:not(:first-child) {
+			top: 12%;
+			left: 16%;
+		}
 	`)}
 `;
 

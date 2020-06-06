@@ -1,10 +1,12 @@
-import React, { ChangeEvent } from 'react';
+import React, { ChangeEvent, useEffect, useRef } from 'react';
 import Editor from 'react-avatar-editor';
 import {
 	Wrapper,
 	ImageUploadIcon,
 	ErrorMessage,
 	ImageUploadWrapper,
+	ChangeImage,
+	RemoveImage,
 } from './avatar-editor.styles';
 import { ReactComponent as Plus } from '../../assets/icons/plus.svg';
 export { Editor };
@@ -12,7 +14,9 @@ export { Editor };
 interface OwnProps {
 	inputId: string;
 	url: string;
+
 	errorMessage: string | null;
+
 	onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 	onCancel: () => void;
 }
@@ -20,10 +24,18 @@ type Props = OwnProps;
 const AvatarEditor = React.forwardRef<Editor, Props>((props, ref) => {
 	const { inputId, onChange, url, onCancel, errorMessage } = props;
 
+	const firstMount = useRef(true);
+	useEffect(() => {
+		firstMount.current = false;
+	}, []);
+
 	return (
 		<>
 			<Wrapper>
-				<ImageUploadWrapper withUrl={!!url}>
+				<ImageUploadWrapper
+					style={{ overflow: firstMount.current ? 'hidden' : 'unset' }}
+					withUrl={!!url}
+				>
 					<input key={url} id={inputId} type='file' onChange={onChange} />
 					{url ? (
 						<Editor
@@ -48,8 +60,8 @@ const AvatarEditor = React.forwardRef<Editor, Props>((props, ref) => {
 			</Wrapper>
 			{url && (
 				<>
-					<button onClick={onCancel}>remove Image</button>
-					<label htmlFor={inputId}>change Image</label>
+					<RemoveImage onClick={onCancel}>remove Image</RemoveImage>
+					<ChangeImage htmlFor={inputId}>change Image</ChangeImage>
 				</>
 			)}
 		</>

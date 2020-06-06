@@ -50,7 +50,7 @@ const UserTrip: React.FC<Props> = ({
 						key={place.placeId}
 						onClick={() =>
 							setMapConfig({
-								zoom: 4,
+								zoom: 9,
 								center: [...(place.placeCoords as any)] as any,
 							})
 						}

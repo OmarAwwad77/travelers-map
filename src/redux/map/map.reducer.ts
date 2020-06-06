@@ -29,6 +29,7 @@ const mapReducer = (state = initialState, action: MapActions): MapState => {
 		case 'ADD_TRIP':
 			return {
 				...state,
+
 				trips: addItem(state.trips, action.trip) as Trip[],
 			};
 
@@ -41,6 +42,7 @@ const mapReducer = (state = initialState, action: MapActions): MapState => {
 		case 'SET_TRIPS':
 			return {
 				...state,
+				loading: false,
 				trips: action.trips,
 			};
 

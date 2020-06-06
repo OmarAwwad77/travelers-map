@@ -10,6 +10,7 @@ import {
 	PostsArea,
 	SideBarWrapper,
 	Loading,
+	NoContent,
 } from './news-feed.styles';
 import { NewsFeedState } from '../../redux/news-feed/news-feed.types';
 import { fetchPostsStart, fetchUsersStart } from '../../redux/root.actions';
@@ -52,6 +53,9 @@ const NewsFeed: React.FC<Props> = ({
 	return (
 		<Wrapper>
 			<PostsArea>
+				{posts.length === 0 && (
+					<NoContent>start following users to get News Feed.</NoContent>
+				)}
 				{posts.map((post, i) => (
 					<Post currentUser={currentUser!} key={post.placeId} post={post} />
 				))}

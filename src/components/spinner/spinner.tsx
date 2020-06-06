@@ -1,11 +1,19 @@
 import React, { CSSProperties } from 'react';
 import styled, { css } from 'styled-components';
 
-const Wrapper = styled.div<CSSProperties>`
+const Wrapper = styled.div<CSSProperties & { center?: boolean }>`
 	width: ${(p) => p.width ?? '100%'};
 	height: ${(p) => p.height ?? '100%'};
 	margin: ${(p) => p.margin};
 	position: relative;
+
+	${(p) =>
+		p.center &&
+		css`
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+		`}
 
 	@-webkit-keyframes sk-bounce {
 		0%,
@@ -54,6 +62,7 @@ const Bounce2 = styled.div<{ color?: string }>`
 type Props = {
 	color?: string;
 	className?: string;
+	center?: boolean;
 } & CSSProperties;
 const Spinner: React.FC<Props> = ({
 	color,
@@ -61,8 +70,15 @@ const Spinner: React.FC<Props> = ({
 	width,
 	height,
 	margin,
+	center,
 }) => (
-	<Wrapper width={width} margin={margin} height={height} className={className}>
+	<Wrapper
+		center={center}
+		width={width}
+		margin={margin}
+		height={height}
+		className={className}
+	>
 		<Bounce1 color={color} />
 		<Bounce2 color={color} />
 	</Wrapper>

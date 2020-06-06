@@ -106,6 +106,11 @@ const LeafletMap: React.FC<Props> = ({
 	}, [places]);
 
 	useEffect(() => {
+		setMapConfig(config);
+		x();
+	}, [config]);
+
+	useEffect(() => {
 		if (markersToAdd?.length) {
 			setGeoJson({ ...geoJson });
 		}
@@ -147,11 +152,12 @@ const LeafletMap: React.FC<Props> = ({
 
 	useEffect(() => {
 		x();
-	}, [config.center]);
+	}, [mapConfig]);
+
 	const onFeatureGroupReady = (reactFGref: FeatureGroup) => {
 		if (reactFGref) {
 			editableFG = reactFGref;
-			x();
+			// x();
 		}
 	};
 
@@ -175,17 +181,15 @@ const LeafletMap: React.FC<Props> = ({
 		}
 
 		const FG = editableFG.leafletElement;
-		const mapData = getMapData(FG, geoJson);
+		const mapData = getMapData(FG, geoJson, true);
 
 		const transformedFeatures = transformFeaturesForUpload(mapData.features);
-		console.log(transformedFeatures);
 		try {
 			onSave(transformedFeatures);
-		} catch (error) {
-			console.log('error saving');
-		}
+		} catch (error) {}
 
-		alert('check firebase');
+		onChange(true);
+		alert('Changes Saved');
 	};
 
 	const addMyCurrentLocation = () => {
@@ -292,7 +296,10 @@ const LeafletMap: React.FC<Props> = ({
 				<DropDown
 					list={['Light', 'Light2', 'Dark']}
 					value={mapStyle as string}
-					onChangeHandler={setMapStyle}
+					onChangeHandler={(val: MapStyle) => {
+						saveChanges();
+						setMapStyle(val);
+					}}
 				/>
 			</DropDownWrapper>
 			{!withTargetUser && (
@@ -301,7 +308,10 @@ const LeafletMap: React.FC<Props> = ({
 						Add My Location <LocateMeIcon />
 					</LocateMe>
 					<AddPlaceByName
-						onFocus={() => setShowInputResults(true)}
+						onFocus={() => {
+							saveChanges();
+							setShowInputResults(true);
+						}}
 						// onBlur={() => setShowInputResults(false)}
 						value={placeInput}
 						onChange={placeNameOnChange}
@@ -322,7 +332,7 @@ const LeafletMap: React.FC<Props> = ({
 			)}
 			{!withTargetUser && (
 				<SaveIconWrapper onClick={saveMapData}>
-					<SaveIcon style={{ width: '100%', color: '#464646' }} />
+					<SaveIcon style={{ width: '100%', color: '#fff' }} />
 				</SaveIconWrapper>
 			)}
 		</Wrapper>
@@ -360,18 +370,10 @@ const mapGeoJsonToLayers = (feature: Feature, withTargetUser?: boolean) => {
 		case 'LineString':
 			return (
 				<Polyline
-					key={Date.now()}
+					key={Math.random()}
 					weight={10}
 					opacity={0.2}
 					positions={coordinates as PolylineCoordinates}
-				/>
-			);
-
-		case 'Polygon':
-			return (
-				<Polygon
-					key={properties!.id}
-					positions={coordinates as PolygonCoordinates}
 				/>
 			);
 	}

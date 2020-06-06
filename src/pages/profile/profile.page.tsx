@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import {
 	PostsArea,
 	Loading,
+	NoContent,
 } from '../../components/news-feed/news-feed.styles';
 import SideBar from '../../components/sidebar/sidebar';
 import Post from '../../components/post/post';
@@ -117,6 +118,7 @@ const Profile: React.FC<Props> = ({
 		<Wrapper>
 			{nestedRoutes}
 			<PostsArea>
+				{myPosts.length === 0 && <NoContent>you haven't posted yet </NoContent>}
 				{myPosts.map((post) => (
 					<Post currentUser={user!} key={post.placeId} post={post} />
 				))}
@@ -125,28 +127,6 @@ const Profile: React.FC<Props> = ({
 				<SideBar title='Edit Profile'>
 					<TabsWrapper>
 						<Tabs>
-							<Tab name='following'>
-								{followingState.map(({ userId, displayName, profileImg }) => (
-									<User
-										displayName={displayName}
-										userImg={profileImg}
-										followed={follows.includes(userId)}
-										userId={userId}
-										key={userId}
-									/>
-								))}
-							</Tab>
-							<Tab name='followers'>
-								{followersState.map(({ userId, displayName, profileImg }) => (
-									<User
-										displayName={displayName}
-										userImg={profileImg}
-										followed={follows.includes(userId)}
-										userId={userId}
-										key={userId}
-									/>
-								))}
-							</Tab>
 							<Tab name='Edit'>
 								<EditLinksWrapper>
 									<EditLink onClick={() => push(`${path}/edit-profile`)}>
@@ -185,6 +165,38 @@ const Profile: React.FC<Props> = ({
 										delete account
 									</EditLink>
 								</EditLinksWrapper>
+							</Tab>
+							<Tab name='following'>
+								{followingState.length === 0 && (
+									<NoContent center fontSize='1.5rem'>
+										no users yet
+									</NoContent>
+								)}
+								{followingState.map(({ userId, displayName, profileImg }) => (
+									<User
+										displayName={displayName}
+										userImg={profileImg}
+										followed={follows.includes(userId)}
+										userId={userId}
+										key={userId}
+									/>
+								))}
+							</Tab>
+							<Tab name='followers'>
+								{followersState.length === 0 && (
+									<NoContent center fontSize='1.5rem'>
+										no followers yet
+									</NoContent>
+								)}
+								{followersState.map(({ userId, displayName, profileImg }) => (
+									<User
+										displayName={displayName}
+										userImg={profileImg}
+										followed={follows.includes(userId)}
+										userId={userId}
+										key={userId}
+									/>
+								))}
 							</Tab>
 						</Tabs>
 					</TabsWrapper>

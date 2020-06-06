@@ -40,7 +40,6 @@ const DropDown = (props: Props) => {
 			<Input
 				id={props.list[0]}
 				onBlur={() => {
-					console.log('onBlur');
 					setListShownState(false);
 				}}
 			/>
@@ -57,25 +56,3 @@ const DropDown = (props: Props) => {
 };
 
 export default DropDown;
-
-/* <input
-	id={props.list[0]}
-	style={{
-		height: '100%',
-		width: '100%',
-		position: 'absolute',
-		top: '50%',
-		left: '50%',
-		zIndex: 22,
-		transform: 'translate(-50%, -50%)',
-		border: 'none',
-		outline: 'none',
-		cursor: 'pointer',
-		color: 'transparent',
-		background: 'transparent',
-	}}
-	onBlur={() => {
-		console.log('onBlur');
-		setListShownState(false);
-	}}
-/>; */

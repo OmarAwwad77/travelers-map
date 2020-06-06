@@ -1,6 +1,7 @@
 import React, { useState, ChangeEvent } from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
+import { useLocation } from 'react-router-dom';
 
 import { Wrapper, Avatar, ButtonsWrapper } from './add-comment.styles';
 import { addCommentStart } from '../../redux/root.actions';

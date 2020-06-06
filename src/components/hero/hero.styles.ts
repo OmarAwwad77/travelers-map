@@ -17,9 +17,9 @@ export const Wrapper = styled.div`
 
 	${media.BREAK_POINT_850_PX(css`
 		height: unset;
-		margin-bottom: 3rem;
+
 		grid-template-columns: 1fr;
-		grid-template-rows: 1fr 1fr 29rem 10rem;
+		grid-template-rows: max-content 1fr 29rem 10rem;
 		gap: 1rem;
 		align-items: start;
 		grid-template-areas:
@@ -73,7 +73,7 @@ export const HeroButton = styled.button`
 	text-transform: uppercase;
 	background: ${(p) => p.theme.colors.secondary1};
 
-	${media.BREAK_POINT_850_PX(css`
+	/* ${media.BREAK_POINT_850_PX(css`
 		align-self: flex-end;
-	`)}
+	`)} */
 `;

@@ -11,7 +11,7 @@ import {
 
 const Hero = () => {
 	const titleText = `discover beautiful 
-	destinations  `;
+  destinations  `;
 	const { push } = useHistory();
 	return (
 		<Wrapper>

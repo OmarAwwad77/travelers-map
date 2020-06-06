@@ -1,5 +1,6 @@
 import React, { SetStateAction } from 'react';
 import { connect } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import VisibilitySensor from 'react-visibility-sensor';
 
 import { ReactComponent as Logo } from '../../assets/icons/logo.svg';
@@ -24,10 +25,12 @@ const Header: React.FC<Props> = ({
 	toggleShowScrollButton,
 	setShowNavSidebar,
 }) => {
+	const { push } = useHistory();
+
 	return (
 		<VisibilitySensor partialVisibility onChange={toggleShowScrollButton}>
 			<Wrapper id='header'>
-				<LogoWrapper>
+				<LogoWrapper onClick={() => push('/')}>
 					<Logo height='100%' width='5rem' />
 					<span>traveler's map</span>
 				</LogoWrapper>

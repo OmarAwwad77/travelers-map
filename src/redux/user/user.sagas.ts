@@ -407,7 +407,6 @@ function* deleteAccountSaga({ password }: DeleteAccountStart): SagaIterator {
 
 		yield put(deleteAccountSuccess());
 	} catch (error) {
-		console.log(error);
 		switch (error.code) {
 			case 'auth/wrong-password':
 				yield put(
@@ -462,7 +461,6 @@ function* updateProfileSage({
 			)
 		);
 	} catch (error) {
-		console.log(error);
 		yield put(
 			updateProfileFailure({
 				label: 'unknown',
@@ -485,9 +483,7 @@ function* toggleFollowUserSaga({
 		]);
 
 		yield put(toggleFollowUserSuccess(targetUserId, followed));
-	} catch (error) {
-		console.log(error);
-	}
+	} catch (error) {}
 }
 
 function* onEmailSignInSaga(): SagaIterator {

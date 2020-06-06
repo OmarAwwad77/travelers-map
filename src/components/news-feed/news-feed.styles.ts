@@ -45,3 +45,24 @@ export const Loading = styled(Spinner)`
 	top: 50%;
 	transform: translate(-50%, -50%);
 `;
+
+export const NoContent = styled.span<{
+	fontSize?: string;
+	y?: string;
+	center?: boolean;
+}>`
+	font-size: ${(p) => p.fontSize ?? '1.5rem'};
+	text-align: center;
+	text-transform: capitalize;
+	transform: translateY(${(p) => p.y ?? 0});
+	color: #8c8b8b;
+
+	${(p) =>
+		p.center &&
+		css`
+			position: absolute;
+			left: 50%;
+			top: 50%;
+			transform: translate(-50%, -50%);
+		`}
+`;

@@ -53,7 +53,11 @@ import {
 	selectUser,
 	selectUserFollowsArr,
 } from '../user/user.selectors';
-import { selectPosts } from './news-feed.selectors';
+import {
+	selectPosts,
+	selectMyPosts,
+	selectStrangerPosts,
+} from './news-feed.selectors';
 import { DbUser, User as CurrentUser } from '../user/user.types';
 
 function* getCommentSaga(id: string): SagaIterator {
@@ -169,12 +173,11 @@ function* addCommentSaga({
 			// nested. update parent
 			yield call(addNestedComment, commentDoc.ref, addedCommentId);
 		}
+
 		yield put(
 			addCommentSuccess(replayToId, dbComment, postId, user, addedCommentId)
 		);
-	} catch (error) {
-		console.log(error);
-	}
+	} catch (error) {}
 }
 
 function* likePostToggleSaga({
@@ -239,9 +242,7 @@ function* fetchPostsSaga(): SagaIterator {
 		} else {
 			yield put(fetchPostsSuccess([]));
 		}
-	} catch (error) {
-		console.log(error);
-	}
+	} catch (error) {}
 }
 
 function* onFetchPostsSaga(): SagaIterator {
@@ -269,9 +270,7 @@ function* onFetchUsersSaga(): SagaIterator {
 					users.push({ userId: doc.id, ...(doc.data() as DbUser) })
 			);
 			yield put(fetchUsersSuccess(users));
-		} catch (error) {
-			console.log(error);
-		}
+		} catch (error) {}
 	}
 }
 

@@ -7,13 +7,15 @@ export const Wrapper = styled.div`
 	align-items: center;
 	justify-content: space-around;
 	min-height: 45rem;
-	min-width: 32rem;
+	min-width: 28rem;
 `;
 
 export const DisplayNameWrapper = styled.div`
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	height: 10rem;
+	justify-content: space-evenly;
 `;
 
 export const DisplayName = styled.input`

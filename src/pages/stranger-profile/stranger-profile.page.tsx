@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { useParams, Redirect } from 'react-router-dom';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 
 import {
 	UserAvatar,
@@ -20,11 +20,16 @@ import { AppState } from '../../redux/root.reducer';
 import {
 	selectStrangerPosts,
 	selectUsers,
+	selectLoading,
 } from '../../redux/news-feed/news-feed.selectors';
-import { PostsArea } from '../../components/news-feed/news-feed.styles';
+import {
+	PostsArea,
+	Loading,
+} from '../../components/news-feed/news-feed.styles';
 import Post from '../../components/post/post';
 import { selectUser } from '../../redux/user/user.selectors';
-import { UserState } from '../../redux/user/user.types';
+import { UserState, DbUser } from '../../redux/user/user.types';
+import { getUserDocFromDb } from '../../firebase/firebase.utils';
 
 const Wrapper = styled.section`
 	display: flex;
@@ -59,7 +64,7 @@ interface LinkDispatchToProps {
 	toggleFollowUserStart: typeof toggleFollowUserStart;
 }
 interface LinkStateToProps
-	extends Pick<NewsFeedState, 'strangerPosts' | 'users'>,
+	extends Pick<NewsFeedState, 'strangerPosts' | 'users' | 'loading'>,
 		Pick<UserState, 'user'> {}
 interface OwnProps {}
 type Props = LinkDispatchToProps & LinkStateToProps & OwnProps;
@@ -70,6 +75,7 @@ const StrangerProfile: React.FC<Props> = ({
 	toggleFollowUserStart,
 	user,
 	users,
+	loading,
 }) => {
 	const { id } = useParams<{ id: string }>();
 	let url: string | undefined;
@@ -79,17 +85,19 @@ const StrangerProfile: React.FC<Props> = ({
 		if (stranger) {
 			url = stranger.profileImg;
 			name = stranger.displayName;
-		} else {
-			// get user from db
 		}
 	}
 	useEffect(() => {
 		fetchUserPostsStart(id);
 	}, []);
 
+	const { colors } = useTheme();
+
+	if (loading) return <Loading color={colors.mainDarker} />;
+
 	return (
 		<Wrapper>
-			{/* {(!url || !name) && <Redirect to='/' />} */}
+			{(!url || !name) && <Redirect to='/' />}
 			<PostsArea>
 				{strangerPosts.map((post) => (
 					<Post currentUser={user!} key={post.placeId} post={post} />
@@ -127,6 +135,7 @@ const mapStateToProps = createStructuredSelector<
 	strangerPosts: selectStrangerPosts,
 	user: selectUser,
 	users: selectUsers,
+	loading: selectLoading,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(StrangerProfile);
