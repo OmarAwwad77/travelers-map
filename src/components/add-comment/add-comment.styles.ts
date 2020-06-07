@@ -38,3 +38,19 @@ export const ButtonsWrapper = styled.div`
 	/* display: flex;
 	flex-direction: column; */
 `;
+
+export const Button = styled.button`
+	border: none;
+	outline: none;
+	padding: 0.5rem;
+	background: ${(p) => p.theme.colors.secondary2};
+	color: #fff;
+	border-radius: 5rem;
+	margin: 0.5rem;
+
+	&:hover,
+	&:active {
+		background: #fff;
+		color: ${(p) => p.theme.colors.secondary2};
+	}
+`;

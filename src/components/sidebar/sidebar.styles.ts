@@ -6,6 +6,11 @@ export const Wrapper = styled.div<{ width?: string }>`
 	height: 100%;
 	border-left: 2px solid ${(p) => p.theme.colors.mainDarker};
 	min-height: 25rem;
+
+	& > *:last-child {
+		margin-bottom: 2rem;
+	}
+
 	${MediaQueries.BREAK_POINT_850_PX(css`
 		border: none;
 		border-bottom: 2px solid ${(p) => p.theme.colors.mainDarker};

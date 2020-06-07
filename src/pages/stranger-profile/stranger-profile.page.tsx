@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { useParams, Redirect } from 'react-router-dom';
-import styled, { useTheme } from 'styled-components';
+import styled, { useTheme, css } from 'styled-components';
 
 import {
 	UserAvatar,
@@ -29,14 +29,25 @@ import {
 import Post from '../../components/post/post';
 import { selectUser } from '../../redux/user/user.selectors';
 import { UserState, DbUser } from '../../redux/user/user.types';
-import { getUserDocFromDb } from '../../firebase/firebase.utils';
+import MediaQueries from '../../styles/media-queries';
 
 const Wrapper = styled.section`
 	display: flex;
+
+	${MediaQueries.BREAK_POINT_850_PX(css`
+		flex-direction: column-reverse;
+		padding: 0.5rem;
+		margin-top: 5rem;
+	`)}
 `;
 const SidebarWrapper = styled.div`
 	width: 30%;
 	text-align: center;
+	${MediaQueries.BREAK_POINT_850_PX(css`
+		margin: 0 auto;
+		width: 50%;
+		padding: 0;
+	`)}
 `;
 
 const Avatar = styled(UserAvatar)<{ url: string }>`

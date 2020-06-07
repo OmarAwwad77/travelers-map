@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import { useLocation } from 'react-router-dom';
 
-import { Wrapper, Avatar, ButtonsWrapper } from './add-comment.styles';
+import { Wrapper, Avatar, ButtonsWrapper, Button } from './add-comment.styles';
 import { addCommentStart } from '../../redux/root.actions';
 import { createStructuredSelector } from 'reselect';
 import { AppState } from '../../redux/root.reducer';
@@ -48,8 +48,8 @@ const AddComment: React.FC<Props> = ({
 			/>
 			{showButtons && (
 				<ButtonsWrapper>
-					<button onClick={() => setShowButtons(false)}>Cancel</button>
-					<button
+					<Button onClick={() => setShowButtons(false)}>Cancel</Button>
+					<Button
 						onClick={() => {
 							addCommentStart(replyToId, comment, postId);
 							onCommentAdded?.();
@@ -58,7 +58,7 @@ const AddComment: React.FC<Props> = ({
 						}}
 					>
 						Comment
-					</button>
+					</Button>
 				</ButtonsWrapper>
 			)}
 		</Wrapper>
