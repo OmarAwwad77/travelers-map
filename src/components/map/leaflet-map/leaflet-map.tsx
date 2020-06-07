@@ -40,6 +40,7 @@ import {
 import { MapStyle, getMapStyle } from './leaflet-map.themes';
 import { getPlacesFromFeatures } from '../map.util';
 import { setPlaces } from '../../../redux/root.actions';
+import { TileLayer } from 'react-leaflet';
 
 /**
  *
@@ -262,7 +263,11 @@ const LeafletMap: React.FC<Props> = ({
 	return (
 		<Wrapper>
 			<Map center={mapConfig.center} zoom={mapConfig.zoom}>
-				{getMapStyle(mapStyle)}
+				{/* {getMapStyle(mapStyle)} */}
+				<TileLayer
+					attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+					url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+				/>
 
 				<FeatureGroup key={Date.now()} ref={onFeatureGroupReady}>
 					{!withTargetUser && (
