@@ -297,7 +297,7 @@ const LeafletMap: React.FC<Props> = ({
 					})}
 				</FeatureGroup>
 			</Map>
-			<DropDownWrapper>
+			{/* <DropDownWrapper>
 				<DropDown
 					list={['Light', 'Light2', 'Dark']}
 					value={mapStyle as string}
@@ -306,7 +306,7 @@ const LeafletMap: React.FC<Props> = ({
 						setMapStyle(val);
 					}}
 				/>
-			</DropDownWrapper>
+			</DropDownWrapper> */}
 			{!withTargetUser && (
 				<>
 					<LocateMe onClick={addMyCurrentLocation}>

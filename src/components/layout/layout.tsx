@@ -35,7 +35,7 @@ const Layout: React.FC<Props> = ({ children, showScrollButton }) => {
 			{showHeader && <Header setShowNavSidebar={setShowNavSidebar} />}
 			<Content>{children}</Content>
 			<NavSidebar show={showNavSidebar} setShow={setShowNavSidebar} />
-			{showScrollButton && (
+			{showScrollButton && showHeader && (
 				<HashLink
 					to='#header'
 					scroll={(el) =>

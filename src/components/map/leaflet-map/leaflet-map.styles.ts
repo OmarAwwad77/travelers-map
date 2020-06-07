@@ -78,7 +78,7 @@ export const LocateMe = styled.a`
 	cursor: pointer;
 	position: absolute;
 	z-index: 2;
-	top: 30px;
+	top: 5px;
 	right: 50%;
 	transform: translateX(50%);
 	text-transform: capitalize;
@@ -107,7 +107,7 @@ export const LocateMeIcon = styled(LocationIcon)`
 export const AddPlaceByName = styled.input`
 	position: absolute;
 	z-index: 2;
-	top: 7rem;
+	top: 45px;
 	right: 50%;
 	transform: translateX(50%);
 	padding: 0.5rem 1rem;
