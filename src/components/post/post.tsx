@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
 import { ReactComponent as ClockIcon } from '../../assets/icons/clock.svg';
 import { ReactComponent as UnLikedIcon } from '../../assets/icons/heart-empty.svg';
@@ -58,6 +59,8 @@ const Post: React.FC<Props> = ({ post, likePostToggleStart, currentUser }) => {
 		userId, //  post owner
 	} = post;
 
+	const { push } = useHistory();
+
 	const [showViewOnMap, setShowViewOnMap] = useState(false);
 
 	const [showPlaceInfo, setShowPlaceInfo] = useState(false);
@@ -94,8 +97,10 @@ const Post: React.FC<Props> = ({ post, likePostToggleStart, currentUser }) => {
 				/>
 			)}
 			<PostHeader>
-				<PostAvatar url={userImg} />
-				<PostOwner>{userDisplayName}</PostOwner>
+				<PostAvatar onClick={() => push(`/user/${userId}`)} url={userImg} />
+				<PostOwner onClick={() => push(`/user/${userId}`)}>
+					{userDisplayName}
+				</PostOwner>
 				<IconWithText>
 					<ClockIcon />
 					<TimeAgo date={createdAt} />
