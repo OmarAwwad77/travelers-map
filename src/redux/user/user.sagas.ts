@@ -394,7 +394,6 @@ function* deleteAccountSaga({ password }: DeleteAccountStart): SagaIterator {
 
 		const userId = firebaseUser.uid;
 
-		yield apply(firebaseUser, firebaseUser.delete, []);
 		// delete user's features
 		yield call(deleteUserFeatures, userId);
 		// delete user form db
@@ -404,6 +403,7 @@ function* deleteAccountSaga({ password }: DeleteAccountStart): SagaIterator {
 		// delete user comments
 		yield call(deleteUserComments, userId);
 		// delete auth user
+		yield apply(firebaseUser, firebaseUser.delete, []);
 
 		yield put(deleteAccountSuccess());
 	} catch (error) {
